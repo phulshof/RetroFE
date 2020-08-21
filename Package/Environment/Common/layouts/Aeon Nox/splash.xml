@@ -1,0 +1,42 @@
+<layout width="1920" height="1080" font="Roboto-Bold.ttf" loadFontSize="32" fontColor="dedede">
+   
+<!--backgroundImage
+  <image src="bkgnd.png" x="0" y="0" height="stretch" width="stretch" layer="0"/>
+-->
+   <!-- logo 
+   <image src="logo.png" x="center" y="center" height="400" xOrigin="center" yOrigin="center" layer="1" alpha="1"/>
+   
+   <text value="Loading..." x="0" y="bottom" xOffset="20" yOrigin="center" yOffset="-220" height="150" width="stretch" fontSize="48" layer="3">
+      <onEnter>
+         <set duration=".2">
+            <animate type="alpha" from="0" to="1" algorithm="easeinquadratic"/>
+         </set>
+      </onEnter>
+      <onIdle>
+         <set duration=".2">
+            <animate type="alpha" from="1" to=".5" algorithm="easeinquadratic"/>
+         </set>
+         <set duration=".2">
+            <animate type="alpha" from=".5" to="1" algorithm="easeinquadratic"/>
+         </set>
+      </onIdle>
+     <onExit>
+         <set duration=".2">
+            <animate type="alpha" from="1" to="0" algorithm="easeinquadratic"/>
+         </set>
+      </onExit>
+   </text>
+    
+   <!-- Text shown when creating meta.db. This will only show once unless meta.db does not exsist
+   <statusText x="0" y="bottom" xOffset="20" yOrigin="center" yOffset="-175" height="150" width="stretch" fontSize="25" layer="3" />
+   -->
+   <video src="video/intro.mp4" height="1080" width="1920" alpha="1">
+        <onExit>                   <set duration=".3"><animate type="alpha"  to="0"/>
+                                                      <animate type="volume" to="0"/></set></onExit>
+   </video>
+
+ </layout>
+
+
+
+

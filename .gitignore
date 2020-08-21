@@ -1,0 +1,12 @@
+syntax: glob
+*.orig
+*.suo
+.git
+Build/
+Documentation/Documentation/*
+Documentation/Artifacts/*
+Documentation/Manual/_build/*
+Configuration/Configuration/bin/**
+Configuration/Configuration/obj/**
+Artifacts/**
+

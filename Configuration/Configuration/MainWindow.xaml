@@ -1,0 +1,74 @@
+﻿<Window x:Class="Configuration.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:v="clr-namespace:Configuration.View"
+        xmlns:vm="clr-namespace:Configuration.ViewModel"
+        xmlns:c="clr-namespace:Configuration.Converter"
+        Title="RetroFE Configuration" Height="550" Width="600"
+        Closing="Window_Closing"
+        >
+    
+    <Window.Resources>
+        <vm:LauncherListVM x:Key="LauncherConfig"/>
+        <vm:CollectionListVM x:Key="CollectionConfig"/>
+        <vm:MainVM x:Key="MainConfig"/>
+        <vm:ControllerVM x:Key="ControllerConfig"/>
+        <c:NullToVisibilityConverter x:Key="NullVisibilityConverter"/>
+    </Window.Resources>
+
+    <TabControl Name="ConfigurationTabControl" SelectionChanged="TabControl_SelectionChanged" FocusableChanged="TabControl_FocusableChanged">
+        <TabItem Header="General">
+            <v:MainSettings 
+                Data="{Binding Mode=TwoWay, Source={StaticResource MainConfig}, Path=.}"
+                Launchers="{Binding LauncherCollection, Source={StaticResource LauncherConfig}}" 
+                Collections="{Binding CollectionList, Source={StaticResource CollectionConfig}}" 
+                />
+        </TabItem>
+        <TabItem Header="Controller">
+            <v:ControlInput Data="{Binding Mode=TwoWay, Source={StaticResource ControllerConfig}, Path=.}" />
+        </TabItem>
+
+        <TabItem Header="Launchers">
+     
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="100" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+        
+                <v:AddRemoveList Grid.Column="0" 
+                                 SelectedItem="{Binding SelectedLauncher, Mode=TwoWay, Source={StaticResource LauncherConfig}}" 
+                                 ListDisplayMemberPath="Name"
+                                 ListItemsSource="{Binding LauncherCollection, Source={StaticResource LauncherConfig}}" 
+                                 AddListItemCommand="{Binding AddListItemCommand, Source={StaticResource LauncherConfig}}" 
+                                 RemoveListItemCommand="{Binding RemoveListItemCommand, Source={StaticResource LauncherConfig}}"/>
+                <StackPanel Grid.Column="1" Orientation="Vertical" Visibility="{Binding SelectedLauncher, Mode=TwoWay, Source={StaticResource LauncherConfig}, Converter={StaticResource NullVisibilityConverter}}">
+                    <v:Launcher Data="{Binding SelectedLauncher, Mode=TwoWay, Source={StaticResource LauncherConfig}}"/>
+                </StackPanel>
+        </Grid>
+        </TabItem>
+        <TabItem Header="Collections">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" MinWidth="100" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <v:AddRemoveList Grid.Column="0" 
+                                     SelectedItem="{Binding SelectedCollection, Mode=TwoWay, Source={StaticResource CollectionConfig}}" 
+                                     ListDisplayMemberPath="Name"
+                                     ListItemsSource="{Binding CollectionList, Source={StaticResource CollectionConfig}}" 
+                                     AddListItemCommand="{Binding AddListItemCommand, Source={StaticResource CollectionConfig}}" 
+                                     RemoveListItemCommand="{Binding RemoveListItemCommand, Source={StaticResource CollectionConfig}}"/>
+                <StackPanel Grid.Column="1" Orientation="Vertical" Visibility="{Binding SelectedCollection, Mode=TwoWay, Source={StaticResource CollectionConfig}, Converter={StaticResource NullVisibilityConverter}}">
+                    <v:Collection 
+                        Data="{Binding SelectedCollection, Mode=TwoWay, Source={StaticResource CollectionConfig}}"
+                        Layouts="{Binding Mode=TwoWay, Source={StaticResource MainConfig}, Path=Layouts}"
+                        Collections="{Binding CollectionList, Source={StaticResource CollectionConfig}}" 
+                        LauncherCollection="{Binding LauncherCollection, Source={StaticResource LauncherConfig}, Mode=TwoWay}" />
+                </StackPanel>
+            </Grid>
+        </TabItem>
+    </TabControl>
+
+    
+</Window>

@@ -1,0 +1,163 @@
+﻿<UserControl x:Class="Configuration.View.Collection"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:c="clr-namespace:Configuration.Converter"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <c:InverseBooleanConverter x:Key="InverseBoolConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolVisibilityConverter"/>
+        <c:InverseBooleanToVisibilityConverter x:Key="InverseBoolVisibilityConverter"/>
+        <c:CollectionExistsConverter x:Key="CollectionExistsConvert"/>
+        <ImageSource x:Key="AddIcon">/Assets/Icons/Add.png</ImageSource>
+        <ImageSource x:Key="DeleteIcon">/Assets/Icons/Delete.png</ImageSource>
+        <Style x:Key="AddButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Padding" Value="1" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Image Source="{StaticResource AddIcon}"  Height="15"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="DeleteButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Padding" Value="1" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Image Source="{StaticResource DeleteIcon}"  Height="15"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </UserControl.Resources>
+    
+    <StackPanel Orientation="Vertical">
+        <GroupBox Header="Execution">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Item (ROM) Folder" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.ListPath}"/>
+                <Button Grid.Row="0" Grid.Column="2" Content="Browse" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.BrowseFolderCommand}" CommandParameter="Item" />
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="File Extensions" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.FileExtensions}"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="(comma separated)" VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Launcher" VerticalAlignment="Center"/>
+                <ComboBox Grid.Row="2" Grid.Column="1"  
+                          ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=LauncherCollection}"
+                          DisplayMemberPath="Name"
+                          SelectedItem="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.Launcher}"
+                          />
+
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Header="Graphics">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Layout" VerticalAlignment="Center"/>
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+                    <ComboBox 
+                        ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Layouts}" 
+                        SelectedItem="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.Layout}"
+                        IsEnabled="{Binding ElementName=DefaultLayout, Path=IsChecked, Converter={StaticResource InverseBoolConverter}}"
+                        Visibility="{Binding ElementName=DefaultLayout, Path=IsChecked, Converter={StaticResource InverseBoolVisibilityConverter}}"/>
+                    <CheckBox Content="Use default layout" 
+                              VerticalAlignment="Center" 
+                              Name="DefaultLayout" 
+                              IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.IsDefaultLayout}"/>
+                </StackPanel>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Video" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.MediaPathVideo}"/>
+                <Button Grid.Row="1" Grid.Column="2" Content="Browse" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.BrowseFolderCommand}" CommandParameter="Video" />
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Title" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.MediaPathTitle}"/>
+                <Button Grid.Row="2" Grid.Column="2" Content="Browse" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.BrowseFolderCommand}" CommandParameter="Title" />
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Logo" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.MediaPathLogo}"/>
+                <Button Grid.Row="3" Grid.Column="2" Content="Browse" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.BrowseFolderCommand}" CommandParameter="Logo" />
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Box" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.MediaPathBox}"/>
+                <Button Grid.Row="4" Grid.Column="2" Content="Browse" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.BrowseFolderCommand}" CommandParameter="Box" />
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Cart" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.MediaPathCart}"/>
+                <Button Grid.Row="5" Grid.Column="2" Content="Browse" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.BrowseFolderCommand}" CommandParameter="Cart" />
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="Snap" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.MediaPathSnap}"/>
+                <Button Grid.Row="6" Grid.Column="2" Content="Browse" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.BrowseFolderCommand}" CommandParameter="Snap" />
+            </Grid>
+        </GroupBox>
+        <!--
+        <GroupBox Header="Submenus">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <Button Style="{StaticResource AddButtonStyle}" HorizontalAlignment="Left"/>
+                    <Button Style="{StaticResource DeleteButtonStyle}" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Data.RemoveSubmenuCommand}" />
+                </StackPanel>
+                <DataGrid DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" ItemsSource="{Binding Data.Submenus}" 
+                      AutoGenerateColumns="False" CanUserAddRows="True" Margin="0,0,0,90" IsEnabled="True" ScrollViewer.CanContentScroll="True">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Collection">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=Collections}" 
+                                              SelectedValuePath="Name"
+                                              SelectedValue="{Binding .}"
+                                              DisplayMemberPath="Name"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Flatten">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                    </DataGrid.Columns>
+                </DataGrid>
+
+            </StackPanel>
+        </GroupBox>
+        -->
+    </StackPanel>
+</UserControl>
