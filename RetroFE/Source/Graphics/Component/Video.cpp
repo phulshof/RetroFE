@@ -32,7 +32,6 @@ Video::Video(std::string file, std::string altFile, int numLoops, Page &p)
     , file_(file)
     , altFile_(altFile)
     , numLoops_(numLoops)
-    , volume_(1.0)
 
 {
     allocateGraphicsMemory( );
@@ -64,7 +63,6 @@ void Video::update(float dt)
             baseViewInfo.ImageHeight = video_->baseViewInfo.ImageHeight;
         }
 
-        video_->setVolume(volume_);
         video_->update(dt);
     }
     Component::update(dt);
@@ -100,9 +98,9 @@ void Video::allocateGraphicsMemory( )
 
         if (file != "")
         {
-            IVideo      *video = new GStreamerVideo();
+            IVideo      *video = new GStreamerVideo( baseViewInfo.Monitor );
             video->initialize();
-            ((GStreamerVideo *)(video))->setNumLoops(numLoops_);
+            ((GStreamerVideo *)(video))->setNumLoops( numLoops_ );
             video_             = new VideoComponent( video, page, file );
         }
     }
@@ -136,16 +134,4 @@ bool Video::isPlaying( )
     {
         return false;
     }
-}
-
-
-void Video::setVolume(double volume)
-{
-	volume_ = volume;
-}
-
-
-double Video::getVolume()
-{
-	return volume_;
 }

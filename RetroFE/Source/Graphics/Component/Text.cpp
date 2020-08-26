@@ -22,12 +22,13 @@
 #include <sstream>
 
 
-Text::Text( std::string text, Page &p, Font *font )
+Text::Text( std::string text, Page &p, Font *font, int monitor )
     : Component(p)
     , textData_(text)
     , fontInst_(font)
 {
     allocateGraphicsMemory( );
+    baseViewInfo.Monitor = monitor;
 }
 
 Text::~Text( )
@@ -157,7 +158,7 @@ void Text::draw( )
             }
 
 
-            SDL::renderCopy( t, baseViewInfo.Alpha, &charRect, &rect, baseViewInfo, page.getScaleX(), page.getScaleY() );
+            SDL::renderCopy( t, baseViewInfo.Alpha, &charRect, &rect, baseViewInfo, page.getLayoutWidth(), page.getLayoutHeight() );
 
             rect.x += static_cast<int>( glyph.advance * scale );
 

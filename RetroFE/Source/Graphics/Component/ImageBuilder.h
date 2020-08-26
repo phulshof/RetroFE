@@ -24,5 +24,5 @@
 class ImageBuilder
 {
 public:
-    Image * CreateImage(std::string path, Page &p, std::string name);
+    Image * CreateImage(std::string path, Page &p, std::string name, int monitor);
 };

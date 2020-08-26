@@ -27,17 +27,15 @@ class Image;
 class ReloadableMedia : public Component
 {
 public:
-    ReloadableMedia(Configuration &config, bool systemMode, bool layoutMode, bool commonMode, bool menuMode, std::string type, Page &page, int displayOffset, bool isVideo, Font *font);
+    ReloadableMedia(Configuration &config, bool systemMode, bool layoutMode, bool commonMode, bool menuMode, std::string type, std::string imageType, Page &page, int displayOffset, bool isVideo, Font *font);
     virtual ~ReloadableMedia();
     void update(float dt);
     void draw();
     void freeGraphicsMemory();
     void allocateGraphicsMemory();
-    Component *findComponent(std::string collection, std::string type, std::string basename, std::string filepath, bool systemMode);
+    Component *findComponent(std::string collection, std::string type, std::string basename, std::string filepath, bool systemMode, bool isVideo);
 
     void enableTextFallback_(bool value);
-    void setVolume(double volume);
-    double getVolume();
 
 private:
     void reloadTexture();
@@ -55,5 +53,5 @@ private:
     std::string currentCollection_;
     Page *page_;
     int displayOffset_;
-    double volume_;
+    std::string imageType_;
 };

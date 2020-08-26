@@ -84,7 +84,7 @@ void Component::allocateGraphicsMemory()
         SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 255, 255));
 
         SDL_LockMutex(SDL::getMutex());
-        backgroundTexture_ = SDL_CreateTextureFromSurface(SDL::getRenderer(), surface);
+        backgroundTexture_ = SDL_CreateTextureFromSurface(SDL::getRenderer(baseViewInfo.Monitor), surface);
         SDL_UnlockMutex(SDL::getMutex());
 
         SDL_FreeSurface(surface);
@@ -180,7 +180,6 @@ void Component::update(float dt)
         currentTweenIndex_    = 0;
         elapsedTweenTime_     = 0;
         storeViewInfo_        = baseViewInfo;
-        storeVolume_          = getVolume();
         currentTweenComplete_ = false;
       }
       animationRequested_   = false;
@@ -201,7 +200,6 @@ void Component::update(float dt)
         currentTweenIndex_    = 0;
         elapsedTweenTime_     = 0;
         storeViewInfo_        = baseViewInfo;
-        storeVolume_          = getVolume();
         currentTweenComplete_ = false;
         animationRequested_   = false;
     }
@@ -231,7 +229,7 @@ void Component::draw()
                                static_cast<char>(baseViewInfo.BackgroundGreen*255),
                                static_cast<char>(baseViewInfo.BackgroundBlue*255));
 
-        SDL::renderCopy(backgroundTexture_, baseViewInfo.BackgroundAlpha, NULL, &rect, baseViewInfo, page.getScaleX(), page.getScaleY());
+        SDL::renderCopy(backgroundTexture_, baseViewInfo.BackgroundAlpha, NULL, &rect, baseViewInfo, page.getLayoutWidth(), page.getLayoutHeight());
     }
 }
 
@@ -395,9 +393,15 @@ bool Component::animate()
 
             case TWEEN_PROPERTY_VOLUME:
                 if (tween->startDefined)
-                    setVolume(tween->animate(elapsedTime));
+                    baseViewInfo.Volume = tween->animate(elapsedTime);
                 else
-                    setVolume(tween->animate(elapsedTime, storeVolume_));
+                    baseViewInfo.Volume = tween->animate(elapsedTime, storeViewInfo_.Volume);
+
+            case TWEEN_PROPERTY_MONITOR:
+                if (tween->startDefined)
+                    baseViewInfo.Monitor = static_cast<unsigned int>(tween->animate(elapsedTime));
+                else
+                    baseViewInfo.Monitor = static_cast<unsigned int>(tween->animate(elapsedTime, storeViewInfo_.Monitor));
 
             case TWEEN_PROPERTY_NOP:
                 break;

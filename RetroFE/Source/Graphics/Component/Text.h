@@ -29,7 +29,7 @@ class Text : public Component
 {
 
 public:
-    Text( std::string text, Page &p, Font *font );
+    Text( std::string text, Page &p, Font *font, int monitor );
     virtual ~Text( );
     void     setText( std::string text, int id = -1 );
     void     allocateGraphicsMemory( );

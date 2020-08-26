@@ -21,11 +21,12 @@
 #include <cstdio>
 #include <cstring>
 
-Font::Font(std::string fontPath, int fontSize, SDL_Color color)
+Font::Font(std::string fontPath, int fontSize, SDL_Color color, int monitor)
     : texture(NULL)
     , fontPath_(fontPath)
     , fontSize_(fontSize)
     , color_(color)
+    , monitor_(monitor)
 {
 }
 
@@ -110,11 +111,6 @@ bool Font::initialize()
 
         x += info->glyph.rect.w;
         y = (y > info->glyph.rect.h) ? y : info->glyph.rect.h;
-        /*
-        std::stringstream ss;
-        ss << " tw:" << atlasWidth << " th:" << atlasHeight << " x:" << x << " y:" << y << " w:" << info->Glyph.Rect.w << " h:" << info->Glyph.Rect.h;
-        Logger::Write(Logger::ZONE_ERROR, "FontCache", ss.str());
-                */
     }
 
     atlasWidth = (atlasWidth >= x) ? atlasWidth : x;
@@ -147,7 +143,7 @@ bool Font::initialize()
     }
     SDL_LockMutex(SDL::getMutex());
 
-    texture = SDL_CreateTextureFromSurface(SDL::getRenderer(), atlasSurface);
+    texture = SDL_CreateTextureFromSurface(SDL::getRenderer(monitor_), atlasSurface);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_FreeSurface(atlasSurface);
     SDL_UnlockMutex(SDL::getMutex());

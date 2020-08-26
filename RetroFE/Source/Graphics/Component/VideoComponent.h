@@ -32,13 +32,10 @@ public:
     void freeGraphicsMemory();
     void allocateGraphicsMemory();
     virtual bool isPlaying();
-	void setVolume(double volume);
-	double getVolume();
 
 private:
     std::string videoFile_;
     std::string name_;
     IVideo *videoInst_;
     bool isPlaying_;
-	double volume_;
 };

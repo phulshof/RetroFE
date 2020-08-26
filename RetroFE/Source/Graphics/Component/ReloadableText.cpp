@@ -280,7 +280,7 @@ void ReloadableText::ReloadTexture()
             ss << text;
         }
 
-        imageInst_ = new Text(ss.str(), page, fontInst_);
+        imageInst_ = new Text(ss.str(), page, fontInst_, baseViewInfo.Monitor);
     }
 }
 

@@ -27,7 +27,7 @@ extern "C"
 class GStreamerVideo : public IVideo
 {
 public:
-    GStreamerVideo();
+    GStreamerVideo( int monitor );
     ~GStreamerVideo();
     bool initialize();
     bool play(std::string file);
@@ -64,4 +64,6 @@ private:
     std::string currentFile_;
     int numLoops_;
 	double volume_;
+    double currentVolume_;
+    int monitor_;
 };

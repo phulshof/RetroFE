@@ -32,7 +32,7 @@ public:
         SDL_Rect rect;
     };
 
-    Font(std::string fontPath, int fontSize, SDL_Color color);
+    Font(std::string fontPath, int fontSize, SDL_Color color, int monitor);
     virtual ~Font();
     bool initialize();
     void deInitialize();
@@ -55,4 +55,5 @@ private:
     std::string fontPath_;
     int fontSize_;
     SDL_Color color_;
+    int monitor_;
 };

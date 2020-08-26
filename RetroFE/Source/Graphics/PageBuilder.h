@@ -42,8 +42,6 @@ private:
     std::string layoutPage;
     std::string layoutPath;
     Configuration &config_;
-    float scaleX_;
-    float scaleY_;
     int screenHeight_;
     int screenWidth_;
     int layoutHeight_;

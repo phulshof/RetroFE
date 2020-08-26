@@ -55,8 +55,6 @@ public:
     virtual void setText(std::string text, int id = -1) {};
     virtual void setImage(std::string filePath, int id = -1) {};
     int getId( );
-    virtual void setVolume(double volume) {};
-    virtual double getVolume() {return 0.0;};
 
 protected:
     Page &page;
@@ -73,7 +71,6 @@ private:
     SDL_Texture *backgroundTexture_;
 
     ViewInfo     storeViewInfo_;
-    double       storeVolume_;
     unsigned int currentTweenIndex_;
     bool         currentTweenComplete_;
     float        elapsedTweenTime_;

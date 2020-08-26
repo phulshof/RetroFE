@@ -46,7 +46,8 @@ ScrollingList::ScrollingList( Configuration &c,
                               bool           commonMode,
                               Font          *font,
                               std::string    layoutKey,
-                              std::string    imageType )
+                              std::string    imageType,
+                              std::string    videoType)
     : Component( p )
     , horizontalScroll( false )
     , layoutMode_( layoutMode )
@@ -64,6 +65,7 @@ ScrollingList::ScrollingList( Configuration &c,
     , fontInst_( font )
     , layoutKey_( layoutKey )
     , imageType_( imageType )
+    , videoType_( videoType )
     , items_( NULL )
 {
 }
@@ -168,6 +170,7 @@ void ScrollingList::allocateSpritePoints( )
         allocateTexture( i, item );
 
         Component *c = components_.at( i );
+        c->allocateGraphicsMemory( );
 
         ViewInfo *view = scrollPoints_->at( i );
 
@@ -689,6 +692,8 @@ void ScrollingList::resetTweens( Component *c, AnimationEvents *sets, ViewInfo *
     set->push(new Tween(TWEEN_PROPERTY_MAX_WIDTH, LINEAR, currentViewInfo->MaxWidth, nextViewInfo->MaxWidth, scrollTime ) );
     set->push(new Tween(TWEEN_PROPERTY_MAX_HEIGHT, LINEAR, currentViewInfo->MaxHeight, nextViewInfo->MaxHeight, scrollTime ) );
     set->push(new Tween(TWEEN_PROPERTY_LAYER, LINEAR, currentViewInfo->Layer, nextViewInfo->Layer, scrollTime ) );
+    set->push(new Tween(TWEEN_PROPERTY_VOLUME, LINEAR, currentViewInfo->Volume, nextViewInfo->Volume, scrollTime ) );
+    set->push(new Tween(TWEEN_PROPERTY_MONITOR, LINEAR, currentViewInfo->Monitor, nextViewInfo->Monitor, scrollTime ) );
     scrollTween->Push( set );
 }
 
@@ -698,13 +703,13 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
 
     if ( index >= components_.size( ) ) return false;
 
-    std::string videoKey ="collections." + collectionName + ".media.video";
     std::string imagePath;
     std::string videoPath;
 
     Component *t = NULL;
 
     ImageBuilder imageBuild;
+    VideoBuilder videoBuild;
 
     std::string layoutName;
     config_.getProperty( "layout", layoutName );
@@ -759,6 +764,7 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
             else
                 imagePath = Utils::combinePath( Configuration::absolutePath, "layouts", layoutName, "collections", collectionName );
             imagePath = Utils::combinePath( imagePath, "medium_artwork", imageType_ );
+            videoPath = Utils::combinePath( imagePath, "medium_artwork", videoType_ );
         }
         else
         {
@@ -766,11 +772,23 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
             {
                 imagePath = Utils::combinePath(Configuration::absolutePath, "collections", "_common" );
                 imagePath = Utils::combinePath( imagePath, "medium_artwork", imageType_ );
+                videoPath = Utils::combinePath( imagePath, "medium_artwork", videoType_ );
             }
             else
+            {
                 config_.getMediaPropertyAbsolutePath( collectionName, imageType_, false, imagePath );
+                config_.getMediaPropertyAbsolutePath( collectionName, videoType_, false, videoPath );
+            }
         }
-        t = imageBuild.CreateImage( imagePath, page, names[n] );
+        if ( videoType_ != "null" )
+        {
+            t = videoBuild.createVideo( videoPath, page, names[n], baseViewInfo.Monitor );
+        }
+        else
+        {
+            t = imageBuild.CreateImage( imagePath, page, names[n], baseViewInfo.Monitor );
+        }
+
         // check sub-collection path for art
         if ( !t && !commonMode_ )
         {
@@ -778,12 +796,21 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
             {
                 imagePath = Utils::combinePath( Configuration::absolutePath, "layouts", layoutName, "collections", item->collectionInfo->name );
                 imagePath = Utils::combinePath( imagePath, "medium_artwork", imageType_ );
+                videoPath = Utils::combinePath( imagePath, "medium_artwork", videoType_ );
             }
             else
             {
                 config_.getMediaPropertyAbsolutePath( item->collectionInfo->name, imageType_, false, imagePath );
+                config_.getMediaPropertyAbsolutePath( item->collectionInfo->name, videoType_, false, videoPath );
             }
-            t = imageBuild.CreateImage( imagePath, page, names[n] );
+            if ( videoType_ != "null" )
+            {
+                t = videoBuild.createVideo( videoPath, page, names[n], baseViewInfo.Monitor );
+            }
+            else
+            {
+                t = imageBuild.CreateImage( imagePath, page, names[n], baseViewInfo.Monitor );
+            }
         }
     }
 
@@ -797,6 +824,7 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
             else
                 imagePath = Utils::combinePath( Configuration::absolutePath, "layouts", layoutName, "collections", item->name );
             imagePath = Utils::combinePath( imagePath, "system_artwork" );
+            videoPath = imagePath;
         }
         else
         {
@@ -804,20 +832,121 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
             {
                 imagePath = Utils::combinePath(Configuration::absolutePath, "collections", "_common" );
                 imagePath = Utils::combinePath( imagePath, "system_artwork" );
+                videoPath = imagePath;
             }
             else
+            {
                 config_.getMediaPropertyAbsolutePath( item->name, imageType_, true, imagePath );
+                config_.getMediaPropertyAbsolutePath( item->name, videoType_, true, videoPath );
+            }
         }
-        t = imageBuild.CreateImage( imagePath, page, imageType_ );
+        if ( videoType_ != "null" )
+        {
+            t = videoBuild.createVideo( videoPath, page, videoType_, baseViewInfo.Monitor );
+        }
+        else
+        {
+            t = imageBuild.CreateImage( imagePath, page, imageType_, baseViewInfo.Monitor );
+        }
     }
 
     // check rom directory path for art
     if ( !t )
-        t = imageBuild.CreateImage( item->filepath, page, imageType_ );
+    {
+        if ( videoType_ != "null" )
+        {
+            t = videoBuild.createVideo( item->filepath, page, videoType_, baseViewInfo.Monitor );
+        }
+        else
+        {
+            t = imageBuild.CreateImage( item->filepath, page, imageType_, baseViewInfo.Monitor );
+        }
+    }
+
+    // Check for fallback art in case no video could be found
+    if ( videoType_ != "null" && !t)
+    {
+        for ( unsigned int n = 0; n < names.size() && !t; ++n )
+        {
+            // check collection path for art
+            if ( layoutMode_ )
+            {
+                if ( commonMode_ )
+                    imagePath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, "collections", "_common");
+                else
+                    imagePath = Utils::combinePath( Configuration::absolutePath, "layouts", layoutName, "collections", collectionName );
+               imagePath = Utils::combinePath( imagePath, "medium_artwork", imageType_ );
+            }
+            else
+            {
+                if ( commonMode_ )
+                {
+                    imagePath = Utils::combinePath(Configuration::absolutePath, "collections", "_common" );
+                    imagePath = Utils::combinePath( imagePath, "medium_artwork", imageType_ );
+                }
+                else
+                {
+                    config_.getMediaPropertyAbsolutePath( collectionName, imageType_, false, imagePath );
+                }
+            }
+
+            t = imageBuild.CreateImage( imagePath, page, names[n], baseViewInfo.Monitor );
+
+            // check sub-collection path for art
+            if ( !t && !commonMode_ )
+            {
+                if ( layoutMode_ )
+                {
+                    imagePath = Utils::combinePath( Configuration::absolutePath, "layouts", layoutName, "collections", item->collectionInfo->name );
+                    imagePath = Utils::combinePath( imagePath, "medium_artwork", imageType_ );
+                }
+                else
+                {
+                    config_.getMediaPropertyAbsolutePath( item->collectionInfo->name, imageType_, false, imagePath );
+                }
+                t = imageBuild.CreateImage( imagePath, page, names[n], baseViewInfo.Monitor );
+            }
+        }
+
+        // check collection path for art based on system name
+        if ( !t )
+        {
+            if ( layoutMode_ )
+            {
+                if ( commonMode_ )
+                    imagePath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, "collections", "_common");
+                else
+                    imagePath = Utils::combinePath( Configuration::absolutePath, "layouts", layoutName, "collections", item->name );
+                imagePath = Utils::combinePath( imagePath, "system_artwork" );
+            }
+            else
+            {
+                if ( commonMode_ )
+                {
+                    imagePath = Utils::combinePath(Configuration::absolutePath, "collections", "_common" );
+                    imagePath = Utils::combinePath( imagePath, "system_artwork" );
+                }
+                else
+                {
+                    config_.getMediaPropertyAbsolutePath( item->name, imageType_, true, imagePath );
+                }
+            }
+            if ( !t )
+            {
+                t = imageBuild.CreateImage( imagePath, page, imageType_, baseViewInfo.Monitor );
+            }
+        }
+        // check rom directory path for art
+        if ( !t )
+        {
+            t = imageBuild.CreateImage( item->filepath, page, imageType_, baseViewInfo.Monitor );
+        }
+
+    }
 
     if ( !t )
     {
-        t = new Text(item->title, page, fontInst_ );
+        t = new Text(item->title, page, fontInst_, baseViewInfo.Monitor );
     }
 
     if ( t )
@@ -942,6 +1071,7 @@ void ScrollingList::scroll( bool forward )
         }
 
         Component *c = components_.at( i );
+        c->allocateGraphicsMemory( );
 
         resetTweens( c, tweenPoints_->at( nextI ), scrollPoints_->at( i ), scrollPoints_->at( nextI ), scrollPeriod_ );
         c->baseViewInfo.font = scrollPoints_->at( nextI )->font; // Use the font settings of the next index

@@ -40,7 +40,7 @@ public:
 
     };
 
-    Page(Configuration &c, float scaleX, float scaleY);
+    Page(Configuration &c, int layoutWidth, int layoutHeight );
     virtual ~Page();
     void deInitialize();
     virtual void onNewItemSelected();
@@ -123,8 +123,8 @@ public:
     void  updateScrollPeriod();
     void  scroll(bool forward);
     bool  hasSubs();
-    float getScaleX();
-    float getScaleY();
+	int getLayoutWidth();
+	int getLayoutHeight();
 
 private:
     void playlistChange();
@@ -163,8 +163,7 @@ private:
     float minShowTime_;
     float elapsedTime_;
     CollectionInfo::Playlists_T::iterator playlist_;
-    float scaleX_;
-    float scaleY_;
-
+	int layoutWidth_;
+	int layoutHeight_;
 
 };

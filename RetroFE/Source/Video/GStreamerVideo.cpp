@@ -42,7 +42,7 @@ gboolean GStreamerVideo::busCallback(GstBus * /* bus */, GstMessage * /* msg */,
     // this callback only needs to be defined so we can loop the video once it completes
     return TRUE;
 }
-GStreamerVideo::GStreamerVideo()
+GStreamerVideo::GStreamerVideo( int monitor )
     : playbin_(NULL)
     , videoBin_(NULL)
     , videoSink_(NULL)
@@ -57,7 +57,9 @@ GStreamerVideo::GStreamerVideo()
     , isPlaying_(false)
     , playCount_(0)
     , numLoops_(0)
-	, volume_(1.0)
+	, volume_(0.0)
+    , currentVolume_(0.0)
+    , monitor_(monitor)
 {
 }
 GStreamerVideo::~GStreamerVideo()
@@ -291,6 +293,9 @@ bool GStreamerVideo::play(std::string file)
         }
     }
 
+    gst_stream_volume_set_volume( GST_STREAM_VOLUME( playbin_ ), GST_STREAM_VOLUME_FORMAT_LINEAR, 0.0 );
+    gst_stream_volume_set_mute( GST_STREAM_VOLUME( playbin_ ), true );
+
     return true;
 }
 
@@ -345,7 +350,7 @@ void GStreamerVideo::update(float /* dt */)
     SDL_LockMutex(SDL::getMutex());
     if(!texture_ && width_ != 0 && height_ != 0)
     {
-        texture_ = SDL_CreateTexture(SDL::getRenderer(), SDL_PIXELFORMAT_IYUV,
+        texture_ = SDL_CreateTexture(SDL::getRenderer(monitor_), SDL_PIXELFORMAT_IYUV,
                                     SDL_TEXTUREACCESS_STREAMING, width_, height_);
         SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
     }
@@ -354,8 +359,12 @@ void GStreamerVideo::update(float /* dt */)
 	{
 		if(volume_ > 1.0)
 			volume_ = 1.0;
-		gst_stream_volume_set_volume( GST_STREAM_VOLUME( playbin_ ), GST_STREAM_VOLUME_FORMAT_LINEAR, static_cast<double>(volume_));
-		if(volume_ < 0.1)
+        if ( currentVolume_ > volume_ || currentVolume_ + 0.005 >= volume_ )
+            currentVolume_ = volume_;
+        else
+            currentVolume_ += 0.005;
+		gst_stream_volume_set_volume( GST_STREAM_VOLUME( playbin_ ), GST_STREAM_VOLUME_FORMAT_LINEAR, static_cast<double>(currentVolume_));
+		if(currentVolume_ < 0.1)
 			gst_stream_volume_set_mute( GST_STREAM_VOLUME( playbin_ ), true );
 		else
 			gst_stream_volume_set_mute( GST_STREAM_VOLUME( playbin_ ), false );

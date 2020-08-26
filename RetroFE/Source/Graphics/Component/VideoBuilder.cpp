@@ -21,7 +21,7 @@
 #include <fstream>
 
 
-VideoComponent * VideoBuilder::createVideo(std::string path, Page &page, std::string name)
+VideoComponent * VideoBuilder::createVideo(std::string path, Page &page, std::string name, int monitor)
 {
     VideoComponent *component = NULL;
     std::vector<std::string> extensions;
@@ -36,7 +36,7 @@ VideoComponent * VideoBuilder::createVideo(std::string path, Page &page, std::st
 
     if(Utils::findMatchingFile(prefix, extensions, file))
     {
-        IVideo *video = factory_.createVideo();
+        IVideo *video = factory_.createVideo( monitor );
 
         if(video)
         {

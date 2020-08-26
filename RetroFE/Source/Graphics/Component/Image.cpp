@@ -19,12 +19,13 @@
 #include "../../Utility/Log.h"
 #include <SDL2/SDL_image.h>
 
-Image::Image(std::string file, std::string altFile, Page &p)
+Image::Image(std::string file, std::string altFile, Page &p, int monitor)
     : Component(p)
     , texture_(NULL)
     , file_(file)
     , altFile_(altFile)
 {
+    baseViewInfo.Monitor = monitor;
     allocateGraphicsMemory();
 }
 
@@ -54,17 +55,17 @@ void Image::allocateGraphicsMemory()
     if(!texture_)
     {
         SDL_LockMutex(SDL::getMutex());
-        texture_ = IMG_LoadTexture(SDL::getRenderer(), file_.c_str());
+        texture_ = IMG_LoadTexture(SDL::getRenderer(baseViewInfo.Monitor), file_.c_str());
         if (!texture_ && altFile_ != "")
         {
-            texture_ = IMG_LoadTexture(SDL::getRenderer(), altFile_.c_str());
+            texture_ = IMG_LoadTexture(SDL::getRenderer(baseViewInfo.Monitor), altFile_.c_str());
         }
 
         if (texture_ != NULL)
         {
             SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
             SDL_QueryTexture(texture_, NULL, NULL, &width, &height);
-            baseViewInfo.ImageWidth = (float)width;
+            baseViewInfo.ImageWidth  = (float)width;
             baseViewInfo.ImageHeight = (float)height;
         }
         SDL_UnlockMutex(SDL::getMutex());
@@ -89,6 +90,6 @@ void Image::draw()
         rect.h = static_cast<int>(baseViewInfo.ScaledHeight());
         rect.w = static_cast<int>(baseViewInfo.ScaledWidth());
 
-        SDL::renderCopy(texture_, baseViewInfo.Alpha, NULL, &rect, baseViewInfo, page.getScaleX(), page.getScaleY());
+        SDL::renderCopy(texture_, baseViewInfo.Alpha, NULL, &rect, baseViewInfo, page.getLayoutWidth(), page.getLayoutHeight());
     }
 }

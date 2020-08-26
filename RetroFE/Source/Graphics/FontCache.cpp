@@ -74,14 +74,14 @@ std::string FontCache::buildFontKey(std::string font, int fontSize, SDL_Color co
     return ss.str();
 }
 
-bool FontCache::loadFont(std::string fontPath, int fontSize, SDL_Color color)
+bool FontCache::loadFont(std::string fontPath, int fontSize, SDL_Color color, int monitor)
 {
     std::string key = buildFontKey(fontPath, fontSize, color);
     std::map<std::string, Font *>::iterator it = fontFaceMap_.find(key);
 
     if(it == fontFaceMap_.end())
     {
-        Font *f = new Font(fontPath, fontSize, color);
+        Font *f = new Font(fontPath, fontSize, color, monitor);
         f->initialize();
         fontFaceMap_[key] = f;
     }

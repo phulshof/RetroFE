@@ -26,7 +26,6 @@ VideoComponent::VideoComponent(IVideo *videoInst, Page &p, std::string videoFile
     , videoFile_(videoFile)
     , videoInst_(videoInst)
     , isPlaying_(false)
-	, volume_(1.0)
 {
 //   AllocateGraphicsMemory();
 }
@@ -49,7 +48,7 @@ void VideoComponent::update(float dt)
     }
     if(isPlaying_)
     {
-        videoInst_->setVolume(volume_);
+        videoInst_->setVolume(baseViewInfo.Volume);
         videoInst_->update(dt);
 
         // video needs to run a frame to start getting size info
@@ -97,23 +96,11 @@ void VideoComponent::draw()
 
     if(texture)
     {
-        SDL::renderCopy(texture, baseViewInfo.Alpha, NULL, &rect, baseViewInfo, page.getScaleX(), page.getScaleY());
+        SDL::renderCopy(texture, baseViewInfo.Alpha, NULL, &rect, baseViewInfo, page.getLayoutWidth(), page.getLayoutHeight());
     }
 }
 
 bool VideoComponent::isPlaying()
 {
     return isPlaying_;
-}
-
-
-void VideoComponent::setVolume(double volume)
-{
-	volume_ = volume;
-}
-
-
-double VideoComponent::getVolume()
-{
-	return volume_;
 }

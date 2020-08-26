@@ -39,7 +39,8 @@ public:
                    bool          commonMode,
                    Font         *font,
                    std::string   layoutKey,
-                   std::string   imageType );
+                   std::string   imageType,
+                   std::string   videoType );
 
     ScrollingList( const ScrollingList &copy );
     virtual ~ScrollingList( );
@@ -124,6 +125,7 @@ private:
     Font          *fontInst_;
     std::string    layoutKey_;
     std::string    imageType_;
+    std::string    videoType_;
 
     std::vector<Item *>     *items_;
     std::vector<Component *> components_;

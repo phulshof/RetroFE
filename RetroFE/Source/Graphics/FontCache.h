@@ -25,7 +25,7 @@ public:
     FontCache();
     void initialize();
     void deInitialize();
-    bool loadFont(std::string font, int fontSize, SDL_Color color);
+    bool loadFont(std::string font, int fontSize, SDL_Color color, int monitor);
     Font *getFont(std::string font, int fontSize, SDL_Color color);
 
     virtual ~FontCache();

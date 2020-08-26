@@ -28,7 +28,7 @@
 #include <sstream>
 
 
-Page::Page(Configuration &config, float scaleX, float scaleY)
+Page::Page(Configuration &config, int layoutWidth, int layoutHeight)
     : config_(config)
     , menuDepth_(0)
     , scrollActive_(false)
@@ -39,8 +39,8 @@ Page::Page(Configuration &config, float scaleX, float scaleY)
     , highlightSoundChunk_(NULL)
     , selectSoundChunk_(NULL)
     , minShowTime_(0)
-    , scaleX_(scaleX)
-    , scaleY_(scaleY)
+	, layoutWidth_(layoutWidth)
+	, layoutHeight_(layoutHeight)
 {
 }
 
@@ -1588,13 +1588,13 @@ bool Page::hasSubs()
 }
 
 
-float Page::getScaleX()
+int Page::getLayoutWidth()
 {
-    return scaleX_;
+	return layoutWidth_;
 }
 
 
-float Page::getScaleY()
+int Page::getLayoutHeight()
 {
-    return scaleY_;
+	return layoutHeight_;
 }

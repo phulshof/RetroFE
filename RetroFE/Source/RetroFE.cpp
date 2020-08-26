@@ -89,15 +89,21 @@ void RetroFE::render( )
 {
 
     SDL_LockMutex( SDL::getMutex( ) );
-    SDL_SetRenderDrawColor( SDL::getRenderer( ), 0x0, 0x0, 0x00, 0xFF );
-    SDL_RenderClear( SDL::getRenderer( ) );
+    for ( int i = 0; i < SDL::getNumDisplays( ); ++i )
+    {
+        SDL_SetRenderDrawColor( SDL::getRenderer( i ), 0x0, 0x0, 0x00, 0xFF );
+        SDL_RenderClear( SDL::getRenderer( i ) );
+    }
 
     if ( currentPage_ )
     {
         currentPage_->draw( );
     }
 
-    SDL_RenderPresent( SDL::getRenderer( ) );
+    for ( int i = 0; i < SDL::getNumDisplays( ); ++i )
+    {
+        SDL_RenderPresent( SDL::getRenderer( i ) );
+    }
     SDL_UnlockMutex( SDL::getMutex( ) );
 
 }
@@ -147,7 +153,7 @@ void RetroFE::launchEnter( )
 {
 
     // Disable window focus
-    SDL_SetWindowGrab(SDL::getWindow( ), SDL_FALSE);
+    SDL_SetWindowGrab(SDL::getWindow( 0 ), SDL_FALSE);
 
     // Free the textures, and optionally take down SDL
     freeGraphicsMemory( );
@@ -163,9 +169,9 @@ void RetroFE::launchExit( )
     allocateGraphicsMemory( );
 
     // Restore the SDL settings
-    SDL_RestoreWindow( SDL::getWindow( ) );
-    SDL_RaiseWindow( SDL::getWindow( ) );
-    SDL_SetWindowGrab( SDL::getWindow( ), SDL_TRUE );
+    SDL_RestoreWindow( SDL::getWindow( 0 ) );
+    SDL_RaiseWindow( SDL::getWindow( 0 ) );
+    SDL_SetWindowGrab( SDL::getWindow( 0 ), SDL_TRUE );
 
     // Empty event queue, but handle joystick add/remove events
     SDL_Event e;
@@ -297,7 +303,7 @@ bool RetroFE::run( )
     config_.getProperty( "videoLoop", videoLoop );
     VideoFactory::setEnabled( videoEnable );
     VideoFactory::setNumLoops( videoLoop );
-    VideoFactory::createVideo( ); // pre-initialize the gstreamer engine
+    VideoFactory::createVideo( 0 ); // pre-initialize the gstreamer engine
     Video::setEnabled( videoEnable );
 
     initializeThread = SDL_CreateThread( initialize, "RetroFEInit", (void *)this );
