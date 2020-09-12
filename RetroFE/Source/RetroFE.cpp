@@ -1273,11 +1273,29 @@ bool RetroFE::run( )
                     if (attractReturn == 1) // Change playlist
                     {
                         attract_.reset( attract_.isSet( ) );
-                        currentPage_->nextPlaylist( );
+
+                        bool cyclePlaylist = false;
+                        config_.getProperty( "attractModeCyclePlaylist", cyclePlaylist );
+
+                        std::string cycleString;
+                        config_.getProperty( "cyclePlaylist", cycleString );
+                        std::vector<std::string> cycleVector;
+                        Utils::listToVector( cycleString, cycleVector, ',' );
+
+                        if ( cyclePlaylist )
+                            currentPage_->nextCyclePlaylist( cycleVector );
+                        else
+                            currentPage_->nextPlaylist( );
+
                         std::string attractModeSkipPlaylist = "";
                         config_.getProperty( "attractModeSkipPlaylist", attractModeSkipPlaylist );
                         if (currentPage_->getPlaylistName( ) == attractModeSkipPlaylist)
-                            currentPage_->nextPlaylist( );
+                        {
+                            if ( cyclePlaylist )
+                                currentPage_->nextCyclePlaylist( cycleVector );
+                            else
+                                currentPage_->nextPlaylist( );
+                        }
                         state = RETROFE_PLAYLIST_REQUEST;
                     }
                     if (attractReturn == 2) // Change collection
