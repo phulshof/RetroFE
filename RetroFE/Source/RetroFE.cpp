@@ -303,7 +303,7 @@ bool RetroFE::run( )
     config_.getProperty( "videoLoop", videoLoop );
     VideoFactory::setEnabled( videoEnable );
     VideoFactory::setNumLoops( videoLoop );
-    VideoFactory::createVideo( 0 ); // pre-initialize the gstreamer engine
+    VideoFactory::createVideo( 0, false ); // pre-initialize the gstreamer engine
     Video::setEnabled( videoEnable );
 
     initializeThread = SDL_CreateThread( initialize, "RetroFEInit", (void *)this );

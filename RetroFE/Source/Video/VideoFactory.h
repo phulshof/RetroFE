@@ -20,11 +20,12 @@ class IVideo;
 class VideoFactory
 {
 public:
-    static IVideo *createVideo( int monitor );
-    static void setEnabled(bool enabled);
-    static void setNumLoops(int numLoops);
+    static IVideo *createVideo( int monitor, bool isTypeVideo );
+    static void    setEnabled(bool enabled);
+    static void    setNumLoops(int numLoops);
 
 private:
-    static bool enabled_;
-    static int numLoops_;
+    static bool    enabled_;
+    static int     numLoops_;
+    static IVideo *instance_;
 };

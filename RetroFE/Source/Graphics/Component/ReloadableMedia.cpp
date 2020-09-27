@@ -434,7 +434,7 @@ Component *ReloadableMedia::findComponent(std::string collection, std::string ty
 
     if(isVideo)
     {
-        component = videoBuild.createVideo(imagePath, page, basename, baseViewInfo.Monitor);
+        component = videoBuild.createVideo(imagePath, page, basename, baseViewInfo.Monitor, type=="video");
     }
     else
     {

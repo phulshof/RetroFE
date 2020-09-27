@@ -782,7 +782,7 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
         }
         if ( videoType_ != "null" )
         {
-            t = videoBuild.createVideo( videoPath, page, names[n], baseViewInfo.Monitor );
+            t = videoBuild.createVideo( videoPath, page, names[n], baseViewInfo.Monitor, false );
         }
         else
         {
@@ -805,7 +805,7 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
             }
             if ( videoType_ != "null" )
             {
-                t = videoBuild.createVideo( videoPath, page, names[n], baseViewInfo.Monitor );
+                t = videoBuild.createVideo( videoPath, page, names[n], baseViewInfo.Monitor, false );
             }
             else
             {
@@ -842,7 +842,7 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
         }
         if ( videoType_ != "null" )
         {
-            t = videoBuild.createVideo( videoPath, page, videoType_, baseViewInfo.Monitor );
+            t = videoBuild.createVideo( videoPath, page, videoType_, baseViewInfo.Monitor, false );
         }
         else
         {
@@ -855,7 +855,7 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
     {
         if ( videoType_ != "null" )
         {
-            t = videoBuild.createVideo( item->filepath, page, videoType_, baseViewInfo.Monitor );
+            t = videoBuild.createVideo( item->filepath, page, videoType_, baseViewInfo.Monitor, false );
         }
         else
         {

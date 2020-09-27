@@ -20,19 +20,23 @@
 
 bool VideoFactory::enabled_ = true;
 int VideoFactory::numLoops_ = 0;
-//IVideo *VideoFactory::instance_ = NULL;
+IVideo *VideoFactory::instance_ = NULL;
 
 
-IVideo *VideoFactory::createVideo( int monitor )
+IVideo *VideoFactory::createVideo( int monitor, bool isTypeVideo )
 {
 
-    IVideo *instance;
-    if(enabled_)
+    IVideo *instance = NULL;
+    if ( enabled_ && (!isTypeVideo || !instance_) )
     {
         instance = new GStreamerVideo( monitor );
         instance->initialize();
         ((GStreamerVideo *)(instance))->setNumLoops(numLoops_);
+        if ( isTypeVideo )
+            instance_ = instance;
     }
+    if ( isTypeVideo )
+        instance = instance_;
 
     return instance;
 }
