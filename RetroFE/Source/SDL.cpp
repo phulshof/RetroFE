@@ -313,6 +313,8 @@ bool SDL::renderCopy( SDL_Texture *texture, float alpha, SDL_Rect *src, SDL_Rect
     SDL_Rect dstRect;
     SDL_Rect srcRectCopy;
     SDL_Rect dstRectCopy;
+    SDL_Rect srcRectOrig;
+    SDL_Rect dstRectOrig;
     double   imageScaleX;
     double   imageScaleY;
 
@@ -353,7 +355,16 @@ bool SDL::renderCopy( SDL_Texture *texture, float alpha, SDL_Rect *src, SDL_Rect
     imageScaleX = (dstRect.w > 0) ? static_cast<double>( srcRect.w ) / static_cast<double>( dstRect.w ) : 0.0;
     imageScaleY = (dstRect.h > 0) ? static_cast<double>( srcRect.h ) / static_cast<double>( dstRect.h ) : 0.0;
 
-    // Make a copy
+    // Make two copies
+    srcRectOrig.x = srcRect.x;
+    srcRectOrig.y = srcRect.y;
+    srcRectOrig.w = srcRect.w;
+    srcRectOrig.h = srcRect.h;
+    dstRectOrig.x = dstRect.x;
+    dstRectOrig.y = dstRect.y;
+    dstRectOrig.w = dstRect.w;
+    dstRectOrig.h = dstRect.h;
+
     srcRectCopy.x = srcRect.x;
     srcRectCopy.y = srcRect.y;
     srcRectCopy.w = srcRect.w;
@@ -402,70 +413,319 @@ bool SDL::renderCopy( SDL_Texture *texture, float alpha, SDL_Rect *src, SDL_Rect
 
     }
 
-    dstRectCopy.x = dstRect.x;
-    dstRectCopy.y = dstRect.y;
-    dstRectCopy.w = dstRect.w;
-    dstRectCopy.h = dstRect.h;
-
     dstRect.x = (int)(dstRect.x*scaleX);
     dstRect.y = (int)(dstRect.y*scaleY);
     dstRect.w = (int)(dstRect.w*scaleX);
     dstRect.h = (int)(dstRect.h*scaleY);
 
-    SDL_SetTextureAlphaMod( texture, static_cast<char>( alpha * 255 ) );
-    SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, &srcRect, &dstRect, viewInfo.Angle, NULL, SDL_FLIP_NONE );
-
-    dstRect.x = dstRectCopy.x;
-    dstRect.y = dstRectCopy.y;
-    dstRect.w = dstRectCopy.w;
-    dstRect.h = dstRectCopy.h;
-
-    if ( viewInfo.Reflection == "top" )
+    if ( srcRect.h > 0 && srcRect.w > 0 )
     {
-        dstRect.h = static_cast<unsigned int>( static_cast<float>(dstRect.h ) * viewInfo.ReflectionScale);
-        dstRect.y = dstRect.y - dstRect.h - viewInfo.ReflectionDistance;
-        dstRect.x = (int)(dstRect.x*scaleX);
-        dstRect.y = (int)(dstRect.y*scaleY);
-        dstRect.w = (int)(dstRect.w*scaleX);
-        dstRect.h = (int)(dstRect.h*scaleY);
-        SDL_SetTextureAlphaMod( texture, static_cast<char>( viewInfo.ReflectionAlpha * alpha * 255 ) );
-        SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, src, &dstRect, viewInfo.Angle, NULL, SDL_FLIP_VERTICAL );
+        SDL_SetTextureAlphaMod( texture, static_cast<char>( alpha * 255 ) );
+        SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, &srcRect, &dstRect, viewInfo.Angle, NULL, SDL_FLIP_NONE );
     }
 
-    if ( viewInfo.Reflection == "bottom" )
+    // Restore original parameters
+    srcRect.x     = srcRectOrig.x;
+    srcRect.y     = srcRectOrig.y;
+    srcRect.w     = srcRectOrig.w;
+    srcRect.h     = srcRectOrig.h;
+    dstRect.x     = dstRectOrig.x;
+    dstRect.y     = dstRectOrig.y;
+    dstRect.w     = dstRectOrig.w;
+    dstRect.h     = dstRectOrig.h;
+    srcRectCopy.x = srcRectOrig.x;
+    srcRectCopy.y = srcRectOrig.y;
+    srcRectCopy.w = srcRectOrig.w;
+    srcRectCopy.h = srcRectOrig.h;
+    dstRectCopy.x = dstRectOrig.x;
+    dstRectCopy.y = dstRectOrig.y;
+    dstRectCopy.w = dstRectOrig.w;
+    dstRectCopy.h = dstRectOrig.h;
+
+    if ( viewInfo.Reflection.find("top") != std::string::npos )
     {
-        dstRect.y = dstRect.y + dstRect.h + viewInfo.ReflectionDistance;
-        dstRect.h = static_cast<unsigned int>( static_cast<float>(dstRect.h ) * viewInfo.ReflectionScale);
+        dstRect.h     = static_cast<unsigned int>( static_cast<float>(dstRect.h ) * viewInfo.ReflectionScale);
+        dstRect.y     = dstRect.y - dstRect.h - viewInfo.ReflectionDistance;
+        imageScaleY   = (dstRect.h > 0) ? static_cast<double>( srcRect.h ) / static_cast<double>( dstRect.h ) : 0.0;
+        dstRectCopy.y = dstRect.y;
+        dstRectCopy.h = dstRect.h;
+
+        // If a container has been defined, limit the display to the container boundaries.
+        if ( viewInfo.ContainerWidth > 0 && viewInfo.ContainerHeight > 0 &&
+             dstRectCopy.w           > 0 && dstRectCopy.h            > 0 )
+        {
+
+            // Correct if the image falls to the left of the container
+            if ( dstRect.x < viewInfo.ContainerX )
+            {
+                dstRect.x = static_cast<int>( viewInfo.ContainerX );
+                dstRect.w = dstRectCopy.w + dstRectCopy.x - dstRect.x;
+                srcRect.x = srcRectCopy.x + srcRectCopy.w * (dstRect.x - dstRectCopy.x) / dstRectCopy.w;
+            }
+
+            // Correct if the image falls to the right of the container
+            if ( (dstRectCopy.x + dstRectCopy.w) > (viewInfo.ContainerX + viewInfo.ContainerWidth) )
+            {
+                dstRect.w = static_cast<int>( viewInfo.ContainerX + viewInfo.ContainerWidth ) - dstRect.x;
+            }
+
+            // Correct if the image falls to the top of the container
+            if ( dstRect.y < viewInfo.ContainerY )
+            {
+                dstRect.y = static_cast<int>( viewInfo.ContainerY );
+                dstRect.h = dstRectCopy.h + dstRectCopy.y - dstRect.y;
+            }
+
+            // Correct if the image falls to the bottom of the container
+            if ( (dstRectCopy.y + dstRectCopy.h) > (viewInfo.ContainerY + viewInfo.ContainerHeight) )
+            {
+                dstRect.h = static_cast<int>( viewInfo.ContainerY + viewInfo.ContainerHeight ) - dstRect.y;
+                srcRect.y = srcRectCopy.y + srcRectCopy.h * (dstRectCopy.h - dstRect.h) / dstRectCopy.h;
+            }
+
+            // Define source width and height
+            srcRect.w = static_cast<int>( dstRect.w * imageScaleX );
+            srcRect.h = static_cast<int>( dstRect.h * imageScaleY );
+
+        }
+
         dstRect.x = (int)(dstRect.x*scaleX);
         dstRect.y = (int)(dstRect.y*scaleY);
         dstRect.w = (int)(dstRect.w*scaleX);
         dstRect.h = (int)(dstRect.h*scaleY);
-        SDL_SetTextureAlphaMod( texture, static_cast<char>( viewInfo.ReflectionAlpha * alpha * 255 ) );
-        SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, src, &dstRect, viewInfo.Angle, NULL, SDL_FLIP_VERTICAL );
+        if ( srcRect.h > 0 && srcRect.w > 0 )
+        {
+            SDL_SetTextureAlphaMod( texture, static_cast<char>( viewInfo.ReflectionAlpha * alpha * 255 ) );
+            SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, &srcRect, &dstRect, viewInfo.Angle, NULL, SDL_FLIP_VERTICAL );
+        }
     }
 
-    if ( viewInfo.Reflection == "left" )
+    // Restore original parameters
+    srcRect.x     = srcRectOrig.x;
+    srcRect.y     = srcRectOrig.y;
+    srcRect.w     = srcRectOrig.w;
+    srcRect.h     = srcRectOrig.h;
+    dstRect.x     = dstRectOrig.x;
+    dstRect.y     = dstRectOrig.y;
+    dstRect.w     = dstRectOrig.w;
+    dstRect.h     = dstRectOrig.h;
+    srcRectCopy.x = srcRectOrig.x;
+    srcRectCopy.y = srcRectOrig.y;
+    srcRectCopy.w = srcRectOrig.w;
+    srcRectCopy.h = srcRectOrig.h;
+    dstRectCopy.x = dstRectOrig.x;
+    dstRectCopy.y = dstRectOrig.y;
+    dstRectCopy.w = dstRectOrig.w;
+    dstRectCopy.h = dstRectOrig.h;
+
+    if ( viewInfo.Reflection.find("bottom") != std::string::npos )
     {
-        dstRect.w = static_cast<unsigned int>( static_cast<float>(dstRect.w ) * viewInfo.ReflectionScale);
-        dstRect.x = dstRect.x - dstRect.w - viewInfo.ReflectionDistance;
+        dstRect.y     = dstRect.y + dstRect.h + viewInfo.ReflectionDistance;
+        dstRect.h     = static_cast<unsigned int>( static_cast<float>(dstRect.h ) * viewInfo.ReflectionScale);
+        imageScaleY   = (dstRect.h > 0) ? static_cast<double>( srcRect.h ) / static_cast<double>( dstRect.h ) : 0.0;
+        dstRectCopy.y = dstRect.y;
+        dstRectCopy.h = dstRect.h;
+
+        // If a container has been defined, limit the display to the container boundaries.
+        if ( viewInfo.ContainerWidth > 0 && viewInfo.ContainerHeight > 0 &&
+             dstRectCopy.w           > 0 && dstRectCopy.h            > 0 )
+        {
+
+            // Correct if the image falls to the left of the container
+            if ( dstRect.x < viewInfo.ContainerX )
+            {
+                dstRect.x = static_cast<int>( viewInfo.ContainerX );
+                dstRect.w = dstRectCopy.w + dstRectCopy.x - dstRect.x;
+                srcRect.x = srcRectCopy.x + srcRectCopy.w * (dstRect.x - dstRectCopy.x) / dstRectCopy.w;
+            }
+
+            // Correct if the image falls to the right of the container
+            if ( (dstRectCopy.x + dstRectCopy.w) > (viewInfo.ContainerX + viewInfo.ContainerWidth) )
+            {
+                dstRect.w = static_cast<int>( viewInfo.ContainerX + viewInfo.ContainerWidth ) - dstRect.x;
+            }
+
+            // Correct if the image falls to the top of the container
+            if ( dstRect.y < viewInfo.ContainerY )
+            {
+                dstRect.y = static_cast<int>( viewInfo.ContainerY );
+                dstRect.h = dstRectCopy.h + dstRectCopy.y - dstRect.y;
+            }
+
+            // Correct if the image falls to the bottom of the container
+            if ( (dstRectCopy.y + dstRectCopy.h) > (viewInfo.ContainerY + viewInfo.ContainerHeight) )
+            {
+                dstRect.h = static_cast<int>( viewInfo.ContainerY + viewInfo.ContainerHeight ) - dstRect.y;
+                srcRect.y = srcRectCopy.y + srcRectCopy.h * (dstRectCopy.h - dstRect.h) / dstRectCopy.h;
+            }
+
+            // Define source width and height
+            srcRect.w = static_cast<int>( dstRect.w * imageScaleX );
+            srcRect.h = static_cast<int>( dstRect.h * imageScaleY );
+
+        }
+
         dstRect.x = (int)(dstRect.x*scaleX);
         dstRect.y = (int)(dstRect.y*scaleY);
         dstRect.w = (int)(dstRect.w*scaleX);
         dstRect.h = (int)(dstRect.h*scaleY);
-        SDL_SetTextureAlphaMod( texture, static_cast<char>( viewInfo.ReflectionAlpha * alpha * 255 ) );
-        SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, src, &dstRect, viewInfo.Angle, NULL, SDL_FLIP_HORIZONTAL );
+        if ( srcRect.h > 0 && srcRect.w > 0 )
+        {
+            SDL_SetTextureAlphaMod( texture, static_cast<char>( viewInfo.ReflectionAlpha * alpha * 255 ) );
+            SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, &srcRect, &dstRect, viewInfo.Angle, NULL, SDL_FLIP_VERTICAL );
+        }
     }
 
-    if ( viewInfo.Reflection == "right" )
+    // Restore original parameters
+    srcRect.x     = srcRectOrig.x;
+    srcRect.y     = srcRectOrig.y;
+    srcRect.w     = srcRectOrig.w;
+    srcRect.h     = srcRectOrig.h;
+    dstRect.x     = dstRectOrig.x;
+    dstRect.y     = dstRectOrig.y;
+    dstRect.w     = dstRectOrig.w;
+    dstRect.h     = dstRectOrig.h;
+    srcRectCopy.x = srcRectOrig.x;
+    srcRectCopy.y = srcRectOrig.y;
+    srcRectCopy.w = srcRectOrig.w;
+    srcRectCopy.h = srcRectOrig.h;
+    dstRectCopy.x = dstRectOrig.x;
+    dstRectCopy.y = dstRectOrig.y;
+    dstRectCopy.w = dstRectOrig.w;
+    dstRectCopy.h = dstRectOrig.h;
+
+    if ( viewInfo.Reflection.find("left") != std::string::npos )
     {
-        dstRect.x = dstRect.x + dstRect.w + viewInfo.ReflectionDistance;
-        dstRect.w = static_cast<unsigned int>( static_cast<float>(dstRect.w ) * viewInfo.ReflectionScale);
+        dstRect.w     = static_cast<unsigned int>( static_cast<float>(dstRect.w ) * viewInfo.ReflectionScale);
+        dstRect.x     = dstRect.x - dstRect.w - viewInfo.ReflectionDistance;
+        imageScaleX   = (dstRect.h > 0) ? static_cast<double>( srcRect.w ) / static_cast<double>( dstRect.w ) : 0.0;
+        dstRectCopy.x = dstRect.x;
+        dstRectCopy.w = dstRect.w;
+
+        // If a container has been defined, limit the display to the container boundaries.
+        if ( viewInfo.ContainerWidth > 0 && viewInfo.ContainerHeight > 0 &&
+             dstRectCopy.w           > 0 && dstRectCopy.h            > 0 )
+        {
+
+            // Correct if the image falls to the left of the container
+            if ( dstRect.x < viewInfo.ContainerX )
+            {
+                dstRect.x = static_cast<int>( viewInfo.ContainerX );
+                dstRect.w = dstRectCopy.w + dstRectCopy.x - dstRect.x;
+            }
+
+            // Correct if the image falls to the right of the container
+            if ( (dstRectCopy.x + dstRectCopy.w) > (viewInfo.ContainerX + viewInfo.ContainerWidth) )
+            {
+                dstRect.w = static_cast<int>( viewInfo.ContainerX + viewInfo.ContainerWidth ) - dstRect.x;
+                srcRect.x = srcRectCopy.x + srcRectCopy.w * (dstRectCopy.w - dstRect.w) / dstRectCopy.w;
+            }
+
+            // Correct if the image falls to the top of the container
+            if ( dstRect.y < viewInfo.ContainerY )
+            {
+                dstRect.y = static_cast<int>( viewInfo.ContainerY );
+                dstRect.h = dstRectCopy.h + dstRectCopy.y - dstRect.y;
+                srcRect.y = srcRectCopy.y + srcRectCopy.h * (dstRect.y - dstRectCopy.y) / dstRectCopy.h;
+            }
+
+            // Correct if the image falls to the bottom of the container
+            if ( (dstRectCopy.y + dstRectCopy.h) > (viewInfo.ContainerY + viewInfo.ContainerHeight) )
+            {
+                dstRect.h = static_cast<int>( viewInfo.ContainerY + viewInfo.ContainerHeight ) - dstRect.y;
+            }
+
+            // Define source width and height
+            srcRect.w = static_cast<int>( dstRect.w * imageScaleX );
+            srcRect.h = static_cast<int>( dstRect.h * imageScaleY );
+
+        }
+
         dstRect.x = (int)(dstRect.x*scaleX);
         dstRect.y = (int)(dstRect.y*scaleY);
         dstRect.w = (int)(dstRect.w*scaleX);
         dstRect.h = (int)(dstRect.h*scaleY);
-        SDL_SetTextureAlphaMod( texture, static_cast<char>( viewInfo.ReflectionAlpha * alpha * 255 ) );
-        SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, src, &dstRect, viewInfo.Angle, NULL, SDL_FLIP_HORIZONTAL );
+        if ( srcRect.h > 0 && srcRect.w > 0 )
+        {
+            SDL_SetTextureAlphaMod( texture, static_cast<char>( viewInfo.ReflectionAlpha * alpha * 255 ) );
+            SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, &srcRect, &dstRect, viewInfo.Angle, NULL, SDL_FLIP_HORIZONTAL );
+        }
+    }
+
+    // Restore original parameters
+    srcRect.x     = srcRectOrig.x;
+    srcRect.y     = srcRectOrig.y;
+    srcRect.w     = srcRectOrig.w;
+    srcRect.h     = srcRectOrig.h;
+    dstRect.x     = dstRectOrig.x;
+    dstRect.y     = dstRectOrig.y;
+    dstRect.w     = dstRectOrig.w;
+    dstRect.h     = dstRectOrig.h;
+    srcRectCopy.x = srcRectOrig.x;
+    srcRectCopy.y = srcRectOrig.y;
+    srcRectCopy.w = srcRectOrig.w;
+    srcRectCopy.h = srcRectOrig.h;
+    dstRectCopy.x = dstRectOrig.x;
+    dstRectCopy.y = dstRectOrig.y;
+    dstRectCopy.w = dstRectOrig.w;
+    dstRectCopy.h = dstRectOrig.h;
+
+    if ( viewInfo.Reflection.find("right") != std::string::npos )
+    {
+        dstRect.x     = dstRect.x + dstRect.w + viewInfo.ReflectionDistance;
+        dstRect.w     = static_cast<unsigned int>( static_cast<float>(dstRect.w ) * viewInfo.ReflectionScale);
+        imageScaleX   = (dstRect.h > 0) ? static_cast<double>( srcRect.w ) / static_cast<double>( dstRect.w ) : 0.0;
+        dstRectCopy.x = dstRect.x;
+        dstRectCopy.w = dstRect.w;
+
+        // If a container has been defined, limit the display to the container boundaries.
+        if ( viewInfo.ContainerWidth > 0 && viewInfo.ContainerHeight > 0 &&
+             dstRectCopy.w           > 0 && dstRectCopy.h            > 0 )
+        {
+
+            // Correct if the image falls to the left of the container
+            if ( dstRect.x < viewInfo.ContainerX )
+            {
+                dstRect.x = static_cast<int>( viewInfo.ContainerX );
+                dstRect.w = dstRectCopy.w + dstRectCopy.x - dstRect.x;
+            }
+
+            // Correct if the image falls to the right of the container
+            if ( (dstRectCopy.x + dstRectCopy.w) > (viewInfo.ContainerX + viewInfo.ContainerWidth) )
+            {
+                dstRect.w = static_cast<int>( viewInfo.ContainerX + viewInfo.ContainerWidth ) - dstRect.x;
+                srcRect.x = srcRectCopy.x + srcRectCopy.w * (dstRectCopy.w - dstRect.w) / dstRectCopy.w;
+            }
+
+            // Correct if the image falls to the top of the container
+            if ( dstRect.y < viewInfo.ContainerY )
+            {
+                dstRect.y = static_cast<int>( viewInfo.ContainerY );
+                dstRect.h = dstRectCopy.h + dstRectCopy.y - dstRect.y;
+                srcRect.y = srcRectCopy.y + srcRectCopy.h * (dstRect.y - dstRectCopy.y) / dstRectCopy.h;
+            }
+
+            // Correct if the image falls to the bottom of the container
+            if ( (dstRectCopy.y + dstRectCopy.h) > (viewInfo.ContainerY + viewInfo.ContainerHeight) )
+            {
+                dstRect.h = static_cast<int>( viewInfo.ContainerY + viewInfo.ContainerHeight ) - dstRect.y;
+            }
+
+            // Define source width and height
+            srcRect.w = static_cast<int>( dstRect.w * imageScaleX );
+            srcRect.h = static_cast<int>( dstRect.h * imageScaleY );
+
+        }
+
+        dstRect.x = (int)(dstRect.x*scaleX);
+        dstRect.y = (int)(dstRect.y*scaleY);
+        dstRect.w = (int)(dstRect.w*scaleX);
+        dstRect.h = (int)(dstRect.h*scaleY);
+        if ( srcRect.h > 0 && srcRect.w > 0 )
+        {
+            SDL_SetTextureAlphaMod( texture, static_cast<char>( viewInfo.ReflectionAlpha * alpha * 255 ) );
+            SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, &srcRect, &dstRect, viewInfo.Angle, NULL, SDL_FLIP_HORIZONTAL );
+        }
     }
 
     return true;
