@@ -1430,7 +1430,6 @@ void PageBuilder::getAnimationEvents(xml_node<> *node, TweenSet &tweens)
                     case TWEEN_PROPERTY_FONT_SIZE:
                     case TWEEN_PROPERTY_CONTAINER_Y:
                     case TWEEN_PROPERTY_CONTAINER_HEIGHT:
-                    case TWEEN_PROPERTY_VOLUME:
                         fromValue = getVerticalAlignment(from, 0);
                         toValue = getVerticalAlignment(to, 0);
                         break;

@@ -396,12 +396,14 @@ bool Component::animate()
                     baseViewInfo.Volume = tween->animate(elapsedTime);
                 else
                     baseViewInfo.Volume = tween->animate(elapsedTime, storeViewInfo_.Volume);
+                break;
 
             case TWEEN_PROPERTY_MONITOR:
                 if (tween->startDefined)
                     baseViewInfo.Monitor = static_cast<unsigned int>(tween->animate(elapsedTime));
                 else
                     baseViewInfo.Monitor = static_cast<unsigned int>(tween->animate(elapsedTime, storeViewInfo_.Monitor));
+                break;
 
             case TWEEN_PROPERTY_NOP:
                 break;

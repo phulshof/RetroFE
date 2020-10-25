@@ -474,7 +474,7 @@ bool GStreamerVideo::isPlaying()
 }
 
 
-void GStreamerVideo::setVolume(double volume)
+void GStreamerVideo::setVolume(float volume)
 {
     volume_ = volume;
 }
