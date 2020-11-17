@@ -50,34 +50,47 @@ int AttractMode::update(float dt, Page &page)
     elapsedPlaylistTime_   += dt;
     elapsedCollectionTime_ += dt;
 
-    // Check if it's time to switch playlists
-    if (!isActive_ && elapsedPlaylistTime_ > idlePlaylistTime && idlePlaylistTime > 0)
+    if ( page.isJukebox() )
     {
-        elapsedTime_         = 0;
-        elapsedPlaylistTime_ = 0;
-        return 1;
+        if ( !isActive_ && !page.isJukeboxPlaying() && elapsedTime_ > 10 )
+        {
+            isActive_    = true;
+            isSet_       = true;
+            elapsedTime_ = 0;
+            activeTime_  = ((float)((1000+rand()) % 5000)) / 1000;
+        }
     }
-    
-
-    // Check if it's time to switch collections
-    if (!isActive_ && elapsedCollectionTime_ > idleCollectionTime && idleCollectionTime > 0)
+    else
     {
-        elapsedTime_           = 0;
-        elapsedPlaylistTime_   = 0;
-        elapsedCollectionTime_ = 0;
-        return 2;
-    }
-    
 
-    // enable attract mode when idling for the expected time. Disable if idle time is set to 0.
-    if(!isActive_ && ((elapsedTime_ > idleTime && idleTime > 0) || (isSet_ && elapsedTime_ > idleNextTime && idleNextTime > 0)))
-    {
-        if (!isSet_)
-            elapsedPlaylistTime_ = 0; // Reset playlist timer if we are entering attract mode
-        isActive_    = true;
-        isSet_       = true;
-        elapsedTime_ = 0;
-        activeTime_  = ((float)((1000+rand()) % 5000)) / 1000;
+        // Check if it's time to switch playlists
+        if (!isActive_ && elapsedPlaylistTime_ > idlePlaylistTime && idlePlaylistTime > 0)
+        {
+            elapsedTime_         = 0;
+            elapsedPlaylistTime_ = 0;
+            return 1;
+        }
+
+        // Check if it's time to switch collections
+        if (!isActive_ && elapsedCollectionTime_ > idleCollectionTime && idleCollectionTime > 0)
+        {
+            elapsedTime_           = 0;
+            elapsedPlaylistTime_   = 0;
+            elapsedCollectionTime_ = 0;
+            return 2;
+        }
+    
+        // enable attract mode when idling for the expected time. Disable if idle time is set to 0.
+        if(!isActive_ && ((elapsedTime_ > idleTime && idleTime > 0) || (isSet_ && elapsedTime_ > idleNextTime && idleNextTime > 0)))
+        {
+            if (!isSet_)
+                elapsedPlaylistTime_ = 0; // Reset playlist timer if we are entering attract mode
+            isActive_    = true;
+            isSet_       = true;
+            elapsedTime_ = 0;
+            activeTime_  = ((float)((1000+rand()) % 5000)) / 1000;
+        }
+
     }
 
     if(isActive_)

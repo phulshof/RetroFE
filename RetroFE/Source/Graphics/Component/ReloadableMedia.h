@@ -27,7 +27,7 @@ class Image;
 class ReloadableMedia : public Component
 {
 public:
-    ReloadableMedia(Configuration &config, bool systemMode, bool layoutMode, bool commonMode, bool menuMode, std::string type, std::string imageType, Page &page, int displayOffset, bool isVideo, Font *font);
+    ReloadableMedia(Configuration &config, bool systemMode, bool layoutMode, bool commonMode, bool menuMode, std::string type, std::string imageType, Page &page, int displayOffset, bool isVideo, Font *font, bool jukebox, int jukeboxNumLoops);
     virtual ~ReloadableMedia();
     void update(float dt);
     void draw();
@@ -36,6 +36,8 @@ public:
     Component *findComponent(std::string collection, std::string type, std::string basename, std::string filepath, bool systemMode, bool isVideo);
 
     void enableTextFallback_(bool value);
+    virtual bool isJukeboxPlaying();
+
 
 private:
     void reloadTexture();
@@ -54,4 +56,6 @@ private:
     Page *page_;
     int displayOffset_;
     std::string imageType_;
+    bool jukebox_;
+    int  jukeboxNumLoops_;
 };

@@ -433,6 +433,14 @@ bool Component::isPlaying()
 }
 
 
+
+
+bool Component::isJukeboxPlaying()
+{
+    return false;
+}
+
+
 void Component::setMenuScrollReload(bool menuScrollReload)
 {
     menuScrollReload_ = menuScrollReload;

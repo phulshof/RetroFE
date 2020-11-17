@@ -16,6 +16,7 @@
 
 #include "VideoFactory.h"
 #include "IVideo.h"
+#include "../Utility/Log.h"
 #include "GStreamerVideo.h"
 
 bool VideoFactory::enabled_ = true;
@@ -23,20 +24,23 @@ int VideoFactory::numLoops_ = 0;
 IVideo *VideoFactory::instance_ = NULL;
 
 
-IVideo *VideoFactory::createVideo( int monitor, bool isTypeVideo )
+IVideo *VideoFactory::createVideo( int monitor, bool isTypeVideo, int numLoops )
 {
-
     IVideo *instance = NULL;
     if ( enabled_ && (!isTypeVideo || !instance_) )
     {
         instance = new GStreamerVideo( monitor );
         instance->initialize();
-        ((GStreamerVideo *)(instance))->setNumLoops(numLoops_);
         if ( isTypeVideo )
             instance_ = instance;
     }
     if ( isTypeVideo )
         instance = instance_;
+
+    if (numLoops > 0 )
+        ((GStreamerVideo *)(instance))->setNumLoops(numLoops);
+    else
+        ((GStreamerVideo *)(instance))->setNumLoops(numLoops_);
 
     return instance;
 }

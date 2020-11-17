@@ -24,7 +24,7 @@
 class VideoBuilder
 {
 public:
-    VideoComponent * createVideo(std::string path, Page &page, std::string name, int monitor, bool isTypeVideo);
+    VideoComponent * createVideo(std::string path, Page &page, std::string name, int monitor, bool isTypeVideo, int numLoops = -1);
 
 private:
     VideoFactory factory_;

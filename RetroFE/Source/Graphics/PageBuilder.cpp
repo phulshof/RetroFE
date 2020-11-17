@@ -504,6 +504,7 @@ bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
 
 
     loadReloadableImages(layout, "reloadableImage",         page);
+    loadReloadableImages(layout, "reloadableAudio",         page);
     loadReloadableImages(layout, "reloadableVideo",         page);
     loadReloadableImages(layout, "reloadableText",          page);
     loadReloadableImages(layout, "reloadableScrollingText", page);
@@ -547,7 +548,7 @@ void PageBuilder::loadReloadableImages(xml_node<> *layout, std::string tagName, 
             id = Utils::convertInt(idXml->value());
         }
 
-        if(!imageType && tagName == "reloadableVideo")
+        if(!imageType && (tagName == "reloadableVideo" || tagName == "reloadableAudio"))
         {
             Logger::write(Logger::ZONE_WARNING, "Layout", "<reloadableImage> component in layout does not specify an imageType for when the video does not exist");
         }
@@ -722,6 +723,18 @@ void PageBuilder::loadReloadableImages(xml_node<> *layout, std::string tagName, 
         }
         else
         {
+            xml_attribute<> *jukeboxXml = componentXml->first_attribute("jukebox");
+            bool jukebox         = false;
+            int  jukeboxNumLoops = 0;
+            if(jukeboxXml &&
+               (Utils::toLower(jukeboxXml->value()) == "true" ||
+                Utils::toLower(jukeboxXml->value()) == "yes"))
+            {
+                jukebox = true;
+                page->setJukebox();
+                xml_attribute<> *numLoopsXml = componentXml->first_attribute("jukeboxNumLoops");
+                jukeboxNumLoops = numLoopsXml ? Utils::convertInt(numLoopsXml->value()) : 1;
+            }
             Font *font = addFont(componentXml, NULL);
             std::string typeString      = "video";
             std::string imageTypeString = "";
@@ -729,7 +742,7 @@ void PageBuilder::loadReloadableImages(xml_node<> *layout, std::string tagName, 
                 typeString = type->value();
             if ( imageType )
                 imageTypeString = imageType->value();
-            c = new ReloadableMedia(config_, systemMode, layoutMode, commonMode, menuMode, typeString, imageTypeString, *page, selectedOffset, (tagName == "reloadableVideo"), font);
+            c = new ReloadableMedia(config_, systemMode, layoutMode, commonMode, menuMode, typeString, imageTypeString, *page, selectedOffset, (tagName == "reloadableVideo") || (tagName == "reloadableAudio"), font, jukebox, jukeboxNumLoops);
             c->setId( id );
             xml_attribute<> *menuScrollReload = componentXml->first_attribute("menuScrollReload");
             if (menuScrollReload &&

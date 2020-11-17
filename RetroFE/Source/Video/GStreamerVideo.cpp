@@ -83,7 +83,8 @@ GStreamerVideo::~GStreamerVideo()
 
 void GStreamerVideo::setNumLoops(int n)
 {
-    numLoops_ = n;
+    if ( n > 0 )
+        numLoops_ = n;
 }
 
 SDL_Texture *GStreamerVideo::getTexture() const

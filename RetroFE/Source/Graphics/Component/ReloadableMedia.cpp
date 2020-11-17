@@ -28,7 +28,7 @@
 #include <vector>
 #include <iostream>
 
-ReloadableMedia::ReloadableMedia(Configuration &config, bool systemMode, bool layoutMode, bool commonMode, bool menuMode, std::string type, std::string imageType, Page &p, int displayOffset, bool isVideo, Font *font)
+ReloadableMedia::ReloadableMedia(Configuration &config, bool systemMode, bool layoutMode, bool commonMode, bool menuMode, std::string type, std::string imageType, Page &p, int displayOffset, bool isVideo, Font *font, bool jukebox, int jukeboxNumLoops)
     : Component(p)
     , config_(config)
     , systemMode_(systemMode)
@@ -43,7 +43,8 @@ ReloadableMedia::ReloadableMedia(Configuration &config, bool systemMode, bool la
     , type_(type)
     , displayOffset_(displayOffset)
     , imageType_(imageType)
-
+    , jukebox_(jukebox)
+    , jukeboxNumLoops_(jukeboxNumLoops)
 {
     allocateGraphicsMemory();
 }
@@ -434,7 +435,10 @@ Component *ReloadableMedia::findComponent(std::string collection, std::string ty
 
     if(isVideo)
     {
-        component = videoBuild.createVideo(imagePath, page, basename, baseViewInfo.Monitor, type=="video");
+        if ( jukebox_ )
+            component = videoBuild.createVideo(imagePath, page, basename, baseViewInfo.Monitor, type=="video", jukeboxNumLoops_);
+        else
+            component = videoBuild.createVideo(imagePath, page, basename, baseViewInfo.Monitor, type=="video");
     }
     else
     {
@@ -456,4 +460,13 @@ void ReloadableMedia::draw()
         loadedComponent_->baseViewInfo = baseViewInfo;
         loadedComponent_->draw();
     }
+}
+
+
+bool ReloadableMedia::isJukeboxPlaying()
+{
+    if ( jukebox_ && loadedComponent_ )
+        return loadedComponent_->isPlaying();
+    else
+        return false;
 }

@@ -48,6 +48,7 @@ public:
     virtual void draw();
     void setTweens(AnimationEvents *set);
     virtual bool isPlaying();
+    virtual bool isJukeboxPlaying();
     ViewInfo baseViewInfo;
     std::string collectionName;
     void setMenuScrollReload(bool menuScrollReload);

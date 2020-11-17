@@ -41,6 +41,7 @@ Page::Page(Configuration &config, int layoutWidth, int layoutHeight)
     , minShowTime_(0)
 	, layoutWidth_(layoutWidth)
 	, layoutHeight_(layoutHeight)
+    , jukebox_(false)
 {
 }
 
@@ -1597,4 +1598,32 @@ int Page::getLayoutWidth()
 int Page::getLayoutHeight()
 {
 	return layoutHeight_;
+}
+
+
+void Page::setJukebox()
+{
+    jukebox_ = true;
+    return;
+}
+
+
+bool Page::isJukebox()
+{
+    return jukebox_;
+}
+
+
+bool Page::isJukeboxPlaying()
+{
+
+    bool retVal = false;
+
+    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    {
+        retVal |= (*it)->isJukeboxPlaying();
+    }
+
+    return retVal;
+
 }

@@ -123,8 +123,11 @@ public:
     void  updateScrollPeriod();
     void  scroll(bool forward);
     bool  hasSubs();
-	int getLayoutWidth();
-	int getLayoutHeight();
+	int   getLayoutWidth();
+	int   getLayoutHeight();
+    void  setJukebox();
+    bool  isJukebox();
+    bool  isJukeboxPlaying();
 
 private:
     void playlistChange();
@@ -165,5 +168,6 @@ private:
     CollectionInfo::Playlists_T::iterator playlist_;
 	int layoutWidth_;
 	int layoutHeight_;
+    bool jukebox_;
 
 };
