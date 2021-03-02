@@ -270,9 +270,14 @@ bool RetroFE::deInitialize( )
     initialized = false;
 
     if ( reboot_ )
+    {
         Logger::write( Logger::ZONE_INFO, "RetroFE", "Rebooting" );
+    }
     else
+    {
         Logger::write( Logger::ZONE_INFO, "RetroFE", "Exiting" );
+        SDL::deInitialize( );
+    }
 
     return retVal;
 }

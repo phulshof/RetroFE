@@ -190,7 +190,8 @@ void ScrollingList::destroyItems( )
 {
     for ( unsigned int i = 0; i < components_.size( ); ++i )
     {
-        delete components_.at( i );
+        if ( components_.at( i ) )
+            delete components_.at( i );
         components_.at( i ) = NULL;
     }
 }
@@ -780,13 +781,16 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
                 config_.getMediaPropertyAbsolutePath( collectionName, videoType_, false, videoPath );
             }
         }
-        if ( videoType_ != "null" )
+        if ( !t )
         {
-            t = videoBuild.createVideo( videoPath, page, names[n], baseViewInfo.Monitor, false );
-        }
-        else
-        {
-            t = imageBuild.CreateImage( imagePath, page, names[n], baseViewInfo.Monitor );
+            if ( videoType_ != "null" )
+            {
+                t = videoBuild.createVideo( videoPath, page, names[n], baseViewInfo.Monitor, false );
+            }
+            else
+            {
+                t = imageBuild.CreateImage( imagePath, page, names[n], baseViewInfo.Monitor );
+            }
         }
 
         // check sub-collection path for art
@@ -968,6 +972,8 @@ void ScrollingList::deallocateTexture( unsigned int index )
     {
         s->freeGraphicsMemory(  );
     }
+    delete s;
+    components_.at( index ) = NULL;
 }
 
 void ScrollingList::draw(  )
