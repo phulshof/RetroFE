@@ -37,7 +37,7 @@ VideoComponent::~VideoComponent()
     if(videoInst_)
     {
         videoInst_->stop();
-        delete videoInst_;
+//        delete videoInst_;
         videoInst_ = NULL;
     }
 }

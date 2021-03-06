@@ -32,27 +32,11 @@ def mkdir_p(path):
 #####################################################################
 parser = argparse.ArgumentParser(description='Bundle up some RetroFE common files.')
 parser.add_argument('--os', choices=['windows','linux','mac'], required=True, help='Operating System (windows or linux or mac)')
-parser.add_argument('--gstreamer_path', help='Path to gstreamer sdk (i.e. D:/gstreamer')
 parser.add_argument('--build', default='full', help='Define what contents to package (full, core, engine, layout, none')
 parser.add_argument('--clean', action='store_true', help='Clean the output directory')
 parser.add_argument('--compiler', help='Compiler to use (vs, mingw, gcc')
 
 args = parser.parse_args()
-
-gstreamer_path = None
-
-# windows needs a gstreamer path set
-#if args.os == 'windows':
-#  if not hasattr(args, 'gstreamer_path'):
-#    print('missing argument --gstreamer_path')
-#    sys.exit(-1)
-#    
-#  gstreamer_path = args.gstreamer_path
-#  
-#  if not os.path.exists(gstreamer_path):
-#    print('could not find gstreamer libraries: ' + gstreamer_path)
-#    sys.exit(-1)
-
 
 #####################################################################
 # Determine base path os to build
@@ -140,23 +124,6 @@ if args.os == 'windows':
     shutil.copy(src_exe, core_path)
 #    third_party_path = os.path.join(base_path, 'RetroFE', 'ThirdParty')
         
-#  if args.build == 'full' or args.build == 'core':
-#    libraries = [
-#      os.path.join(gstreamer_path, 'lib/*.dll'),
-#      os.path.join(gstreamer_path, 'lib/gstreamer-1.0/*.dll'),
-#      os.path.join(gstreamer_path, 'bin/*.dll'),
-#      os.path.join(third_party_path, 'SDL2-2.0.3', 'lib', 'x86', r'*.dll'),
-#      os.path.join(third_party_path, 'SDL2_image-2.0.0', 'lib', 'x86', '*.dll'),
-#      os.path.join(third_party_path, 'SDL2_mixer-2.0.0', 'lib', 'x86', '*.dll'),
-#      os.path.join(third_party_path, 'SDL2_ttf-2.0.12', 'lib', 'x86', '*.dll')
-#    ]
-#    
-#    # copy third party libraries
-#    for glob_dlls in libraries:
-#      for file in glob.glob(glob_dlls):
-#        shutil.copy(file, core_path)
-
-  
 elif args.os == 'linux':
   if args.build == 'full' or args.build == 'core' or args.build == 'engine':
     src_exe = os.path.join(base_path, 'RetroFE', 'Build', 'retrofe')
