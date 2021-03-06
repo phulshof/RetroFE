@@ -972,8 +972,6 @@ void ScrollingList::deallocateTexture( unsigned int index )
     {
         s->freeGraphicsMemory(  );
     }
-    delete s;
-    components_.at( index ) = NULL;
 }
 
 void ScrollingList::draw(  )

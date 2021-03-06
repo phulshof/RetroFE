@@ -21,7 +21,7 @@
 
 std::string retrofe_version_major = "0";
 std::string retrofe_version_minor = "10";
-std::string retrofe_version_build = "8.6";
+std::string retrofe_version_build = "9";
 
 
 std::string Version::getString( )
