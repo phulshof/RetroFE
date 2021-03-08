@@ -26,6 +26,7 @@ Item::Item()
     , leaf(true)
 {
     file = "";
+    isFavorite = false;
 }
 
 Item::~Item()

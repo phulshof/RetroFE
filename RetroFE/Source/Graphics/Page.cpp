@@ -1359,6 +1359,7 @@ void Page::removePlaylist()
     if(it != items->end())
     {
         items->erase(it);
+        (*it)->isFavorite = false;
         collection->sortPlaylists();
         collection->saveRequest = true;
     }
@@ -1377,6 +1378,7 @@ void Page::addPlaylist()
     if(playlist_->first != "favorites" && std::find(items->begin(), items->end(), selectedItem_) == items->end())
     {
         items->push_back(selectedItem_);
+        selectedItem_->isFavorite = true;
         collection->sortPlaylists();
         collection->saveRequest = true;
     }

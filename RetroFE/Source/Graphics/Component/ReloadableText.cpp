@@ -230,6 +230,13 @@ void ReloadableText::ReloadTexture()
                 ss << pluralPrefix_ << (page.getSelectedIndex()+1) << "/" << page.getCollectionSize() << pluralPostfix_;
             }
         }
+        else if (type_ == "isFavorite")
+        {
+            if (selectedItem->isFavorite)
+                text = "yes";
+            else
+                text = "no";
+        }
 
         if (!selectedItem->leaf || systemMode_) // item is not a leaf
         {

@@ -136,6 +136,20 @@ void ReloadableMedia::reloadTexture()
     {
         names.push_back(selectedItem->cloneof);
     }
+
+    std::string typeLC   = Utils::toLower(type_);
+    if (typeLC == "isfavorite")
+    {
+        if (selectedItem->isFavorite)
+        {
+            names.push_back("yes");
+        }
+        else
+        {
+            names.push_back("no");
+        }
+    }
+
     names.push_back("default");
 
     if(isVideo_)
@@ -214,7 +228,6 @@ void ReloadableMedia::reloadTexture()
     for(unsigned int n = 0; n < names.size() && !loadedComponent_; ++n)
     {
         std::string basename = names[n];
-        std::string typeLC   = Utils::toLower(type_);
         bool        defined  = false;
         if ( isVideo_ )
             typeLC = Utils::toLower(imageType_);

@@ -469,6 +469,8 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
                         if ( ((*it)->name == itemName || itemName == "*") && (*it)->collectionInfo->name == collectionName )
                         {
                             info->playlists[basename]->push_back((*it));
+                            if ( basename == "favorites" )
+                                (*it)->isFavorite = true;
                         }
                     }
                 }

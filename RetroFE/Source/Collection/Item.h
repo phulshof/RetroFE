@@ -43,6 +43,7 @@ public:
     std::string joyWays;
     std::string rating;
     std::string score;
+    bool        isFavorite;
     CollectionInfo *collectionInfo;
     bool leaf;
 
