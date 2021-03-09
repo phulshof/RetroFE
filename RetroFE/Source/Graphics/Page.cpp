@@ -1359,7 +1359,7 @@ void Page::removePlaylist()
     if(it != items->end())
     {
         items->erase(it);
-        (*it)->isFavorite = false;
+        selectedItem_->isFavorite = false;
         collection->sortPlaylists();
         collection->saveRequest = true;
     }
