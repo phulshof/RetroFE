@@ -1567,6 +1567,13 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             state = RETROFE_PLAYLIST_REQUEST;
         }
 
+        else if ( input_.keystate(UserInput::KeyCodeTogglePlaylist) )
+        {
+            attract_.reset( );
+            page->togglePlaylist( );
+            state = RETROFE_PLAYLIST_REQUEST;
+        }
+
         else if ( input_.keystate(UserInput::KeyCodeRandom) )
         {
             attract_.reset( );

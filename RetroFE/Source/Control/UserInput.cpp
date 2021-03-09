@@ -73,6 +73,7 @@ bool UserInput::initialize()
     MapKey("prevCyclePlaylist", KeyCodePrevCyclePlaylist, false);
     MapKey("addPlaylist", KeyCodeAddPlaylist, false);
     MapKey("removePlaylist", KeyCodeRemovePlaylist, false);
+    MapKey("togglePlaylist", KeyCodeTogglePlaylist, false);
     MapKey("random", KeyCodeRandom, false);
     MapKey("menu", KeyCodeMenu, false);
 	MapKey("reboot", KeyCodeReboot, false);

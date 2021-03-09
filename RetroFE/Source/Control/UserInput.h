@@ -59,6 +59,7 @@ public:
         KeyCodeMenu,
         KeyCodeAddPlaylist,
         KeyCodeRemovePlaylist,
+		KeyCodeTogglePlaylist,
         KeyCodeAdminMode,
         KeyCodeHideItem,
         KeyCodeQuit,

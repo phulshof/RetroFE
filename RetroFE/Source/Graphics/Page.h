@@ -115,6 +115,7 @@ public:
     void  setText( std::string text, int id );
     void  addPlaylist();
     void  removePlaylist();
+    void  togglePlaylist();
     void  updateLastPlayedPlaylist( Item *item );
     void  reallocateMenuSpritePoints();
     bool  isMenuScrolling();

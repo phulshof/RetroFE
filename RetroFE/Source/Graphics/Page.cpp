@@ -1386,6 +1386,17 @@ void Page::addPlaylist()
 }
 
 
+void Page::togglePlaylist()
+{
+    if (!selectedItem_) return;
+
+    if (selectedItem_->isFavorite)
+		removePlaylist();
+	else
+		addPlaylist();
+}
+
+
 std::string Page::getCollectionName()
 {
     if(collections_.size() == 0) return "";
