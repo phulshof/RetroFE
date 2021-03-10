@@ -57,7 +57,7 @@ int AttractMode::update(float dt, Page &page)
             isActive_    = true;
             isSet_       = true;
             elapsedTime_ = 0;
-            activeTime_  = ((float)((1000+rand()) % 5000)) / 1000;
+            activeTime_  = ((float)(minTime+(rand() % (maxTime-minTime)))) / 1000;
         }
     }
     else
@@ -88,7 +88,7 @@ int AttractMode::update(float dt, Page &page)
             isActive_    = true;
             isSet_       = true;
             elapsedTime_ = 0;
-            activeTime_  = ((float)((1000+rand()) % 5000)) / 1000;
+            activeTime_  = ((float)(minTime+(rand() % (maxTime-minTime)))) / 1000;
         }
 
     }

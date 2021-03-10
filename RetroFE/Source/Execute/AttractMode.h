@@ -27,6 +27,8 @@ public:
     float idleNextTime;
     float idlePlaylistTime;
     float idleCollectionTime;
+	int   minTime;
+	int   maxTime;
     bool  isActive();
     bool  isSet();
 

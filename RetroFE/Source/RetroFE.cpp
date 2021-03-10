@@ -323,6 +323,8 @@ bool RetroFE::run( )
     int attractModeNextTime       = 0;
     int attractModePlaylistTime   = 0;
     int attractModeCollectionTime = 0;
+	int attractModeMinTime        = 1000;
+	int attractModeMaxTime        = 5000;
     std::string firstCollection   = "Main";
     bool running                  = true;
     RETROFE_STATE state           = RETROFE_NEW;
@@ -331,12 +333,16 @@ bool RetroFE::run( )
     config_.getProperty( "attractModeNextTime", attractModeNextTime );
     config_.getProperty( "attractModePlaylistTime", attractModePlaylistTime );
     config_.getProperty( "attractModeCollectionTime", attractModeCollectionTime );
+	config_.getProperty( "attractModeMinTime", attractModeMinTime );
+	config_.getProperty( "attractModeMaxTime", attractModeMaxTime );
     config_.getProperty( "firstCollection", firstCollection );
 
     attract_.idleTime           = static_cast<float>(attractModeTime);
     attract_.idleNextTime       = static_cast<float>(attractModeNextTime);
     attract_.idlePlaylistTime   = static_cast<float>(attractModePlaylistTime);
     attract_.idleCollectionTime = static_cast<float>(attractModeCollectionTime);
+	attract_.minTime            = attractModeMinTime;
+	attract_.maxTime            = attractModeMaxTime;
 
     int fps     = 60;
 	int fpsIdle = 60;
