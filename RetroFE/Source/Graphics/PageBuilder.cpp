@@ -104,7 +104,10 @@ Page *PageBuilder::buildPage( std::string collectionName )
 
     for ( size_t monitor = 0; monitor < monitors.size(); monitor++ )
     {
-        monitor_         = monitor;
+		if ( monitor > 0 )
+            monitor_ = monitor - 1;
+		else
+            monitor_ = monitor;
         layoutFile       = Utils::combinePath(layoutPath, layoutPage + monitors[monitor] + ".xml");
         layoutFileAspect = Utils::combinePath(layoutPath, layoutPage + " " + std::to_string( screenWidth_/Utils::gcd( screenWidth_, screenHeight_ ) ) + "x" + std::to_string( screenHeight_/Utils::gcd( screenWidth_, screenHeight_ ) ) + monitors[monitor] + ".xml" );
 
