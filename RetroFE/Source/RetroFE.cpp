@@ -69,12 +69,12 @@ RetroFE::RetroFE( Configuration &c )
     , lastLaunchReturnTime_(0)
     , keyLastTime_(0)
     , keyDelayTime_(.3f)
-	, reboot_(false)
+    , reboot_(false)
 {
     menuMode_                            = false;
     attractMode_                         = false;
-	attractModePlaylistCollectionNumber_ = 0;
-	firstPlaylist_                       = "all";
+    attractModePlaylistCollectionNumber_ = 0;
+    firstPlaylist_                       = "all";
 }
 
 
@@ -323,8 +323,8 @@ bool RetroFE::run( )
     int attractModeNextTime       = 0;
     int attractModePlaylistTime   = 0;
     int attractModeCollectionTime = 0;
-	int attractModeMinTime        = 1000;
-	int attractModeMaxTime        = 5000;
+    int attractModeMinTime        = 1000;
+    int attractModeMaxTime        = 5000;
     std::string firstCollection   = "Main";
     bool running                  = true;
     RETROFE_STATE state           = RETROFE_NEW;
@@ -333,23 +333,23 @@ bool RetroFE::run( )
     config_.getProperty( "attractModeNextTime", attractModeNextTime );
     config_.getProperty( "attractModePlaylistTime", attractModePlaylistTime );
     config_.getProperty( "attractModeCollectionTime", attractModeCollectionTime );
-	config_.getProperty( "attractModeMinTime", attractModeMinTime );
-	config_.getProperty( "attractModeMaxTime", attractModeMaxTime );
+    config_.getProperty( "attractModeMinTime", attractModeMinTime );
+    config_.getProperty( "attractModeMaxTime", attractModeMaxTime );
     config_.getProperty( "firstCollection", firstCollection );
 
     attract_.idleTime           = static_cast<float>(attractModeTime);
     attract_.idleNextTime       = static_cast<float>(attractModeNextTime);
     attract_.idlePlaylistTime   = static_cast<float>(attractModePlaylistTime);
     attract_.idleCollectionTime = static_cast<float>(attractModeCollectionTime);
-	attract_.minTime            = attractModeMinTime;
-	attract_.maxTime            = attractModeMaxTime;
+    attract_.minTime            = attractModeMinTime;
+    attract_.maxTime            = attractModeMaxTime;
 
     int fps     = 60;
-	int fpsIdle = 60;
-	config_.getProperty( "fps", fps );
-	config_.getProperty( "fpsIdle", fpsIdle );
-	double fpsTime     = 1000.0 / static_cast<double>(fps);
-	double fpsIdleTime = 1000.0 / static_cast<double>(fpsIdle);
+    int fpsIdle = 60;
+    config_.getProperty( "fps", fps );
+    config_.getProperty( "fpsIdle", fpsIdle );
+    double fpsTime     = 1000.0 / static_cast<double>(fps);
+    double fpsIdleTime = 1000.0 / static_cast<double>(fpsIdle);
 
     int initializeStatus = 0;
     bool inputClear      = false;
@@ -480,8 +480,8 @@ bool RetroFE::run( )
 
                     config_.getProperty( "firstPlaylist", firstPlaylist_ );
                     currentPage_->selectPlaylist( firstPlaylist_ );
-					if (currentPage_->getPlaylistName() != firstPlaylist_ )
-						currentPage_->selectPlaylist( "all" );
+                    if (currentPage_->getPlaylistName() != firstPlaylist_ )
+                        currentPage_->selectPlaylist( "all" );
 
                     currentPage_->onNewItemSelected( );
                     currentPage_->reallocateMenuSpritePoints( );
@@ -672,8 +672,8 @@ bool RetroFE::run( )
                 else
                 {
                     currentPage_->selectPlaylist( autoPlaylist );
-					if (currentPage_->getPlaylistName() != autoPlaylist )
-						currentPage_->selectPlaylist( "all" );
+                    if (currentPage_->getPlaylistName() != autoPlaylist )
+                        currentPage_->selectPlaylist( "all" );
                 }
 
                 if ( rememberMenu && lastMenuOffsets_.find( nextPageName ) != lastMenuOffsets_.end( ) )
@@ -687,7 +687,7 @@ bool RetroFE::run( )
                 state = RETROFE_NEXT_PAGE_MENU_LOAD_ART;
 
                 // Check if we've entered an empty collection and need to go back automatically
-	            if (currentPage_->getCollectionSize() == 0)
+                if (currentPage_->getCollectionSize() == 0)
                 {
                     bool backOnEmpty = false;
                     config_.getProperty( "backOnEmpty", backOnEmpty );
@@ -749,22 +749,22 @@ bool RetroFE::run( )
                 state = RETROFE_COLLECTION_DOWN_ENTER;
 
                 if ( attractMode_ ) // Check playlist change in attract mode
-				{
-					attractModePlaylistCollectionNumber_   += 1;
-					int attractModePlaylistCollectionNumber = 0;
-					config_.getProperty( "attractModePlaylistCollectionNumber", attractModePlaylistCollectionNumber );
-					// Check if playlist should be changed
-					if ( attractModePlaylistCollectionNumber_ > 0 && attractModePlaylistCollectionNumber_ >= attractModePlaylistCollectionNumber )
-					{
-						attractModePlaylistCollectionNumber_ = 0;
+                {
+                    attractModePlaylistCollectionNumber_   += 1;
+                    int attractModePlaylistCollectionNumber = 0;
+                    config_.getProperty( "attractModePlaylistCollectionNumber", attractModePlaylistCollectionNumber );
+                    // Check if playlist should be changed
+                    if ( attractModePlaylistCollectionNumber_ > 0 && attractModePlaylistCollectionNumber_ >= attractModePlaylistCollectionNumber )
+                    {
+                        attractModePlaylistCollectionNumber_ = 0;
                         currentPage_->nextPlaylist( );
                         std::string attractModeSkipPlaylist = "";
                         config_.getProperty( "attractModeSkipPlaylist", attractModeSkipPlaylist );
                         if (currentPage_->getPlaylistName( ) == attractModeSkipPlaylist)
                             currentPage_->nextPlaylist( );
-						state = RETROFE_PLAYLIST_REQUEST;
-					}
-				}
+                        state = RETROFE_PLAYLIST_REQUEST;
+                    }
+                }
             }
             break;
 
@@ -797,35 +797,39 @@ bool RetroFE::run( )
                 if (rememberMenu && lastMenuPlaylists_.find( currentPage_->getCollectionName( ) ) != lastMenuPlaylists_.end( ))
                 {
                     currentPage_->selectPlaylist( lastMenuPlaylists_[currentPage_->getCollectionName( )] ); // Switch to last playlist
-                    currentPage_->setScrollOffsetIndex( lastMenuOffsets_[currentPage_->getCollectionName( )] );
                 }
                 else
                 {
                     currentPage_->selectPlaylist( autoPlaylist );
-					if (currentPage_->getPlaylistName() != autoPlaylist )
-						currentPage_->selectPlaylist( "all" );
+                    if (currentPage_->getPlaylistName() != autoPlaylist )
+                        currentPage_->selectPlaylist( "all" );
+                }
+
+                if (rememberMenu && lastMenuPlaylists_.find( currentPage_->getCollectionName( ) ) != lastMenuPlaylists_.end( ))
+                {
+                    currentPage_->setScrollOffsetIndex( lastMenuOffsets_[currentPage_->getCollectionName( )] );
                 }
 
                 state = RETROFE_COLLECTION_DOWN_MENU_ENTER;
                 currentPage_->onNewItemSelected( );
 
                 if ( attractMode_ ) // Check playlist change in attract mode
-				{
-					attractModePlaylistCollectionNumber_   += 1;
-					int attractModePlaylistCollectionNumber = 0;
-					config_.getProperty( "attractModePlaylistCollectionNumber", attractModePlaylistCollectionNumber );
-					// Check if playlist should be changed
-					if ( attractModePlaylistCollectionNumber_ > 0 && attractModePlaylistCollectionNumber_ >= attractModePlaylistCollectionNumber )
-					{
-						attractModePlaylistCollectionNumber_ = 0;
+                {
+                    attractModePlaylistCollectionNumber_   += 1;
+                    int attractModePlaylistCollectionNumber = 0;
+                    config_.getProperty( "attractModePlaylistCollectionNumber", attractModePlaylistCollectionNumber );
+                    // Check if playlist should be changed
+                    if ( attractModePlaylistCollectionNumber_ > 0 && attractModePlaylistCollectionNumber_ >= attractModePlaylistCollectionNumber )
+                    {
+                        attractModePlaylistCollectionNumber_ = 0;
                         currentPage_->nextPlaylist( );
                         std::string attractModeSkipPlaylist = "";
                         config_.getProperty( "attractModeSkipPlaylist", attractModeSkipPlaylist );
                         if (currentPage_->getPlaylistName( ) == attractModeSkipPlaylist)
                             currentPage_->nextPlaylist( );
-						state = RETROFE_PLAYLIST_REQUEST;
-					}
-				}
+                        state = RETROFE_PLAYLIST_REQUEST;
+                    }
+                }
 
             }
             break;
@@ -844,12 +848,12 @@ bool RetroFE::run( )
             {
                 int attractModePlaylistCollectionNumber = 0;
                 config_.getProperty( "attractModePlaylistCollectionNumber", attractModePlaylistCollectionNumber );
-				if (!( attractMode_ && attractModePlaylistCollectionNumber > 0 && attractModePlaylistCollectionNumber_ == 0 ))
-				{
+                if (!( attractMode_ && attractModePlaylistCollectionNumber > 0 && attractModePlaylistCollectionNumber_ == 0 ))
+                {
                     currentPage_->setScrolling(Page::ScrollDirectionForward);
                     currentPage_->scroll(true);
                     currentPage_->updateScrollPeriod( );
-				}
+                }
                 state = RETROFE_COLLECTION_DOWN_SCROLL;
             }
             break;
@@ -992,8 +996,8 @@ bool RetroFE::run( )
                 else
                 {
                     currentPage_->selectPlaylist( autoPlaylist );
-					if (currentPage_->getPlaylistName() != autoPlaylist )
-						currentPage_->selectPlaylist( "all" );
+                    if (currentPage_->getPlaylistName() != autoPlaylist )
+                        currentPage_->selectPlaylist( "all" );
                 }
 
                 if ( rememberMenu && lastMenuOffsets_.find( currentPage_->getCollectionName( ) ) != lastMenuOffsets_.end( ) )
@@ -1094,7 +1098,7 @@ bool RetroFE::run( )
                 CollectionInfoBuilder cib(config_, *metadb_);
                 std::string attractModeSkipPlaylist  = "";
                 std::string lastPlayedSkipCollection = "";
-				int         size = 0;
+                int         size = 0;
                 config_.getProperty( "attractModeSkipPlaylist",  attractModeSkipPlaylist );
                 config_.getProperty( "lastPlayedSkipCollection", lastPlayedSkipCollection );
                 config_.getProperty( "lastplayedSize", size );
@@ -1102,17 +1106,17 @@ bool RetroFE::run( )
                     nextPageItem_->collectionInfo->name != lastPlayedSkipCollection)
                     cib.updateLastPlayedPlaylist( currentPage_->getCollection(), nextPageItem_, size ); // Update last played playlist if not currently in the skip playlist (e.g. settings)
                 if (l.run(nextPageItem_->collectionInfo->name, nextPageItem_)) // Run and check if we need to reboot
-				{
+                {
                     attract_.reset( );
                     reboot_ = true;
                     state   = RETROFE_QUIT_REQUEST;
-				}
-				else
-				{
+                }
+                else
+                {
                     launchExit( );
                     currentPage_->exitGame( );
                     state = RETROFE_LAUNCH_EXIT;
-				}
+                }
             }
             break;
 
@@ -1168,13 +1172,17 @@ bool RetroFE::run( )
                 if (rememberMenu && lastMenuPlaylists_.find( currentPage_->getCollectionName( ) ) != lastMenuPlaylists_.end( ))
                 {
                     currentPage_->selectPlaylist( lastMenuPlaylists_[currentPage_->getCollectionName( )] ); // Switch to last playlist
-                    currentPage_->setScrollOffsetIndex( lastMenuOffsets_[currentPage_->getCollectionName( )] );
                 }
                 else
                 {
                     currentPage_->selectPlaylist( autoPlaylist );
-					if (currentPage_->getPlaylistName() != autoPlaylist )
-						currentPage_->selectPlaylist( "all" );
+                    if (currentPage_->getPlaylistName() != autoPlaylist )
+                        currentPage_->selectPlaylist( "all" );
+                }
+
+                if ( rememberMenu && lastMenuOffsets_.find( currentPage_->getCollectionName( ) ) != lastMenuOffsets_.end( ) )
+                {
+                    currentPage_->setScrollOffsetIndex( lastMenuOffsets_[currentPage_->getCollectionName( )] );
                 }
 
                 currentPage_->onNewItemSelected( );
@@ -1285,10 +1293,10 @@ bool RetroFE::run( )
 
             deltaTime = currentTime_ - lastTime;
             double sleepTime;
-			if (state == RETROFE_IDLE)
-				sleepTime = fpsIdleTime - deltaTime*1000;
-			else
-				sleepTime = fpsTime - deltaTime*1000;
+            if (state == RETROFE_IDLE)
+                sleepTime = fpsIdleTime - deltaTime*1000;
+            else
+                sleepTime = fpsTime - deltaTime*1000;
             if ( sleepTime > 0 )
             {
                 SDL_Delay( static_cast<unsigned int>( sleepTime ) );
@@ -1338,8 +1346,8 @@ bool RetroFE::run( )
                     attract_.reset( );
                 }
                 currentPage_->update( deltaTime );
-				SDL_PumpEvents( );
-				input_.updateKeystate( );
+                SDL_PumpEvents( );
+                input_.updateKeystate( );
                 if (!splashMode)
                 {
                     if ( currentPage_->isAttractIdle( ) )
@@ -1364,7 +1372,7 @@ bool RetroFE::run( )
             render( );
         }
     }
-	return reboot_;
+    return reboot_;
 }
 
 
@@ -1461,7 +1469,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             attract_.reset( );
             bool backOnCollection = false;
             config_.getProperty( "backOnCollection", backOnCollection );
-			if ( page->getMenuDepth( ) == 1 || !backOnCollection )
+            if ( page->getMenuDepth( ) == 1 || !backOnCollection )
                 state = RETROFE_COLLECTION_UP_REQUEST;
             else
                 state = RETROFE_BACK_REQUEST;
@@ -1473,7 +1481,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             attract_.reset( );
             bool backOnCollection = false;
             config_.getProperty( "backOnCollection", backOnCollection );
-			if ( page->getMenuDepth( ) == 1 || !backOnCollection )
+            if ( page->getMenuDepth( ) == 1 || !backOnCollection )
                 state = RETROFE_COLLECTION_DOWN_REQUEST;
             else
                 state = RETROFE_BACK_REQUEST;
@@ -1526,7 +1534,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
 
         else if ( input_.keystate(UserInput::KeyCodeNextPlaylist) ||
                  (input_.keystate(UserInput::KeyCodePlaylistDown)  &&  page->isHorizontalScroll( )) ||
-		         (input_.keystate(UserInput::KeyCodePlaylistRight) && !page->isHorizontalScroll( )))
+                 (input_.keystate(UserInput::KeyCodePlaylistRight) && !page->isHorizontalScroll( )))
         {
             attract_.reset( );
             page->nextPlaylist( );
@@ -1652,15 +1660,15 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         else if (input_.keystate(UserInput::KeyCodeReboot))
         {
             attract_.reset( );
-			reboot_ = true;
+            reboot_ = true;
             state   = RETROFE_QUIT_REQUEST;
         }
 
         else if (input_.keystate(UserInput::KeyCodeSaveFirstPlaylist))
         {
             attract_.reset( );
-			if ( page->getMenuDepth( ) == 1 )
-			{
+            if ( page->getMenuDepth( ) == 1 )
+            {
                 firstPlaylist_ = page->getPlaylistName( );
                 saveRetroFEState( );
             }
@@ -1890,8 +1898,8 @@ void RetroFE::saveRetroFEState( )
     std::string file = Utils::combinePath(Configuration::absolutePath, "settings_saved.conf");
     Logger::write(Logger::ZONE_INFO, "RetroFE", "Saving settings_saved.conf");
     std::ofstream filestream;
-	try
-	{
+    try
+    {
         filestream.open(file.c_str());
         filestream << "firstPlaylist = " << firstPlaylist_ << std::endl;
         filestream.close();

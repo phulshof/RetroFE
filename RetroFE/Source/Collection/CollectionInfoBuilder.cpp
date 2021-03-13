@@ -304,15 +304,10 @@ bool CollectionInfoBuilder::ImportDirectory(CollectionInfo *info, std::string me
     if (emuarc)
         romHierarchy = true;
 
-    // If no merged file exists, or it is empty, attempt to use the include and exclude from the subcollection
-    // If this not a merged collection, the size will be 0 anyways and the code below will still execute
-    if (includeFilter.size() == 0)
-    {
-        Logger::write(Logger::ZONE_INFO, "CollectionInfoBuilder", "Checking for \"" + includeFile + "\"");
-        ImportBasicList(info, includeFile, includeFilterUnsorted);
-        ImportBasicList(info, includeFile, includeFilter);
-        ImportBasicList(info, excludeFile, excludeFilter);
-    }
+    Logger::write(Logger::ZONE_INFO, "CollectionInfoBuilder", "Checking for \"" + includeFile + "\"");
+    ImportBasicList(info, includeFile, includeFilterUnsorted);
+    ImportBasicList(info, includeFile, includeFilter);
+    ImportBasicList(info, excludeFile, excludeFilter);
 
     if (showMissing)
     {
