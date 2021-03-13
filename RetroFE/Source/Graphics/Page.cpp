@@ -784,19 +784,23 @@ bool Page::isHorizontalScroll()
 
 void Page::pageScroll(ScrollDirection direction)
 {
-    for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
+    if(activeMenu_.size() > 0 && activeMenu_[0])
     {
-        ScrollingList *menu = *it;
-        if(menu)
+        if(direction == ScrollDirectionForward)
         {
-            if(direction == ScrollDirectionForward)
-            {
-                menu->pageDown();
-            }
-            if(direction == ScrollDirectionBack)
-            {
-                menu->pageUp();
-            }
+            activeMenu_[0]->pageDown();
+        }
+        if(direction == ScrollDirectionBack)
+        {
+            activeMenu_[0]->pageUp();
+        }
+
+        unsigned int index = activeMenu_[0]->getScrollOffsetIndex();
+        for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
+        {
+            ScrollingList *menu = *it;
+			if (menu)
+                menu->setScrollOffsetIndex(index);
         }
     }
 }
