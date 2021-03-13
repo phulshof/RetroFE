@@ -480,6 +480,8 @@ bool RetroFE::run( )
 
                     config_.getProperty( "firstPlaylist", firstPlaylist_ );
                     currentPage_->selectPlaylist( firstPlaylist_ );
+					if (currentPage_->getPlaylistName() != firstPlaylist_ )
+						currentPage_->selectPlaylist( "all" );
 
                     currentPage_->onNewItemSelected( );
                     currentPage_->reallocateMenuSpritePoints( );
@@ -670,6 +672,8 @@ bool RetroFE::run( )
                 else
                 {
                     currentPage_->selectPlaylist( autoPlaylist );
+					if (currentPage_->getPlaylistName() != autoPlaylist )
+						currentPage_->selectPlaylist( "all" );
                 }
 
                 if ( rememberMenu && lastMenuOffsets_.find( nextPageName ) != lastMenuOffsets_.end( ) )
@@ -798,6 +802,8 @@ bool RetroFE::run( )
                 else
                 {
                     currentPage_->selectPlaylist( autoPlaylist );
+					if (currentPage_->getPlaylistName() != autoPlaylist )
+						currentPage_->selectPlaylist( "all" );
                 }
 
                 state = RETROFE_COLLECTION_DOWN_MENU_ENTER;
@@ -986,6 +992,8 @@ bool RetroFE::run( )
                 else
                 {
                     currentPage_->selectPlaylist( autoPlaylist );
+					if (currentPage_->getPlaylistName() != autoPlaylist )
+						currentPage_->selectPlaylist( "all" );
                 }
 
                 if ( rememberMenu && lastMenuOffsets_.find( currentPage_->getCollectionName( ) ) != lastMenuOffsets_.end( ) )
@@ -1159,16 +1167,14 @@ bool RetroFE::run( )
 
                 if (rememberMenu && lastMenuPlaylists_.find( currentPage_->getCollectionName( ) ) != lastMenuPlaylists_.end( ))
                 {
-                  currentPage_->selectPlaylist( lastMenuPlaylists_[currentPage_->getCollectionName( )] ); // Switch to last playlist
+                    currentPage_->selectPlaylist( lastMenuPlaylists_[currentPage_->getCollectionName( )] ); // Switch to last playlist
+                    currentPage_->setScrollOffsetIndex( lastMenuOffsets_[currentPage_->getCollectionName( )] );
                 }
                 else
                 {
                     currentPage_->selectPlaylist( autoPlaylist );
-                }
-
-                if ( rememberMenu && lastMenuOffsets_.find( currentPage_->getCollectionName( ) ) != lastMenuOffsets_.end( ) )
-                {
-                    currentPage_->setScrollOffsetIndex( lastMenuOffsets_[currentPage_->getCollectionName( )] );
+					if (currentPage_->getPlaylistName() != autoPlaylist )
+						currentPage_->selectPlaylist( "all" );
                 }
 
                 currentPage_->onNewItemSelected( );
