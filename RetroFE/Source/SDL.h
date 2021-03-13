@@ -64,6 +64,6 @@ private:
     static std::vector<int>            windowWidth_;
     static std::vector<int>            windowHeight_;
     static std::vector<bool>           fullscreen_;
-	static int                         numScreens_;
+    static int                         numScreens_;
     static int                         numDisplays_;
 };

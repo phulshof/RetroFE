@@ -46,6 +46,7 @@ private:
     int screenWidth_;
     int layoutHeight_;
     int layoutWidth_;
+    int monitor_;
     SDL_Color fontColor_;
     std::string fontName_;
     int fontSize_;

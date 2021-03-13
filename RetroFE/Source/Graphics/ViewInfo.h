@@ -71,7 +71,7 @@ public:
     float        ContainerY;
     float        ContainerWidth;
     float        ContainerHeight;
-	int          Monitor;
+    int          Monitor;
     float        Volume;
 
 private:

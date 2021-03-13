@@ -124,8 +124,10 @@ public:
     void  updateScrollPeriod();
     void  scroll(bool forward);
     bool  hasSubs();
-	int   getLayoutWidth();
-	int   getLayoutHeight();
+    int   getLayoutWidth(int monitor);
+    int   getLayoutHeight(int monitor);
+    void  setLayoutWidth(int monitor, int width);
+    void  setLayoutHeight(int monitor, int height);
     void  setJukebox();
     bool  isJukebox();
     bool  isJukeboxPlaying();
@@ -167,8 +169,8 @@ private:
     float minShowTime_;
     float elapsedTime_;
     CollectionInfo::Playlists_T::iterator playlist_;
-	int layoutWidth_;
-	int layoutHeight_;
+    std::vector<int> layoutWidth_;
+    std::vector<int> layoutHeight_;
     bool jukebox_;
 
 };
