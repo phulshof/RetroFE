@@ -53,7 +53,7 @@ ReloadableScrollingText::ReloadableScrollingText(Configuration &config, bool sys
     , currentCollection_("")
     , page_(NULL)
     , displayOffset_(displayOffset)
-
+    , textWidth_(0.0f)
 {
     text_.clear( );
 }
@@ -80,6 +80,9 @@ void ReloadableScrollingText::update(float dt)
         if (direction_ == "horizontal")
         {
             currentPosition_ += scrollingSpeed_ * dt;
+            // Do not scroll if text fits within the size of the display and starting position is 0
+            if ( startPosition_ == 0.0f && textWidth_ <= baseViewInfo.Width )
+                currentPosition_ = 0.0f;
         }
         else if (direction_ == "vertical")
         {
@@ -498,21 +501,25 @@ void ReloadableScrollingText::draw( )
                 rect.x -= static_cast<int>( currentPosition_ );
             }
 
+            textWidth_ = 0.0f;
+
             for (unsigned int l = 0; l < text_.size( ); ++l)
             {
                 for (unsigned int i = 0; i < text_[l].size( ); ++i)
                 {
 
-                    // Do not print outside the box
-                    if (rect.x >= (static_cast<int>( xOrigin ) + imageMaxWidth))
-                    {
-                        break;
-                    }
-
                     Font::GlyphInfo glyph;
 
                     if (font->getRect( text_[l][i], glyph) && glyph.rect.h > 0)
                     {
+                        textWidth_ += glyph.advance * scale;
+
+                        // Do not print outside the box
+                        if (rect.x >= (static_cast<int>( xOrigin ) + imageMaxWidth))
+                        {
+                            break;
+                        }
+
                         SDL_Rect charRect = glyph.rect;
                         rect.h  = static_cast<int>( charRect.h * scale );
                         rect.w  = static_cast<int>( charRect.w * scale );
