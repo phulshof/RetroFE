@@ -53,7 +53,7 @@ ReloadableScrollingText::ReloadableScrollingText(Configuration &config, bool sys
     , currentCollection_("")
     , page_(NULL)
     , displayOffset_(displayOffset)
-    , textWidth_(0.0f)
+    , textWidth_(0)
 {
     text_.clear( );
 }
@@ -501,7 +501,7 @@ void ReloadableScrollingText::draw( )
                 rect.x -= static_cast<int>( currentPosition_ );
             }
 
-            textWidth_ = 0.0f;
+            textWidth_ = 0;
 
             for (unsigned int l = 0; l < text_.size( ); ++l)
             {
@@ -512,7 +512,7 @@ void ReloadableScrollingText::draw( )
 
                     if (font->getRect( text_[l][i], glyph) && glyph.rect.h > 0)
                     {
-                        textWidth_ += glyph.advance * scale;
+                        textWidth_ += static_cast<int>(glyph.advance * scale);
 
                         // Do not print outside the box
                         if (rect.x >= (static_cast<int>( xOrigin ) + imageMaxWidth))
