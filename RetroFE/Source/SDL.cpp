@@ -331,6 +331,15 @@ bool SDL::renderCopy( SDL_Texture *texture, float alpha, SDL_Rect *src, SDL_Rect
     if ( mirror_[viewInfo.Monitor] )
         scaleY /= 2;
 
+    // Don't print outside the screen in mirror mode
+    if ( mirror_[viewInfo.Monitor] && (viewInfo.ContainerWidth < 0 || viewInfo.ContainerHeight < 0) )
+    {
+        viewInfo.ContainerX      = 0;
+        viewInfo.ContainerY      = 0;
+        viewInfo.ContainerWidth  = layoutWidth;
+        viewInfo.ContainerHeight = layoutHeight;
+    }
+
     SDL_Rect srcRect;
     SDL_Rect dstRect;
     SDL_Rect srcRectCopy;
@@ -467,6 +476,7 @@ bool SDL::renderCopy( SDL_Texture *texture, float alpha, SDL_Rect *src, SDL_Rect
                 dstRect.x = windowWidth_[viewInfo.Monitor]/2 - dstRect.y - dstRect.h/2 - dstRect.w/2;
                 dstRect.y = tmp - dstRect.h/2 + dstRect.w/2;
                 angle    += 90;
+                SDL_SetTextureAlphaMod( texture, static_cast<char>( alpha * 255 ) );
                 SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, &srcRect, &dstRect, angle, NULL, SDL_FLIP_NONE );
                 dstRect.x = windowWidth_[viewInfo.Monitor] - dstRect.x - dstRect.w;
                 dstRect.y = windowHeight_[viewInfo.Monitor] - dstRect.y - dstRect.h;
@@ -599,6 +609,7 @@ bool SDL::renderCopy( SDL_Texture *texture, float alpha, SDL_Rect *src, SDL_Rect
                     dstRect.x = windowWidth_[viewInfo.Monitor]/2 - dstRect.y - dstRect.h/2 - dstRect.w/2;
                     dstRect.y = tmp - dstRect.h/2 + dstRect.w/2;
                     angle    += 90;
+                    SDL_SetTextureAlphaMod( texture, static_cast<char>( alpha * 255 ) );
                     SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, &srcRect, &dstRect, angle, NULL, SDL_FLIP_VERTICAL );
                     dstRect.x = windowWidth_[viewInfo.Monitor] - dstRect.x - dstRect.w;
                     dstRect.y = windowHeight_[viewInfo.Monitor] - dstRect.y - dstRect.h;
@@ -732,6 +743,7 @@ bool SDL::renderCopy( SDL_Texture *texture, float alpha, SDL_Rect *src, SDL_Rect
                     dstRect.x = windowWidth_[viewInfo.Monitor]/2 - dstRect.y - dstRect.h/2 - dstRect.w/2;
                     dstRect.y = tmp - dstRect.h/2 + dstRect.w/2;
                     angle    += 90;
+                    SDL_SetTextureAlphaMod( texture, static_cast<char>( alpha * 255 ) );
                     SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, &srcRect, &dstRect, angle, NULL, SDL_FLIP_VERTICAL );
                     dstRect.x = windowWidth_[viewInfo.Monitor] - dstRect.x - dstRect.w;
                     dstRect.y = windowHeight_[viewInfo.Monitor] - dstRect.y - dstRect.h;
@@ -865,6 +877,7 @@ bool SDL::renderCopy( SDL_Texture *texture, float alpha, SDL_Rect *src, SDL_Rect
                     dstRect.x = windowWidth_[viewInfo.Monitor]/2 - dstRect.y - dstRect.h/2 - dstRect.w/2;
                     dstRect.y = tmp - dstRect.h/2 + dstRect.w/2;
                     angle    += 90;
+                    SDL_SetTextureAlphaMod( texture, static_cast<char>( alpha * 255 ) );
                     SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, &srcRect, &dstRect, angle, NULL, SDL_FLIP_HORIZONTAL );
                     dstRect.x = windowWidth_[viewInfo.Monitor] - dstRect.x - dstRect.w;
                     dstRect.y = windowHeight_[viewInfo.Monitor] - dstRect.y - dstRect.h;
@@ -998,6 +1011,7 @@ bool SDL::renderCopy( SDL_Texture *texture, float alpha, SDL_Rect *src, SDL_Rect
                     dstRect.x = windowWidth_[viewInfo.Monitor]/2 - dstRect.y - dstRect.h/2 - dstRect.w/2;
                     dstRect.y = tmp - dstRect.h/2 + dstRect.w/2;
                     angle    += 90;
+                    SDL_SetTextureAlphaMod( texture, static_cast<char>( alpha * 255 ) );
                     SDL_RenderCopyEx( renderer_[viewInfo.Monitor], texture, &srcRect, &dstRect, angle, NULL, SDL_FLIP_HORIZONTAL );
                     dstRect.x = windowWidth_[viewInfo.Monitor] - dstRect.x - dstRect.w;
                     dstRect.y = windowHeight_[viewInfo.Monitor] - dstRect.y - dstRect.h;
