@@ -336,8 +336,8 @@ bool SDL::renderCopy( SDL_Texture *texture, float alpha, SDL_Rect *src, SDL_Rect
     {
         viewInfo.ContainerX      = 0;
         viewInfo.ContainerY      = 0;
-        viewInfo.ContainerWidth  = layoutWidth;
-        viewInfo.ContainerHeight = layoutHeight;
+        viewInfo.ContainerWidth  = static_cast<float>( layoutWidth );
+        viewInfo.ContainerHeight = static_cast<float>( layoutHeight );
     }
 
     SDL_Rect srcRect;
