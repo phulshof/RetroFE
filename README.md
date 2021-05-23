@@ -45,6 +45,16 @@ Depending on your version of OS X the GUI will read user defined Environment var
 
 
 ## Mac download and compile RetroFE from source code ##
+
+## Install the Packages
+
+Best option is to use homebrew:
+
+	brew install
+	brew install sdl2 sdl2_mixer sdl2_image sdl2_ttf gstreamer \
+		gst-plugins-base gst-plugins-good gst-plugins-bad \
+		gst-plugins-ugly gst-libav
+
 If you don't use Homebrew you will need to download and install the same dependencies as given in the linux instuctions.
 You may need to export the libs with $LIBRARY_PATH and or supply the include folders with $CPATH before building.
 
@@ -93,8 +103,6 @@ Compile RetroFE and create a full environment:
 
 Copy your live RetroFE system to any folder of your choosing:
 	cp -r Artifacts\linux\RetroFE /your/ideal/retrofe/path
-
-
 
 # Compiling and installing on Windows #
 ** Visit the [RetroFE downloads](http://http://retrofe.nl/download/) page to download a precompiled version if you do not want to compile your own. **
