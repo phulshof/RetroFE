@@ -45,7 +45,7 @@ bool SDL::initialize( Configuration &config )
     bool        hideMouse;
 
     Logger::write( Logger::ZONE_INFO, "SDL", "Initializing" );
-    if ( SDL_Init( SDL_INIT_EVERYTHING ) != 0 )
+    if ( SDL_Init( SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS ) != 0 )
     {
         std::string error = SDL_GetError( );
         Logger::write( Logger::ZONE_ERROR, "SDL", "Initialize failed: " + error );
@@ -264,17 +264,23 @@ bool SDL::deInitialize( )
 
     for ( int i = 0; i < numScreens_; ++i )
     {
-        if ( renderer_[0] )
+        if ( renderer_.size( ) > 0 )
         {
-            SDL_DestroyRenderer( renderer_[0] );
+            if ( renderer_[0] )
+            {
+                SDL_DestroyRenderer( renderer_[0] );
+            }
+            renderer_.erase( renderer_.begin( ) );
         }
-        renderer_.erase( renderer_.begin( ) );
 
-        if ( window_[0] )
+        if ( window_.size( ) > 0 )
         {
-            SDL_DestroyWindow( window_[0] );
+            if ( window_[0] )
+            {
+                SDL_DestroyWindow( window_[0] );
+            }
+            window_.erase( window_.begin( ) );
         }
-        window_.erase( window_.begin( ) );
     }
     displayWidth_.clear( );
     displayHeight_.clear( );

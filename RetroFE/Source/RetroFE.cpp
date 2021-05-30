@@ -187,6 +187,7 @@ void RetroFE::launchExit( )
 
     // Restore time settings
     currentTime_ = static_cast<float>( SDL_GetTicks( ) ) / 1000;
+    keyLastTime_ = currentTime_;
     lastLaunchReturnTime_ = currentTime_;
 
 }
@@ -1297,7 +1298,7 @@ bool RetroFE::run( )
                 sleepTime = fpsIdleTime - deltaTime*1000;
             else
                 sleepTime = fpsTime - deltaTime*1000;
-            if ( sleepTime > 0 )
+            if ( sleepTime > 0 && sleepTime < 1000 )
             {
                 SDL_Delay( static_cast<unsigned int>( sleepTime ) );
             }
