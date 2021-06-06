@@ -229,8 +229,13 @@ void ReloadableMedia::reloadTexture()
     {
         std::string basename = names[n];
         bool        defined  = false;
+        std::string type     = type_;
+
         if ( isVideo_ )
+        {
             typeLC = Utils::toLower(imageType_);
+            type   = imageType_;
+        }
 
         if(basename == "default")
         {
@@ -310,7 +315,7 @@ void ReloadableMedia::reloadTexture()
 
         if (!selectedItem->leaf) // item is not a leaf
         {
-            (void)config_.getProperty("collections." + selectedItem->name + "." + type_, basename );
+            (void)config_.getProperty("collections." + selectedItem->name + "." + type, basename );
         }
 
         bool overwriteXML = false;
@@ -318,7 +323,7 @@ void ReloadableMedia::reloadTexture()
         if ( !defined || overwriteXML ) // No basename was found yet; check the info in stead
         {
             std::string basename_tmp;
-            selectedItem->getInfo( type_, basename_tmp );
+            selectedItem->getInfo( type, basename_tmp );
             if ( basename_tmp != "" )
             {
                 basename = basename_tmp;
@@ -331,12 +336,12 @@ void ReloadableMedia::reloadTexture()
         {
 
             // check the master collection for the system artifact 
-            loadedComponent_ = findComponent(collectionName, type_, type_, "", true, false);
+            loadedComponent_ = findComponent(collectionName, type, type, "", true, false);
 
             // check collection for the system artifact
             if(!loadedComponent_)
             {
-              loadedComponent_ = findComponent(selectedItem->collectionInfo->name, type_, type_, "", true, false);
+              loadedComponent_ = findComponent(selectedItem->collectionInfo->name, type, type, "", true, false);
             }
 
         }
@@ -348,18 +353,18 @@ void ReloadableMedia::reloadTexture()
             {
 
               // check the master collection for the artifact 
-              loadedComponent_ = findComponent(collectionName, type_, basename, "", false, false);
+              loadedComponent_ = findComponent(collectionName, type, basename, "", false, false);
 
               // check the collection for the artifact
               if(!loadedComponent_)
               {
-                loadedComponent_ = findComponent(selectedItem->collectionInfo->name, type_, basename, "", false, false);
+                loadedComponent_ = findComponent(selectedItem->collectionInfo->name, type, basename, "", false, false);
               }
 
               // check the rom directory for the artifact
               if(!loadedComponent_)
               {
-                loadedComponent_ = findComponent(selectedItem->collectionInfo->name, type_, type_, selectedItem->filepath, false, false);
+                loadedComponent_ = findComponent(selectedItem->collectionInfo->name, type, type, selectedItem->filepath, false, false);
               }
 
             }
@@ -367,18 +372,18 @@ void ReloadableMedia::reloadTexture()
             {
 
               // check the master collection for the artifact 
-              loadedComponent_ = findComponent(collectionName, type_, basename, "", false, false);
+              loadedComponent_ = findComponent(collectionName, type, basename, "", false, false);
 
               // check the collection for the artifact
               if(!loadedComponent_)
               {
-                loadedComponent_ = findComponent(selectedItem->collectionInfo->name, type_, basename, "", false, false);
+                loadedComponent_ = findComponent(selectedItem->collectionInfo->name, type, basename, "", false, false);
               }
 
               // check the submenu collection for the system artifact
               if (!loadedComponent_)
               {
-                loadedComponent_ = findComponent(selectedItem->name, type_, type_, "", true, false);
+                loadedComponent_ = findComponent(selectedItem->name, type, type, "", true, false);
               } 
 
             }
