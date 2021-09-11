@@ -364,6 +364,7 @@ bool RetroFE::run( )
     Launcher l( config_ );
     Menu     m( config_, input_ );
     preloadTime = static_cast<float>( SDL_GetTicks( ) ) / 1000;
+	l.LEDBlinky( 1 );
 
     while ( running )
     {
@@ -603,6 +604,7 @@ bool RetroFE::run( )
         // Start onHighlightEnter animation
         case RETROFE_HIGHLIGHT_LOAD_ART:
             currentPage_->highlightEnter( );
+            l.LEDBlinky( 9, currentPage_->getSelectedItem( )->collectionInfo->name, currentPage_->getSelectedItem( ) );
             state = RETROFE_HIGHLIGHT_ENTER;
             break;
 
@@ -632,6 +634,7 @@ bool RetroFE::run( )
         case RETROFE_NEXT_PAGE_MENU_EXIT:
             if ( currentPage_->isIdle( ) )
             {
+                l.LEDBlinky( 8, currentPage_->getSelectedItem( )->name, currentPage_->getSelectedItem( ) );
                 lastMenuOffsets_[currentPage_->getCollectionName( )]   = currentPage_->getScrollOffsetIndex( );
                 lastMenuPlaylists_[currentPage_->getCollectionName( )] = currentPage_->getPlaylistName( );
                 std::string nextPageName = nextPageItem_->name;
@@ -710,6 +713,7 @@ bool RetroFE::run( )
             {
                 currentPage_->start( );
             }
+            l.LEDBlinky( 9, currentPage_->getSelectedItem( )->collectionInfo->name, currentPage_->getSelectedItem( ) );
             state = RETROFE_NEXT_PAGE_MENU_ENTER;
             break;
 
@@ -921,6 +925,7 @@ bool RetroFE::run( )
         // Start onHighlightEnter animation
         case RETROFE_COLLECTION_HIGHLIGHT_LOAD_ART:
             currentPage_->highlightEnter( );
+            l.LEDBlinky( 9, currentPage_->getSelectedItem( )->collectionInfo->name, currentPage_->getSelectedItem( ) );
             state = RETROFE_COLLECTION_HIGHLIGHT_ENTER;
             break;
 
@@ -1103,9 +1108,12 @@ bool RetroFE::run( )
                 config_.getProperty( "attractModeSkipPlaylist",  attractModeSkipPlaylist );
                 config_.getProperty( "lastPlayedSkipCollection", lastPlayedSkipCollection );
                 config_.getProperty( "lastplayedSize", size );
+
                 if (currentPage_->getPlaylistName( )    != attractModeSkipPlaylist &&
                     nextPageItem_->collectionInfo->name != lastPlayedSkipCollection)
                     cib.updateLastPlayedPlaylist( currentPage_->getCollection(), nextPageItem_, size ); // Update last played playlist if not currently in the skip playlist (e.g. settings)
+
+                l.LEDBlinky( 3, nextPageItem_->collectionInfo->name, nextPageItem_ );
                 if (l.run(nextPageItem_->collectionInfo->name, nextPageItem_)) // Run and check if we need to reboot
                 {
                     attract_.reset( );
@@ -1115,6 +1123,7 @@ bool RetroFE::run( )
                 else
                 {
                     launchExit( );
+					l.LEDBlinky( 4 );
                     currentPage_->exitGame( );
                     state = RETROFE_LAUNCH_EXIT;
                 }
@@ -1277,7 +1286,10 @@ bool RetroFE::run( )
         // Wait for onExit animation to finish before quitting RetroFE
         case RETROFE_QUIT:
             if ( currentPage_->isGraphicsIdle( ) )
+			{
+				l.LEDBlinky( 2 );
                 running = false;
+			}
             break;
         }
 
@@ -1356,10 +1368,12 @@ bool RetroFE::run( )
                         if ( !attractMode_ && attract_.isSet( ) )
                         {
                             currentPage_->attractEnter( );
+                            l.LEDBlinky( 5 );
                         }
                         else if ( attractMode_ && !attract_.isSet( ) )
                         {
                             currentPage_->attractExit( );
+                            l.LEDBlinky( 6 );
                         }
                         else if ( attract_.isSet( ) )
                         {

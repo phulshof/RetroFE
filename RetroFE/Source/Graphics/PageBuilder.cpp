@@ -432,6 +432,7 @@ bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
         xml_attribute<> *srcXml      = componentXml->first_attribute("src");
         xml_attribute<> *numLoopsXml = componentXml->first_attribute("numLoops");
         xml_attribute<> *idXml = componentXml->first_attribute("id");
+        xml_attribute<> *monitorXml = componentXml->first_attribute("monitor");
 
         int id = -1;
         if (idXml)
@@ -453,7 +454,8 @@ bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
             altVideoPath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, std::string(srcXml->value()));
             int numLoops = numLoopsXml ? Utils::convertInt(numLoopsXml->value()) : 1;
 
-            Video *c = new Video(videoPath, altVideoPath, numLoops, *page);
+            int monitor = monitorXml ? Utils::convertInt(monitorXml->value()) : monitor_;
+            Video *c = new Video(videoPath, altVideoPath, numLoops, *page, monitor);
             c->setId( id );
             xml_attribute<> *menuScrollReload = componentXml->first_attribute("menuScrollReload");
             if (menuScrollReload &&
