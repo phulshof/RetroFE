@@ -26,7 +26,7 @@
 bool Video::enabled_ = true;
 
 
-Video::Video(std::string file, std::string altFile, int numLoops, Page &p)
+Video::Video(std::string file, std::string altFile, int numLoops, Page &p, int monitor)
     : Component(p)
     , video_(NULL)
     , file_(file)
@@ -34,6 +34,7 @@ Video::Video(std::string file, std::string altFile, int numLoops, Page &p)
     , numLoops_(numLoops)
 
 {
+    baseViewInfo.Monitor = monitor;
     allocateGraphicsMemory( );
 }
 
@@ -101,7 +102,7 @@ void Video::allocateGraphicsMemory( )
             IVideo      *video = new GStreamerVideo( baseViewInfo.Monitor );
             video->initialize();
             ((GStreamerVideo *)(video))->setNumLoops( numLoops_ );
-            video_             = new VideoComponent( video, page, file );
+            video_ = new VideoComponent( video, page, file );
         }
     }
 

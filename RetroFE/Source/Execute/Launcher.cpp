@@ -129,6 +129,62 @@ bool Launcher::run(std::string collection, Item *collectionItem)
     return reboot;
 }
 
+
+void Launcher::LEDBlinky( int command, std::string collection, Item *collectionItem )
+{
+	std::string LEDBlinkyDirectory = "";
+	config_.getProperty( "LEDBlinkyDirectory", LEDBlinkyDirectory );
+	std::string exe  = LEDBlinkyDirectory + "\\LEDBlinky.exe";
+	std::string args = std::to_string( command );
+	bool wait = false;
+	if ( command == 2 )
+		wait = true;
+	if ( command == 8 )
+	{
+		std::string launcherName = collectionItem->collectionInfo->launcher;
+		std::string launcherFile = Utils::combinePath( Configuration::absolutePath, "collections", collectionItem->collectionInfo->name, "launchers", collectionItem->name + ".conf" );
+		std::ifstream launcherStream( launcherFile.c_str( ) );
+		if (launcherStream.good( )) // Launcher file found
+		{
+			std::string line;
+			if (std::getline( launcherStream, line)) // Launcher found
+			{
+				launcherName = line;
+			}
+		}
+		launcherName = Utils::toLower( launcherName );
+		std::string emulator = collection;
+		config_.getProperty("launchers." + launcherName + ".LEDBlinkyEmulator", emulator );
+		args = args + " \"" + emulator + "\"";
+	}
+	if ( command == 3 || command == 9 )
+	{
+		std::string launcherName = collectionItem->collectionInfo->launcher;
+		std::string launcherFile = Utils::combinePath( Configuration::absolutePath, "collections", collectionItem->collectionInfo->name, "launchers", collectionItem->name + ".conf" );
+		std::ifstream launcherStream( launcherFile.c_str( ) );
+		if (launcherStream.good( )) // Launcher file found
+		{
+			std::string line;
+			if (std::getline( launcherStream, line)) // Launcher found
+			{
+				launcherName = line;
+			}
+		}
+		launcherName = Utils::toLower( launcherName );
+		std::string emulator = launcherName;
+		config_.getProperty("launchers." + launcherName + ".LEDBlinkyEmulator", emulator );
+		args = args + " \"" + collectionItem->name + "\" \"" + emulator + "\"";
+		if ( emulator == "" )
+			return;
+	}
+	if ( LEDBlinkyDirectory != "" && !execute( exe, args, LEDBlinkyDirectory, wait ) )
+	{
+        Logger::write( Logger::ZONE_ERROR, "LEDBlinky", "Failed to launch." );
+	}
+	return;
+}
+
+
 std::string Launcher::replaceVariables(std::string str,
                                        std::string itemFilePath,
                                        std::string itemName,
@@ -151,7 +207,7 @@ std::string Launcher::replaceVariables(std::string str,
     return str;
 }
 
-bool Launcher::execute(std::string executable, std::string args, std::string currentDirectory)
+bool Launcher::execute(std::string executable, std::string args, std::string currentDirectory, bool wait)
 {
     bool retVal = false;
     std::string executionString = "\"" + executable + "\" " + args;
@@ -192,13 +248,16 @@ bool Launcher::execute(std::string executable, std::string args, std::string cur
     else
     {
 #ifdef WIN32
-        while(WAIT_OBJECT_0 != MsgWaitForMultipleObjects(1, &processInfo.hProcess, FALSE, INFINITE, QS_ALLINPUT))
-        {
-            MSG msg;
-            while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-            {
-                DispatchMessage(&msg);
-            }
+		if ( wait )
+		{
+			while(WAIT_OBJECT_0 != MsgWaitForMultipleObjects(1, &processInfo.hProcess, FALSE, INFINITE, QS_ALLINPUT))
+			{
+				MSG msg;
+				while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+				{
+					DispatchMessage(&msg);
+				}
+			}
         }
 
         // result = GetExitCodeProcess(processInfo.hProcess, &exitCode);
