@@ -82,7 +82,16 @@ bool SDL::initialize( Configuration &config )
     {
 
         SDL_DisplayMode mode;
-        Uint32          windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS;
+        bool            windowBorder = false;
+        bool            windowResize = false;
+        Uint32          windowFlags  = SDL_WINDOW_OPENGL;
+
+        config.getProperty( "windowBorder", windowBorder );
+        if ( !windowBorder )
+            windowFlags |= SDL_WINDOW_BORDERLESS;
+        config.getProperty( "windowResize", windowResize );
+        if ( windowResize )
+            windowFlags |= SDL_WINDOW_RESIZABLE;
 
         int screenNum = 0;
         if ( !config.getProperty( "screenNum" + std::to_string( i ), screenNum ) && i != 0 )
@@ -324,6 +333,8 @@ bool SDL::renderCopy( SDL_Texture *texture, float alpha, SDL_Rect *src, SDL_Rect
     // Skip rendering if the object is invisible anyway or if renderer does not exist
     if ( alpha == 0 || viewInfo.Monitor >= numScreens_ || !renderer_[viewInfo.Monitor] )
         return true;
+
+    SDL_GetWindowSize( getWindow( viewInfo.Monitor ), &windowWidth_[viewInfo.Monitor], &windowHeight_[viewInfo.Monitor] );
 
     float scaleX = (float)windowWidth_[viewInfo.Monitor]  / (float)layoutWidth;
     float scaleY = (float)windowHeight_[viewInfo.Monitor] / (float)layoutHeight;
