@@ -197,7 +197,7 @@
     <!-- text_overlay -->
 
 
-    <reloadableText mode="system" type="title" alpha="0" x="180" y="220" maxWidth="900" height="40" xOrigin="left" yOrigin="center" font="fonts/Oswald-Bold.ttf" fontSize="80" loadFontSize="80" fontColor="ffffff" layer="10">
+    <reloadableText type="title" alpha="0" x="180" y="220" maxWidth="900" height="40" xOrigin="left" yOrigin="center" font="fonts/Oswald-Bold.ttf" fontSize="80" loadFontSize="80" fontColor="ffffff" layer="10">
         <onEnter>                       <set duration=".1"><animate type="alpha" to="1"/></set></onEnter>
         <onExit>                        <set duration=".1"><animate type="alpha" to="0"/></set></onExit>
         <onMenuEnter      menuIndex="0"><set duration=".1"><animate type="alpha" to="1"/></set></onMenuEnter>
@@ -229,7 +229,7 @@
     </reloadableText>
 
 
-    <reloadableText mode="system" type="year" alpha="0" x="180" y="320" maxWidth="900" height="40" xOrigin="left" yOrigin="center" font="fonts/Oswald-Regular.ttf" fontSize="30" loadFontSize="30" fontColor="ffffff" layer="10">
+    <reloadableText type="year" alpha="1" x="180" y="320" maxWidth="900" height="40" xOrigin="left" yOrigin="center" font="fonts/Oswald-Regular.ttf" fontSize="30" loadFontSize="30" fontColor="ffffff" layer="10">
         <onEnter>                       <set duration=".1"><animate type="alpha" to="1"/></set></onEnter>
         <onExit>                        <set duration=".1"><animate type="alpha" to="0"/></set></onExit>
         <onMenuEnter      menuIndex="0"><set duration=".1"><animate type="alpha" to="1"/></set></onMenuEnter>
@@ -498,18 +498,18 @@
 
     <!-- Device image container -->
     <reloadableImage type="device" x="center" y="855" width="2000" maxHeight="4000" xOrigin="center" yOrigin="center" containerX="235" containerY="685" containerWidth="1450" containerHeight="340" layer="9">
-        <onEnter>                       <set duration=".1"><animate type="alpha" to="1"/></set></onEnter>
+        <onEnter>                       <set duration=".1"><animate type="alpha" to="0.3"/></set></onEnter>
         <onExit>                        <set duration=".1"><animate type="alpha" to="0"/></set></onExit>
-        <onMenuEnter      menuIndex="0"><set duration=".1"><animate type="alpha" to="1"/></set></onMenuEnter>
+        <onMenuEnter      menuIndex="0"><set duration=".1"><animate type="alpha" to="0.3"/></set></onMenuEnter>
         <onMenuExit       menuIndex="0"><set duration=".1"><animate type="alpha" to="0"/></set></onMenuExit>
-        <onMenuJumpEnter  menuIndex="0"><set duration=".1"><animate type="alpha" to="1"/></set></onMenuEnter>
+        <onMenuJumpEnter  menuIndex="0"><set duration=".1"><animate type="alpha" to="0.3"/></set></onMenuEnter>
         <onMenuJumpExit   menuIndex="0"><set duration=".1"><animate type="alpha" to="0"/></set></onMenuExit>
-        <onPlaylistEnter  menuIndex="0"><set duration=".1"><animate type="alpha" to="1"/></set></onMenuEnter>
+        <onPlaylistEnter  menuIndex="0"><set duration=".1"><animate type="alpha" to="0.3"/></set></onMenuEnter>
         <onPlaylistExit   menuIndex="0"><set duration=".1"><animate type="alpha" to="0"/></set></onMenuExit>
-        <onHighlightEnter menuIndex="0"><set duration=".1"><animate type="alpha" to="1"/></set></onHighlightEnter>
+        <onHighlightEnter menuIndex="0"><set duration=".1"><animate type="alpha" to="0.3"/></set></onHighlightEnter>
         <onHighlightExit  menuIndex="0"><set duration=".1"><animate type="alpha" to="0"/></set></onHighlightExit>
         <onGameEnter      menuIndex="0"><set duration=".1"><animate type="alpha" to="0"/></set></oneGameEnter>
-        <onGameExit       menuIndex="0"><set duration=".1"><animate type="alpha" to="1"/></set></oneGameExit>
+        <onGameExit       menuIndex="0"><set duration=".1"><animate type="alpha" to="0.3"/></set></oneGameExit>
     </reloadableImage>
 
 
