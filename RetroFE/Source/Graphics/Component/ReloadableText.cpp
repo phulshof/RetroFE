@@ -254,6 +254,8 @@ void ReloadableText::ReloadTexture()
                 text   +=  "0" + std::to_string( seconds );
             else
                 text   += std::to_string( seconds );
+			if ( page.getDuration( ) == 0 )
+				text    = "--:--:--";
         }
         else if (type_ == "duration")
         {
@@ -272,6 +274,8 @@ void ReloadableText::ReloadTexture()
                 text   +=  "0" + std::to_string( seconds );
             else
                 text   += std::to_string( seconds );
+			if ( page.getDuration( ) == 0 )
+				text    = "--:--:--";
         }
 
         if (!selectedItem->leaf || systemMode_) // item is not a leaf
