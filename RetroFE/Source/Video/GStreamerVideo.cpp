@@ -591,7 +591,7 @@ void GStreamerVideo::restart( )
 unsigned long long GStreamerVideo::getCurrent( )
 {
     gint64 ret = 0;
-    if ( !gst_element_query_position( playbin_, GST_FORMAT_TIME, &ret ) )
+    if ( !gst_element_query_position( playbin_, GST_FORMAT_TIME, &ret ) || !isPlaying_ )
         ret = 0;
     return (unsigned long long)ret;
 }
@@ -600,7 +600,7 @@ unsigned long long GStreamerVideo::getCurrent( )
 unsigned long long GStreamerVideo::getDuration( )
 {
     gint64 ret = 0;
-    if ( !gst_element_query_duration( playbin_, GST_FORMAT_TIME, &ret ) )
+    if ( !gst_element_query_duration( playbin_, GST_FORMAT_TIME, &ret ) || !isPlaying_ )
         ret = 0;
     return (unsigned long long)ret;
 }
