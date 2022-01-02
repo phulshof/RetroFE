@@ -1667,3 +1667,79 @@ bool Page::isJukeboxPlaying()
     return retVal;
 
 }
+
+
+void Page::skipForward( )
+{
+    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    {
+        (*it)->skipForward( );
+    }
+}
+
+
+void Page::skipBackward( )
+{
+    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    {
+        (*it)->skipBackward( );
+    }
+}
+
+
+void Page::skipForwardp( )
+{
+    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    {
+        (*it)->skipForwardp( );
+    }
+}
+
+
+void Page::skipBackwardp( )
+{
+    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    {
+        (*it)->skipBackwardp( );
+    }
+}
+
+
+void Page::pause( )
+{
+    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    {
+        (*it)->pause( );
+    }
+}
+
+
+void Page::restart( )
+{
+    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    {
+        (*it)->restart( );
+    }
+}
+
+
+unsigned long long Page::getCurrent( )
+{
+    unsigned long long ret = 0;
+    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    {
+        ret += (*it)->getCurrent( );
+    }
+    return ret;
+}
+
+
+unsigned long long Page::getDuration( )
+{
+    unsigned long long ret = 0;
+    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    {
+        ret += (*it)->getDuration( );
+    }
+    return ret;
+}

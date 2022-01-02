@@ -57,10 +57,11 @@ GStreamerVideo::GStreamerVideo( int monitor )
     , isPlaying_(false)
     , playCount_(0)
     , numLoops_(0)
-	, volume_(0.0)
+    , volume_(0.0)
     , currentVolume_(0.0)
     , monitor_(monitor)
 {
+    paused_ = false;
 }
 GStreamerVideo::~GStreamerVideo()
 {
@@ -120,6 +121,7 @@ bool GStreamerVideo::initialize()
 #endif
 
     initialized_ = true;
+    paused_      = false;
 
     return true;
 }
@@ -470,4 +472,114 @@ bool GStreamerVideo::isPlaying()
 void GStreamerVideo::setVolume(float volume)
 {
     volume_ = volume;
+}
+
+
+void GStreamerVideo::skipForward( )
+{
+
+    gint64 current;
+    gint64 duration;
+
+    if ( !gst_element_query_position( playbin_, GST_FORMAT_TIME, &current ) )
+        return;
+
+    if ( !gst_element_query_duration( playbin_, GST_FORMAT_TIME, &duration ) )
+        return;
+
+    current += 60 * GST_SECOND;
+    if ( current > duration )
+        current = duration;
+    gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), current );
+
+}
+
+void GStreamerVideo::skipBackward( )
+{
+
+    gint64 current;
+
+    if ( !gst_element_query_position( playbin_, GST_FORMAT_TIME, &current ) )
+        return;
+
+    if ( current > 60 * GST_SECOND )
+        current -= 60 * GST_SECOND;
+    else
+        current = 0;
+    gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), current );
+
+}
+
+
+void GStreamerVideo::skipForwardp( )
+{
+
+    gint64 current;
+    gint64 duration;
+
+    if ( !gst_element_query_position( playbin_, GST_FORMAT_TIME, &current ) )
+        return;
+
+    if ( !gst_element_query_duration( playbin_, GST_FORMAT_TIME, &duration ) )
+        return;
+
+    current += 0.05 * duration;
+    if ( current > duration )
+        current = duration;
+    gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), current );
+
+}
+
+void GStreamerVideo::skipBackwardp( )
+{
+
+    gint64 current;
+    gint64 duration;
+
+    if ( !gst_element_query_position( playbin_, GST_FORMAT_TIME, &current ) )
+        return;
+
+    if ( !gst_element_query_duration( playbin_, GST_FORMAT_TIME, &duration ) )
+        return;
+
+    if ( current > 0.05 * duration )
+        current -= 0.05 * duration;
+    else
+        current = 0;
+    gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), current );
+
+}
+
+
+void GStreamerVideo::pause( )
+{
+    paused_ = !paused_;
+    if (paused_)
+        gst_element_set_state(GST_ELEMENT(playbin_), GST_STATE_PAUSED);
+    else
+        gst_element_set_state(GST_ELEMENT(playbin_), GST_STATE_PLAYING);
+}
+
+
+void GStreamerVideo::restart( )
+{
+
+    gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), 0 );
+
+}
+
+
+unsigned long long GStreamerVideo::getCurrent( )
+{
+    gint64 ret = 0;
+    gst_element_query_position( playbin_, GST_FORMAT_TIME, &ret);
+    return (unsigned long long)ret;
+}
+
+
+unsigned long long GStreamerVideo::getDuration( )
+{
+    gint64 ret = 0;
+    gst_element_query_duration( playbin_, GST_FORMAT_TIME, &ret);
+    return (unsigned long long)ret;
 }

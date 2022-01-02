@@ -131,6 +131,14 @@ public:
     void  setJukebox();
     bool  isJukebox();
     bool  isJukeboxPlaying();
+    void  skipForward( );
+    void  skipBackward( );
+    void  skipForwardp( );
+    void  skipBackwardp( );
+    void  pause( );
+    void  restart( );
+    unsigned long long getCurrent( );
+    unsigned long long getDuration( );
 
 private:
     void playlistChange();

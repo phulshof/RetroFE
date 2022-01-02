@@ -76,8 +76,14 @@ bool UserInput::initialize()
     MapKey("togglePlaylist", KeyCodeTogglePlaylist, false);
     MapKey("random", KeyCodeRandom, false);
     MapKey("menu", KeyCodeMenu, false);
-	MapKey("reboot", KeyCodeReboot, false);
-	MapKey("saveFirstPlaylist", KeyCodeSaveFirstPlaylist, false);
+    MapKey("reboot", KeyCodeReboot, false);
+    MapKey("saveFirstPlaylist", KeyCodeSaveFirstPlaylist, false);
+    MapKey("jbFastForward1m", KeyCodeSkipForward, false);
+    MapKey("jbFastRewind1m", KeyCodeSkipBackward, false);
+    MapKey("jbFastForward5p", KeyCodeSkipForwardp, false);
+    MapKey("jbFastRewind5p", KeyCodeSkipBackwardp, false);
+    MapKey("jbPause", KeyCodePause, false);
+    MapKey("jbRestart", KeyCodeRestart, false);
 
     bool retVal = true;
 

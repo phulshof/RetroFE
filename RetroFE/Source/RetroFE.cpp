@@ -1609,6 +1609,48 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             state = RETROFE_PLAYLIST_REQUEST;
         }
 
+        else if ( input_.keystate(UserInput::KeyCodeSkipForward) )
+        {
+            attract_.reset( );
+            page->skipForward( );
+            keyLastTime_ = currentTime_;
+        }
+
+        else if ( input_.keystate(UserInput::KeyCodeSkipBackward) )
+        {
+            attract_.reset( );
+            page->skipBackward( );
+            keyLastTime_ = currentTime_;
+        }
+
+        else if ( input_.keystate(UserInput::KeyCodeSkipForwardp) )
+        {
+            attract_.reset( );
+            page->skipForwardp( );
+            keyLastTime_ = currentTime_;
+        }
+
+        else if ( input_.keystate(UserInput::KeyCodeSkipBackwardp) )
+        {
+            attract_.reset( );
+            page->skipBackwardp( );
+            keyLastTime_ = currentTime_;
+        }
+
+        else if ( input_.keystate(UserInput::KeyCodePause) )
+        {
+            attract_.reset( );
+            page->pause( );
+            keyLastTime_ = currentTime_;
+        }
+
+        else if ( input_.keystate(UserInput::KeyCodeRestart) )
+        {
+            attract_.reset( );
+            page->restart( );
+            keyLastTime_ = currentTime_;
+        }
+
         else if ( input_.keystate(UserInput::KeyCodeRandom) )
         {
             attract_.reset( );

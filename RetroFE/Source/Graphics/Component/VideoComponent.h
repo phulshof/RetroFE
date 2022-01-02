@@ -32,6 +32,14 @@ public:
     void freeGraphicsMemory();
     void allocateGraphicsMemory();
     virtual bool isPlaying();
+    virtual void skipForward( );
+    virtual void skipBackward( );
+    virtual void skipForwardp( );
+    virtual void skipBackwardp( );
+    virtual void pause( );
+    virtual void restart( );
+    virtual unsigned long long getCurrent( );
+    virtual unsigned long long getDuration( );
 
 private:
     std::string videoFile_;

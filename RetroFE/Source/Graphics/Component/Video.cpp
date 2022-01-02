@@ -136,3 +136,63 @@ bool Video::isPlaying( )
         return false;
     }
 }
+
+
+void Video::skipForward( )
+{
+    if ( video_ )
+        video_->skipForward( );
+}
+
+
+void Video::skipBackward( )
+{
+    if ( video_ )
+        video_->skipBackward( );
+}
+
+
+void Video::skipForwardp( )
+{
+    if ( video_ )
+        video_->skipForwardp( );
+}
+
+
+void Video::skipBackwardp( )
+{
+    if ( video_ )
+        video_->skipBackwardp( );
+}
+
+
+void Video::pause( )
+{
+    if ( video_ )
+        video_->pause( );
+}
+
+
+void Video::restart( )
+{
+    if ( video_ )
+        video_->restart( );
+}
+
+
+unsigned long long Video::getCurrent( )
+{
+    if ( video_ )
+        return video_->getCurrent( );
+    else
+        return 0;
+}
+
+
+unsigned long long Video::getDuration( )
+{
+    if ( video_ )
+        return video_->getDuration( );
+    else
+        return 0;
+}
