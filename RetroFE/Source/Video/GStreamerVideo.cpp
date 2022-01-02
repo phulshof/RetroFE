@@ -523,7 +523,7 @@ void GStreamerVideo::skipForwardp( )
     if ( !gst_element_query_duration( playbin_, GST_FORMAT_TIME, &duration ) )
         return;
 
-    current += 0.05 * duration;
+    current += duration/20;
     if ( current > duration )
         current = duration;
     gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), current );
@@ -542,8 +542,8 @@ void GStreamerVideo::skipBackwardp( )
     if ( !gst_element_query_duration( playbin_, GST_FORMAT_TIME, &duration ) )
         return;
 
-    if ( current > 0.05 * duration )
-        current -= 0.05 * duration;
+    if ( current > duration/20 )
+        current -= duration/20;
     else
         current = 0;
     gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), current );
