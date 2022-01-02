@@ -57,7 +57,7 @@ void ReloadableText::update(float dt)
 {
     if (newItemSelected ||
        (newScrollItemSelected && getMenuScrollReload()) ||
-        type_ == "time")
+        type_ == "time" || type_ == "current" || type_ == "duration")
     {
         ReloadTexture();
         newItemSelected = false;
@@ -236,6 +236,42 @@ void ReloadableText::ReloadTexture()
                 text = "yes";
             else
                 text = "no";
+        }
+        else if (type_ == "current")
+        {
+            unsigned long long current = 0;
+            current     = page.getCurrent( );
+            current    /= 1000000000;
+            int seconds = current%60;
+            int minutes = (current/60)%60;
+            int hours   = (current/3600);
+            text        = std::to_string( hours ) + ":";
+            if ( minutes < 10 )
+                text   += "0" + std::to_string( minutes ) + ":";
+            else
+                text   += std::to_string( minutes ) + ":";
+            if ( seconds < 10 )
+                text   +=  "0" + std::to_string( seconds );
+            else
+                text   += std::to_string( seconds );
+        }
+        else if (type_ == "duration")
+        {
+            unsigned long long duration = 0;
+            duration    = page.getDuration( );
+            duration   /= 1000000000;
+            int seconds = duration%60;
+            int minutes = (duration/60)%60;
+            int hours   = (duration/3600);
+            text        = std::to_string( hours ) + ":";
+            if ( minutes < 10 )
+                text   += "0" + std::to_string( minutes ) + ":";
+            else
+                text   += std::to_string( minutes ) + ":";
+            if ( seconds < 10 )
+                text   +=  "0" + std::to_string( seconds );
+            else
+                text   += std::to_string( seconds );
         }
 
         if (!selectedItem->leaf || systemMode_) // item is not a leaf

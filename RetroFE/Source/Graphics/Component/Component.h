@@ -49,6 +49,14 @@ public:
     void setTweens(AnimationEvents *set);
     virtual bool isPlaying();
     virtual bool isJukeboxPlaying();
+    virtual void skipForward( ) {};
+    virtual void skipBackward( ) {};
+    virtual void skipForwardp( ) {};
+    virtual void skipBackwardp( ) {};
+    virtual void pause( ) {};
+    virtual void restart( ) {};
+    virtual unsigned long long getCurrent( ) {return 0;};
+    virtual unsigned long long getDuration( ) {return 0;};
     ViewInfo baseViewInfo;
     std::string collectionName;
     void setMenuScrollReload(bool menuScrollReload);

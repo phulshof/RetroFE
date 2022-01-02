@@ -59,12 +59,18 @@ public:
         KeyCodeMenu,
         KeyCodeAddPlaylist,
         KeyCodeRemovePlaylist,
-		KeyCodeTogglePlaylist,
+        KeyCodeTogglePlaylist,
         KeyCodeAdminMode,
         KeyCodeHideItem,
         KeyCodeQuit,
-		KeyCodeReboot,
-		KeyCodeSaveFirstPlaylist,
+        KeyCodeReboot,
+        KeyCodeSaveFirstPlaylist,
+        KeyCodeSkipForward,
+        KeyCodeSkipBackward,
+        KeyCodeSkipForwardp,
+        KeyCodeSkipBackwardp,
+        KeyCodePause,
+        KeyCodeRestart,
         KeyCodeMax
     };
 

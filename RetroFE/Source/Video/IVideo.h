@@ -32,4 +32,12 @@ public:
     virtual int getHeight() = 0;
     virtual int getWidth() = 0;
     virtual void setVolume(float volume) = 0;
+    virtual void skipForward( ) = 0;
+    virtual void skipBackward( ) = 0;
+    virtual void skipForwardp( ) = 0;
+    virtual void skipBackwardp( ) = 0;
+    virtual void pause( ) = 0;
+    virtual void restart( ) = 0;
+    virtual unsigned long long getCurrent( ) = 0;
+    virtual unsigned long long getDuration( ) = 0;
 };

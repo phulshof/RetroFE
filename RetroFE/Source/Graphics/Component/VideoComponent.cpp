@@ -106,3 +106,63 @@ bool VideoComponent::isPlaying()
 {
     return isPlaying_;
 }
+
+
+void VideoComponent::skipForward( )
+{
+    if ( videoInst_ )
+        videoInst_->skipForward( );
+}
+
+
+void VideoComponent::skipBackward( )
+{
+    if ( videoInst_ )
+        videoInst_->skipBackward( );
+}
+
+
+void VideoComponent::skipForwardp( )
+{
+    if ( videoInst_ )
+        videoInst_->skipForwardp( );
+}
+
+
+void VideoComponent::skipBackwardp( )
+{
+    if ( videoInst_ )
+        videoInst_->skipBackwardp( );
+}
+
+
+void VideoComponent::pause( )
+{
+    if ( videoInst_ )
+        videoInst_->pause( );
+}
+
+
+void VideoComponent::restart( )
+{
+    if ( videoInst_ )
+        videoInst_->restart( );
+}
+
+
+unsigned long long VideoComponent::getCurrent( )
+{
+    if ( videoInst_ )
+        return videoInst_->getCurrent( );
+    else
+        return 0;
+}
+
+
+unsigned long long VideoComponent::getDuration( )
+{
+    if ( videoInst_ )
+        return videoInst_->getDuration( );
+    else
+        return 0;
+}

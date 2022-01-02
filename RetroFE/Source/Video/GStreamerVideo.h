@@ -41,7 +41,15 @@ public:
     int getHeight();
     int getWidth();
     bool isPlaying();
-	void setVolume(float volume);
+    void setVolume(float volume);
+    void skipForward( );
+    void skipBackward( );
+    void skipForwardp( );
+    void skipBackwardp( );
+    void pause( );
+    void restart( );
+    unsigned long long getCurrent( );
+    unsigned long long getDuration( );
 
 private:
     static void processNewBuffer (GstElement *fakesink, GstBuffer *buf, GstPad *pad, gpointer data);
@@ -63,7 +71,8 @@ private:
     int playCount_;
     std::string currentFile_;
     int numLoops_;
-	float volume_;
+    float volume_;
     double currentVolume_;
     int monitor_;
+    bool paused_;
 };

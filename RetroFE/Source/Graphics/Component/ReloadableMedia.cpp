@@ -488,3 +488,63 @@ bool ReloadableMedia::isJukeboxPlaying()
     else
         return false;
 }
+
+
+void ReloadableMedia::skipForward( )
+{
+    if ( jukebox_ && loadedComponent_ )
+        loadedComponent_->skipForward( );
+}
+
+
+void ReloadableMedia::skipBackward( )
+{
+    if ( jukebox_ && loadedComponent_ )
+        loadedComponent_->skipBackward( );
+}
+
+
+void ReloadableMedia::skipForwardp( )
+{
+    if ( jukebox_ && loadedComponent_ )
+        loadedComponent_->skipForwardp( );
+}
+
+
+void ReloadableMedia::skipBackwardp( )
+{
+    if ( jukebox_ && loadedComponent_ )
+        loadedComponent_->skipBackwardp( );
+}
+
+
+void ReloadableMedia::pause( )
+{
+    if ( jukebox_ && loadedComponent_ )
+        loadedComponent_->pause( );
+}
+
+
+void ReloadableMedia::restart( )
+{
+    if ( jukebox_ && loadedComponent_ )
+        loadedComponent_->restart( );
+}
+
+
+unsigned long long ReloadableMedia::getCurrent( )
+{
+    if ( jukebox_ && loadedComponent_ )
+        return loadedComponent_->getCurrent( );
+    else
+        return 0;
+}
+
+
+unsigned long long ReloadableMedia::getDuration( )
+{
+    if ( jukebox_ && loadedComponent_ )
+        return loadedComponent_->getDuration( );
+    else
+        return 0;
+}

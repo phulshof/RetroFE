@@ -37,6 +37,14 @@ public:
 
     void enableTextFallback_(bool value);
     virtual bool isJukeboxPlaying();
+    virtual void skipForward( );
+    virtual void skipBackward( );
+    virtual void skipForwardp( );
+    virtual void skipBackwardp( );
+    virtual void pause( );
+    virtual void restart( );
+    virtual unsigned long long getCurrent( );
+    virtual unsigned long long getDuration( );
 
 
 private:
