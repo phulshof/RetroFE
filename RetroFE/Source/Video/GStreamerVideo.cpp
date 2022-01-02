@@ -130,12 +130,16 @@ bool GStreamerVideo::deInitialize()
 {
     gst_deinit();
     initialized_ = false;
+    paused_      = false;
     return true;
 }
 
 
 bool GStreamerVideo::stop()
 {
+
+    paused_ = false;
+
     if(!initialized_)
     {
         return false;
@@ -478,6 +482,9 @@ void GStreamerVideo::setVolume(float volume)
 void GStreamerVideo::skipForward( )
 {
 
+    if ( !isPlaying_ )
+        return;
+
     gint64 current;
     gint64 duration;
 
@@ -497,6 +504,9 @@ void GStreamerVideo::skipForward( )
 void GStreamerVideo::skipBackward( )
 {
 
+    if ( !isPlaying_ )
+        return;
+
     gint64 current;
 
     if ( !gst_element_query_position( playbin_, GST_FORMAT_TIME, &current ) )
@@ -513,6 +523,9 @@ void GStreamerVideo::skipBackward( )
 
 void GStreamerVideo::skipForwardp( )
 {
+
+    if ( !isPlaying_ )
+        return;
 
     gint64 current;
     gint64 duration;
@@ -532,6 +545,9 @@ void GStreamerVideo::skipForwardp( )
 
 void GStreamerVideo::skipBackwardp( )
 {
+
+    if ( !isPlaying_ )
+        return;
 
     gint64 current;
     gint64 duration;
@@ -563,6 +579,9 @@ void GStreamerVideo::pause( )
 
 void GStreamerVideo::restart( )
 {
+
+    if ( !isPlaying_ )
+        return;
 
     gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), 0 );
 
