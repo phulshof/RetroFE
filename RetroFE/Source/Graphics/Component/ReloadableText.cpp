@@ -244,7 +244,7 @@ void ReloadableText::ReloadTexture()
             current    /= 1000000000;
             int seconds = current%60;
             int minutes = (current/60)%60;
-            int hours   = (current/3600);
+            int hours   = int( current/3600 );
             text        = std::to_string( hours ) + ":";
             if ( minutes < 10 )
                 text   += "0" + std::to_string( minutes ) + ":";
@@ -262,7 +262,7 @@ void ReloadableText::ReloadTexture()
             duration   /= 1000000000;
             int seconds = duration%60;
             int minutes = (duration/60)%60;
-            int hours   = (duration/3600);
+            int hours   = int( duration/3600 );
             text        = std::to_string( hours ) + ":";
             if ( minutes < 10 )
                 text   += "0" + std::to_string( minutes ) + ":";
