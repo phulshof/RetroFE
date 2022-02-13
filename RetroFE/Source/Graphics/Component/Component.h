@@ -57,6 +57,7 @@ public:
     virtual void restart( ) {};
     virtual unsigned long long getCurrent( ) {return 0;};
     virtual unsigned long long getDuration( ) {return 0;};
+    virtual bool isPaused( ) {return false;};
     ViewInfo baseViewInfo;
     std::string collectionName;
     void setMenuScrollReload(bool menuScrollReload);

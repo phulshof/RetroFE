@@ -40,4 +40,5 @@ public:
     virtual void restart( ) = 0;
     virtual unsigned long long getCurrent( ) = 0;
     virtual unsigned long long getDuration( ) = 0;
+    virtual bool isPaused( ) = 0;
 };

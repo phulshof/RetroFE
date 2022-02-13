@@ -604,3 +604,9 @@ unsigned long long GStreamerVideo::getDuration( )
         ret = 0;
     return (unsigned long long)ret;
 }
+
+
+bool GStreamerVideo::isPaused( )
+{
+    return paused_;
+}

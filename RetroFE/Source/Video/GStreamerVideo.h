@@ -50,6 +50,7 @@ public:
     void restart( );
     unsigned long long getCurrent( );
     unsigned long long getDuration( );
+    bool isPaused( );
 
 private:
     static void processNewBuffer (GstElement *fakesink, GstBuffer *buf, GstPad *pad, gpointer data);

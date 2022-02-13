@@ -158,6 +158,15 @@ void RetroFE::launchEnter( )
     // Free the textures, and optionally take down SDL
     freeGraphicsMemory( );
 
+    bool hideMouse = false;
+    int  mouseX    = 5000;
+    int  mouseY    = 5000;
+    config_.getProperty( "hideMouse", hideMouse );
+    config_.getProperty( "mouseX",    mouseX );
+    config_.getProperty( "mouseY",    mouseY );
+    if ( hideMouse )
+        SDL_WarpMouseGlobal( mouseX, mouseY );
+
 }
 
 
@@ -189,6 +198,15 @@ void RetroFE::launchExit( )
     currentTime_ = static_cast<float>( SDL_GetTicks( ) ) / 1000;
     keyLastTime_ = currentTime_;
     lastLaunchReturnTime_ = currentTime_;
+
+    bool hideMouse = false;
+    int  mouseX    = 5000;
+    int  mouseY    = 5000;
+    config_.getProperty( "hideMouse", hideMouse );
+    config_.getProperty( "mouseX",    mouseX );
+    config_.getProperty( "mouseY",    mouseY );
+    if ( hideMouse )
+        SDL_WarpMouseGlobal( mouseX, mouseY );
 
 }
 
@@ -1613,6 +1631,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         {
             attract_.reset( );
             page->skipForward( );
+            page->jukeboxJump( );
             keyLastTime_ = currentTime_;
         }
 
@@ -1620,6 +1639,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         {
             attract_.reset( );
             page->skipBackward( );
+            page->jukeboxJump( );
             keyLastTime_ = currentTime_;
         }
 
@@ -1627,6 +1647,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         {
             attract_.reset( );
             page->skipForwardp( );
+            page->jukeboxJump( );
             keyLastTime_ = currentTime_;
         }
 
@@ -1634,6 +1655,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         {
             attract_.reset( );
             page->skipBackwardp( );
+            page->jukeboxJump( );
             keyLastTime_ = currentTime_;
         }
 
@@ -1641,6 +1663,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         {
             attract_.reset( );
             page->pause( );
+            page->jukeboxJump( );
             keyLastTime_ = currentTime_;
         }
 
