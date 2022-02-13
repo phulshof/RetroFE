@@ -887,6 +887,7 @@ AnimationEvents *PageBuilder::createTweenInstance(xml_node<> *componentXml)
     buildTweenSet(tweens, componentXml, "onAttractEnter",   "attractEnter");
     buildTweenSet(tweens, componentXml, "onAttract",        "attract");
     buildTweenSet(tweens, componentXml, "onAttractExit",    "attractExit");
+    buildTweenSet(tweens, componentXml, "onJukeboxJump",    "jukeboxJump");
 
     buildTweenSet(tweens, componentXml, "onMenuActionInputEnter",  "menuActionInputEnter");
     buildTweenSet(tweens, componentXml, "onMenuActionInputExit",   "menuActionInputExit");

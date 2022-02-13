@@ -166,3 +166,12 @@ unsigned long long VideoComponent::getDuration( )
     else
         return 0;
 }
+
+
+bool VideoComponent::isPaused( )
+{
+    if ( videoInst_ )
+        return videoInst_->isPaused( );
+    else
+        return false;
+}

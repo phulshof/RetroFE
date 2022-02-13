@@ -45,6 +45,7 @@ public:
     virtual void restart( );
     virtual unsigned long long getCurrent( );
     virtual unsigned long long getDuration( );
+    virtual bool isPaused( );
 
 
 private:

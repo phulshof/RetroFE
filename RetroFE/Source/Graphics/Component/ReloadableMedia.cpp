@@ -65,7 +65,8 @@ void ReloadableMedia::enableTextFallback_(bool value)
 void ReloadableMedia::update(float dt)
 {
     if (newItemSelected ||
-       (newScrollItemSelected && getMenuScrollReload()))
+       (newScrollItemSelected && getMenuScrollReload()) ||
+        type_ == "isPaused")
     {
 
         reloadTexture();
@@ -137,10 +138,21 @@ void ReloadableMedia::reloadTexture()
         names.push_back(selectedItem->cloneof);
     }
 
-    std::string typeLC   = Utils::toLower(type_);
+    std::string typeLC = Utils::toLower(type_);
     if (typeLC == "isfavorite")
     {
         if (selectedItem->isFavorite)
+        {
+            names.push_back("yes");
+        }
+        else
+        {
+            names.push_back("no");
+        }
+    }
+    if (typeLC == "ispaused")
+    {
+        if (page.isPaused( ))
         {
             names.push_back("yes");
         }
@@ -548,3 +560,14 @@ unsigned long long ReloadableMedia::getDuration( )
     else
         return 0;
 }
+
+
+bool ReloadableMedia::isPaused( )
+{
+    if ( jukebox_ && loadedComponent_ )
+        return loadedComponent_->isPaused( );
+    else
+        return false;
+}
+
+

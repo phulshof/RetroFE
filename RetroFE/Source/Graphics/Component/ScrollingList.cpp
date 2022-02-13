@@ -614,6 +614,15 @@ void ScrollingList::triggerAttractExitEvent( int menuIndex )
     }
 }
 
+void ScrollingList::triggerJukeboxJumpEvent( int menuIndex )
+{
+    for ( unsigned int i = 0; i < components_.size( ); ++i )
+    {
+        Component *c = components_.at( i );
+        if ( c ) c->triggerEvent( "jukeboxJump", menuIndex );
+    }
+}
+
 void ScrollingList::update( float dt )
 {
 

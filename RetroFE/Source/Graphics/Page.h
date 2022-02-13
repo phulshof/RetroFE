@@ -111,6 +111,7 @@ public:
     void  attractEnter( );
     void  attract( );
     void  attractExit( );
+    void  jukeboxJump( );
     void  triggerEvent( std::string action );
     void  setText( std::string text, int id );
     void  addPlaylist();
@@ -139,6 +140,7 @@ public:
     void  restart( );
     unsigned long long getCurrent( );
     unsigned long long getDuration( );
+    bool  isPaused( );
 
 private:
     void playlistChange();
