@@ -34,14 +34,6 @@
 
 bool GStreamerVideo::initialized_ = false;
 
-//todo: this started out as sandbox code. This class needs to be refactored
-
-// MUST match video size
-//gboolean GStreamerVideo::busCallback(GstBus * /* bus */, GstMessage * /* msg */, gpointer /* data */)
-//{ 
-//    // this callback only needs to be defined so we can loop the video once it completes
-//    return TRUE;
-//}
 GStreamerVideo::GStreamerVideo( int monitor )
     : playbin_(NULL)
     , videoBin_(NULL)
@@ -179,6 +171,7 @@ bool GStreamerVideo::stop()
 
 bool GStreamerVideo::play(std::string file)
 {
+
     playCount_ = 0;
 
     if(!initialized_)
@@ -186,21 +179,17 @@ bool GStreamerVideo::play(std::string file)
         return false;
     }
 
-    stop();
-
     currentFile_ = file;
 
-    const gchar *uriFile = gst_filename_to_uri (file.c_str(), NULL);
+    stop();
+
+    gchar *uriFile = gst_filename_to_uri (file.c_str(), NULL);
     if(!uriFile)
     {
         return false;
     }
     else
     {
-//        Configuration::convertToAbsolutePath(Configuration::absolutePath, file);
-        file = uriFile;
-        delete uriFile;
-
         if(!playbin_)
         {
             playbin_ = gst_element_factory_make("playbin", "player");
@@ -262,7 +251,8 @@ bool GStreamerVideo::play(std::string file)
             gst_object_unref(videoConvertSinkPad);
             videoConvertSinkPad = NULL;
         }
-        g_object_set(G_OBJECT(playbin_), "uri", file.c_str(), "video-sink", videoBin_, NULL);
+        g_object_set(G_OBJECT(playbin_), "uri", uriFile, "video-sink", videoBin_, NULL);
+        g_free( uriFile );
 
         isPlaying_ = true;
 
@@ -271,7 +261,6 @@ bool GStreamerVideo::play(std::string file)
         g_signal_connect(videoSink_, "handoff", G_CALLBACK(processNewBuffer), this);
 
         videoBus_ = gst_pipeline_get_bus(GST_PIPELINE(playbin_));
-//        gst_bus_add_watch(videoBus_, &busCallback, this);
 
         /* Start playing */
         GstStateChangeReturn playState = gst_element_set_state(GST_ELEMENT(playbin_), GST_STATE_PLAYING);
@@ -305,26 +294,14 @@ void GStreamerVideo::freeElements()
         gst_object_unref(playbin_);
         playbin_ = NULL;
     }
-//    if(videoSink_)
-//    {
-//        gst_object_unref(videoSink_);
-        videoSink_ = NULL;
-//    }
-//    if(videoConvert_)
-//    {
- //       gst_object_unref(videoConvert_);
-        videoConvert_ = NULL;
-//    }
     if(videoConvertCaps_)
     {
         gst_caps_unref(videoConvertCaps_);
         videoConvertCaps_ = NULL;
     }
-//    if(videoBin_)
-//    {
-//        gst_object_unref(videoBin_);
-        videoBin_ = NULL;
-//    }
+    videoSink_    = NULL;
+    videoConvert_ = NULL;
+    videoBin_     = NULL;
 }
 
 
@@ -394,7 +371,6 @@ void GStreamerVideo::update(float /* dt */)
                 GstMapInfo bufInfo;
                 unsigned int y_stride, u_stride, v_stride;
                 const Uint8 *y_plane, *u_plane, *v_plane;
-                std::stringstream ss;
 
                 y_stride = GST_ROUND_UP_4(width_);
                 u_stride = v_stride = GST_ROUND_UP_4(y_stride / 2);

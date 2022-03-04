@@ -48,19 +48,10 @@ Animation *AnimationEvents::getAnimation(std::string tween)
 Animation *AnimationEvents::getAnimation(std::string tween, int index)
 {
     if(animationMap_.find(tween) == animationMap_.end())
-    {
         animationMap_[tween][-1] = new Animation();
-    }
 
     if(animationMap_[tween].find(index) == animationMap_[tween].end())
-    {
         index = -1;
-
-        if(animationMap_[tween].find(index) == animationMap_[tween].end())
-        {
-            animationMap_[tween][index] = new Animation();
-        }
-    }
 
     return animationMap_[tween][index];
 }

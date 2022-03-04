@@ -19,6 +19,7 @@
 #include "../../Database/Configuration.h"
 #include "../../Utility/Log.h"
 #include "../../Video/GStreamerVideo.h"
+#include "../../Video/VideoFactory.h"
 #include "../../SDL.h"
 
 VideoComponent::VideoComponent(IVideo *videoInst, Page &p, std::string videoFile)
@@ -37,7 +38,8 @@ VideoComponent::~VideoComponent()
     if(videoInst_)
     {
         videoInst_->stop();
-//        delete videoInst_;
+        if ( VideoFactory::canDelete( videoInst_ ) )
+            delete videoInst_;
         videoInst_ = NULL;
     }
 }

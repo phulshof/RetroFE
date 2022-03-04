@@ -31,6 +31,7 @@
 #include "Graphics/Page.h"
 #include "Graphics/Component/ScrollingList.h"
 #include "Graphics/Component/Video.h"
+#include <gst/gst.h>
 #include "Video/VideoFactory.h"
 #include <algorithm>
 #include <dirent.h>
@@ -166,7 +167,6 @@ void RetroFE::launchEnter( )
     config_.getProperty( "mouseY",    mouseY );
     if ( hideMouse )
         SDL_WarpMouseGlobal( mouseX, mouseY );
-
 }
 
 
@@ -296,6 +296,7 @@ bool RetroFE::deInitialize( )
     {
         Logger::write( Logger::ZONE_INFO, "RetroFE", "Exiting" );
         SDL::deInitialize( );
+        gst_deinit( );
     }
 
     return retVal;
@@ -327,7 +328,6 @@ bool RetroFE::run( )
     config_.getProperty( "videoLoop", videoLoop );
     VideoFactory::setEnabled( videoEnable );
     VideoFactory::setNumLoops( videoLoop );
-    VideoFactory::createVideo( 0, false ); // pre-initialize the gstreamer engine
     Video::setEnabled( videoEnable );
 
     initializeThread = SDL_CreateThread( initialize, "RetroFEInit", (void *)this );
@@ -421,6 +421,8 @@ bool RetroFE::run( )
 
         // Idle state; waiting for input
         case RETROFE_IDLE:
+
+            currentPage_->cleanup( );
 
             // Not in splash mode
             if ( currentPage_ && !splashMode )
@@ -1229,7 +1231,6 @@ bool RetroFE::run( )
         case RETROFE_BACK_MENU_ENTER:
             if ( currentPage_->isIdle( ) )
             {
-                currentPage_->cleanup( );
                 bool collectionInputClear = false;
                 config_.getProperty( "collectionInputClear", collectionInputClear );
                 if (  collectionInputClear  )

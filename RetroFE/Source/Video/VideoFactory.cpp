@@ -56,3 +56,9 @@ void VideoFactory::setNumLoops(int numLoops)
 {
     numLoops_ = numLoops;
 }
+
+
+bool VideoFactory::canDelete( IVideo *instance )
+{
+    return ( instance != instance_ );
+}
