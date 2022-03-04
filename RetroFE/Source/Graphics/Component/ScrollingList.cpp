@@ -100,6 +100,12 @@ ScrollingList::ScrollingList( const ScrollingList &copy )
 ScrollingList::~ScrollingList( )
 {
     destroyItems( );
+    while( scrollPoints_->size( ) > 0 )
+    {
+        ViewInfo *scrollPoint = scrollPoints_->back( );
+        delete scrollPoint;
+        scrollPoints_->pop_back( );
+    }
 }
 
 
@@ -980,6 +986,8 @@ void ScrollingList::deallocateTexture( unsigned int index )
     if ( s )
     {
         s->freeGraphicsMemory(  );
+        delete s;
+        components_.at( index ) = NULL;
     }
 }
 

@@ -256,7 +256,7 @@ bool CollectionInfoBuilder::ImportBasicList(CollectionInfo *info, std::string fi
 
             if (!found)
             {
-               Item *i = new Item();
+                Item *i = new Item();
 
                 line.erase( std::remove(line.begin(), line.end(), '\r'), line.end() );
 
@@ -309,16 +309,18 @@ bool CollectionInfoBuilder::ImportDirectory(CollectionInfo *info, std::string me
     ImportBasicList(info, includeFile, includeFilter);
     ImportBasicList(info, excludeFile, excludeFilter);
 
-    if (showMissing)
+    for(std::vector<Item *>::iterator it = includeFilterUnsorted.begin(); it != includeFilterUnsorted.end(); ++it)
     {
-        for(std::vector<Item *>::iterator it = includeFilterUnsorted.begin(); it != includeFilterUnsorted.end(); ++it)
+        if (showMissing && excludeFilter.find((*it)->name) == excludeFilter.end())
         {
-            if (excludeFilter.find((*it)->name) == excludeFilter.end())
-            {
-                info->items.push_back(*it);
-            }
+            info->items.push_back(*it);
+        }
+        else
+        {
+            delete *it;
         }
     }
+    includeFilterUnsorted.clear( );
 
     // Read ROM directory if showMissing is false
     if (!showMissing || includeFilter.size() == 0)
@@ -469,7 +471,12 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
                         }
                     }
                 }
-
+                while ( playlistFilter.size( ) > 0 )
+                {
+                    std::map<std::string, Item *>::iterator it = playlistFilter.begin();
+                    delete it->second;
+                    playlistFilter.erase( it->first );
+                }
             }
         }
     }

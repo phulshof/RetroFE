@@ -23,6 +23,7 @@ public:
     static IVideo *createVideo( int monitor, bool isTypeVideo, int numLoops = -1 );
     static void    setEnabled(bool enabled);
     static void    setNumLoops(int numLoops);
+    static bool    canDelete( IVideo *instance );
 
 private:
     static bool    enabled_;
