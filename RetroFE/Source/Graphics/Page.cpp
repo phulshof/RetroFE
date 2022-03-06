@@ -56,6 +56,9 @@ Page::~Page()
 
 void Page::deInitialize()
 {
+
+    cleanup( );
+
     MenuVector_T::iterator it = menus_.begin();
     while(it != menus_.end())
     {
