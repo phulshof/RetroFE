@@ -733,7 +733,8 @@ bool RetroFE::run( )
             {
                 currentPage_->start( );
             }
-            l.LEDBlinky( 9, currentPage_->getSelectedItem( )->collectionInfo->name, currentPage_->getSelectedItem( ) );
+            if ( currentPage_->getSelectedItem( ) )
+                l.LEDBlinky( 9, currentPage_->getSelectedItem( )->collectionInfo->name, currentPage_->getSelectedItem( ) );
             state = RETROFE_NEXT_PAGE_MENU_ENTER;
             break;
 
