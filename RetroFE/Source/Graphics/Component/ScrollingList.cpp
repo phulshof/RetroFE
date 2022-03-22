@@ -197,7 +197,10 @@ void ScrollingList::destroyItems( )
     for ( unsigned int i = 0; i < components_.size( ); ++i )
     {
         if ( components_.at( i ) )
+        {
+            components_.at( i )->freeGraphicsMemory( );
             delete components_.at( i );
+        }
         components_.at( i ) = NULL;
     }
 }
@@ -632,13 +635,6 @@ void ScrollingList::triggerJukeboxJumpEvent( int menuIndex )
 void ScrollingList::update( float dt )
 {
 
-    // Check if scrollPeriod_ has been properly initialised already or if something went wrong
-    // while updating the scrollPeriod_
-    if ( scrollPeriod_ < minScrollTime_ )
-    {
-        scrollPeriod_ = startScrollTime_;
-    }
-
     Component::update( dt );
 
     if (components_.size( ) == 0 ) return;
@@ -984,11 +980,7 @@ void ScrollingList::deallocateTexture( unsigned int index )
     Component *s = components_.at( index );
 
     if ( s )
-    {
         s->freeGraphicsMemory(  );
-        delete s;
-        components_.at( index ) = NULL;
-    }
 }
 
 void ScrollingList::draw(  )
@@ -1061,6 +1053,11 @@ void ScrollingList::scroll( bool forward )
 
     if ( !items_ || items_->size(  ) == 0 ) return;
     if ( !scrollPoints_ || scrollPoints_->size(  ) == 0 ) return;
+
+    if ( scrollPeriod_ < minScrollTime_ )
+    {
+        scrollPeriod_ = minScrollTime_;
+    }
 
     // Replace the item that's scrolled out
     if ( forward )
