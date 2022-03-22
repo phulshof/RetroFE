@@ -382,7 +382,7 @@ bool RetroFE::run( )
     Launcher l( config_ );
     Menu     m( config_, input_ );
     preloadTime = static_cast<float>( SDL_GetTicks( ) ) / 1000;
-	l.LEDBlinky( 1 );
+    l.LEDBlinky( 1 );
 
     while ( running )
     {
@@ -1144,7 +1144,7 @@ bool RetroFE::run( )
                 else
                 {
                     launchExit( );
-					l.LEDBlinky( 4 );
+                    l.LEDBlinky( 4 );
                     currentPage_->exitGame( );
                     state = RETROFE_LAUNCH_EXIT;
                 }
@@ -1306,10 +1306,10 @@ bool RetroFE::run( )
         // Wait for onExit animation to finish before quitting RetroFE
         case RETROFE_QUIT:
             if ( currentPage_->isGraphicsIdle( ) )
-			{
-				l.LEDBlinky( 2 );
+            {
+                l.LEDBlinky( 2 );
                 running = false;
-			}
+            }
             break;
         }
 
