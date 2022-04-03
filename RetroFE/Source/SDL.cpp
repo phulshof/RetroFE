@@ -131,7 +131,7 @@ bool SDL::initialize( Configuration &config )
                 Logger::write( Logger::ZONE_ERROR, "Configuration", "Missing property \"horizontal\"" + std::to_string(i) );
                 return false;
             }
-            else if ( hString != "stretch" && (i == 0 && !config.getProperty( "horizontal", windowWidth_[i] )) && !config.getProperty( "horizontal" + std::to_string(i), windowWidth_[i] ))
+            else if ( hString != "stretch" && (i != 0 || !config.getProperty( "horizontal", windowWidth_[i] )) && !config.getProperty( "horizontal" + std::to_string(i), windowWidth_[i] ))
             {
                 Logger::write( Logger::ZONE_ERROR, "Configuration", "Invalid property value for \"horizontal\"" + std::to_string(i) );
                 return false;
@@ -148,7 +148,7 @@ bool SDL::initialize( Configuration &config )
                 Logger::write( Logger::ZONE_ERROR, "Configuration", "Missing property \"vertical\"" + std::to_string(i) );
                 return false;
             }
-            else if ( vString != "stretch" && (i == 0 && !config.getProperty( "vertical", windowHeight_[i] )) && !config.getProperty( "vertical" + std::to_string(i), windowHeight_[i] ) )
+            else if ( vString != "stretch" && (i != 0 || !config.getProperty( "vertical", windowHeight_[i] )) && !config.getProperty( "vertical" + std::to_string(i), windowHeight_[i] ) )
             {
                 Logger::write( Logger::ZONE_ERROR, "Configuration", "Invalid property value for \"vertical\"" + std::to_string(i) );
                 return false;
