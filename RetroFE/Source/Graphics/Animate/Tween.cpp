@@ -78,27 +78,27 @@ TweenAlgorithm Tween::getTweenType(std::string name)
 {
     if(tweenTypeMap_.size() == 0)
     {
-        tweenTypeMap_["easeInquadratic"] = EASE_IN_QUADRATIC;
-        tweenTypeMap_["easeOutquadratic"] = EASE_OUT_QUADRATIC;
-        tweenTypeMap_["easeInoutquadratic"] = EASE_INOUT_QUADRATIC;
-        tweenTypeMap_["easeIncubic"] = EASE_IN_CUBIC;
-        tweenTypeMap_["easeOutcubic"] = EASE_OUT_CUBIC;
-        tweenTypeMap_["easeInoutcubic"] = EASE_INOUT_CUBIC;
-        tweenTypeMap_["easeInquartic"] = EASE_IN_QUARTIC;
-        tweenTypeMap_["easeOutquartic"] = EASE_OUT_QUARTIC;
-        tweenTypeMap_["easeInoutquartic"] = EASE_INOUT_QUARTIC;
-        tweenTypeMap_["easeInquintic"] = EASE_IN_QUINTIC;
-        tweenTypeMap_["easeOutquintic"] = EASE_OUT_QUINTIC;
-        tweenTypeMap_["easeInoutquintic"] = EASE_INOUT_QUINTIC;
-        tweenTypeMap_["easeInsine"] = EASE_IN_SINE;
-        tweenTypeMap_["easeOutsine"] = EASE_OUT_SINE;
-        tweenTypeMap_["easeInoutsine"] = EASE_INOUT_SINE;
-        tweenTypeMap_["easeInexponential"] = EASE_IN_EXPONENTIAL;
-        tweenTypeMap_["easeOutexponential"] = EASE_OUT_EXPONENTIAL;
-        tweenTypeMap_["easeInoutexponential"] = EASE_INOUT_EXPONENTIAL;
-        tweenTypeMap_["easeIncircular"] = EASE_IN_CIRCULAR;
-        tweenTypeMap_["easeOutcircular"] = EASE_OUT_CIRCULAR;
-        tweenTypeMap_["easeInoutcircular"] = EASE_INOUT_CIRCULAR;
+        tweenTypeMap_["easeinquadratic"] = EASE_IN_QUADRATIC;
+        tweenTypeMap_["easeoutquadratic"] = EASE_OUT_QUADRATIC;
+        tweenTypeMap_["easeinoutquadratic"] = EASE_INOUT_QUADRATIC;
+        tweenTypeMap_["easeincubic"] = EASE_IN_CUBIC;
+        tweenTypeMap_["easeoutcubic"] = EASE_OUT_CUBIC;
+        tweenTypeMap_["easeinoutcubic"] = EASE_INOUT_CUBIC;
+        tweenTypeMap_["easeinquartic"] = EASE_IN_QUARTIC;
+        tweenTypeMap_["easeoutquartic"] = EASE_OUT_QUARTIC;
+        tweenTypeMap_["easeinoutquartic"] = EASE_INOUT_QUARTIC;
+        tweenTypeMap_["easeinquintic"] = EASE_IN_QUINTIC;
+        tweenTypeMap_["easeoutquintic"] = EASE_OUT_QUINTIC;
+        tweenTypeMap_["easeonoutquintic"] = EASE_INOUT_QUINTIC;
+        tweenTypeMap_["easeinsine"] = EASE_IN_SINE;
+        tweenTypeMap_["easeoutsine"] = EASE_OUT_SINE;
+        tweenTypeMap_["easeinoutsine"] = EASE_INOUT_SINE;
+        tweenTypeMap_["easeinexponential"] = EASE_IN_EXPONENTIAL;
+        tweenTypeMap_["easeoutexponential"] = EASE_OUT_EXPONENTIAL;
+        tweenTypeMap_["easeinoutexponential"] = EASE_INOUT_EXPONENTIAL;
+        tweenTypeMap_["easeincircular"] = EASE_IN_CIRCULAR;
+        tweenTypeMap_["easeoutcircular"] = EASE_OUT_CIRCULAR;
+        tweenTypeMap_["easeinoutcircular"] = EASE_INOUT_CIRCULAR;
         tweenTypeMap_["linear"] = LINEAR;
     }
 
