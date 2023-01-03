@@ -30,6 +30,8 @@
 #include <cstring>
 #endif
 
+// bool LEDBlinkyCloseOnExit = true;
+
 Launcher::Launcher(Configuration &c)
     : config_(c)
 {
@@ -137,8 +139,15 @@ void Launcher::LEDBlinky( int command, std::string collection, Item *collectionI
 	std::string exe  = LEDBlinkyDirectory + "\\LEDBlinky.exe";
 	std::string args = std::to_string( command );
 	bool wait = false;
-	if ( command == 2 )
-		wait = true;
+	if ( command == 2 ) 
+    {
+        bool LEDBlinkyCloseOnExit;
+        config_.getProperty("LEDBlinkyCloseOnExit", LEDBlinkyCloseOnExit);
+        if (LEDBlinkyCloseOnExit == true) {
+            wait = true;
+        }
+        else wait = false;
+    }
 	if ( command == 8 )
 	{
 		std::string launcherName = collectionItem->collectionInfo->launcher;
