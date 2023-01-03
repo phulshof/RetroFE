@@ -1310,9 +1310,11 @@ bool RetroFE::run( )
 
         // Wait for onExit animation to finish before quitting RetroFE
         case RETROFE_QUIT:
+            bool LEDBlinkyCloseOnExit = true;
+            config_.getProperty("LEDBlinkyCloseOnExit", LEDBlinkyCloseOnExit);
             if ( currentPage_->isGraphicsIdle( ) )
             {
-                if (LEDBlinkyCloseOnExit = yes) {
+                if (LEDBlinkyCloseOnExit == true) {
                     l.LEDBlinky(2);
                     running = false;
                 }
