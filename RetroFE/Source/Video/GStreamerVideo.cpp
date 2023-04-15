@@ -269,6 +269,12 @@ bool GStreamerVideo::play(std::string file)
                     // set "thread-type" property to 2
                     g_object_set(G_OBJECT(element), "thread-type", 2, NULL);
                 }
+                if (g_str_has_prefix(elementName, "avdec_h265"))
+                {
+                    // Modify the properties of the avdec_h265 element here
+                    // set "thread-type" property to 2
+                    g_object_set(G_OBJECT(element), "thread-type", 2, NULL);
+                }
 
             g_free(elementName);
         }
