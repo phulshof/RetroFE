@@ -144,7 +144,19 @@ bool GStreamerVideo::stop()
 
     if(playbin_)
     {
-        (void)gst_element_set_state(playbin_, GST_STATE_NULL);
+        GstStateChangeReturn ret = gst_element_set_state(playbin_, GST_STATE_NULL);
+        if (ret == GST_STATE_CHANGE_FAILURE) 
+        {
+            Logger::write(Logger::ZONE_ERROR, "Video", "Failed to set playbin to NULL state");
+            return false;
+        }
+
+        ret = gst_element_get_state(playbin_, NULL, NULL, GST_CLOCK_TIME_NONE);
+        if (ret == GST_STATE_CHANGE_FAILURE) 
+        {
+            Logger::write(Logger::ZONE_ERROR, "Video", "Failed to wait for playbin to reach NULL state");
+            return false;
+        }
     }
 
     if(texture_)
@@ -287,6 +299,7 @@ bool GStreamerVideo::play(std::string file)
 
         /* Start playing */
         GstStateChangeReturn playState = gst_element_set_state(GST_ELEMENT(playbin_), GST_STATE_PLAYING);
+        //gst_debug_bin_to_dot_file(GST_BIN(playbin_), GST_DEBUG_GRAPH_SHOW_ALL, "pipeline");
         if (playState != GST_STATE_CHANGE_ASYNC)
         {
             isPlaying_ = false;
