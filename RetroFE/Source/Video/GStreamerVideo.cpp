@@ -279,13 +279,13 @@ bool GStreamerVideo::play(std::string file)
                 {
                     // Modify the properties of the avdec_h264 element here
                     // set "thread-type" property to 2 and "max-threads" to 1
-                    g_object_set(G_OBJECT(element), "thread-type", 2, "max-threads", 1, NULL);
+                    g_object_set(G_OBJECT(element), "thread-type", 2, "max-threads", 2, NULL);
                 }
                 if (g_str_has_prefix(elementName, "avdec_h265"))
                 {
                     // Modify the properties of the avdec_h265 element here
                     // set "thread-type" property to 2 and "max-threads" to 1
-                    g_object_set(G_OBJECT(element), "thread-type", 2, "max-threads", 1, NULL);
+                    g_object_set(G_OBJECT(element), "thread-type", 2, "max-threads", 2, NULL);
                 }
 
             g_free(elementName);
