@@ -9,7 +9,3 @@ Documentation/Manual/_build/*
 Configuration/Configuration/bin/**
 Configuration/Configuration/obj/**
 Artifacts/**
-
-RetroFE/Source/Graphics/Page.cpp
-RetroFE/Source/RetroFE.cpp
-.vs/slnx.sqlite
