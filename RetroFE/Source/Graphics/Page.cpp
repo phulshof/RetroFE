@@ -1431,10 +1431,13 @@ void Page::togglePlaylist()
 {
     if (!selectedItem_) return;
 
+if(playlist_->first != "favorites")
+  {
     if (selectedItem_->isFavorite)
         removePlaylist();
     else
         addPlaylist();
+  }
 }
 
 

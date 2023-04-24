@@ -1347,7 +1347,7 @@ bool RetroFE::run( )
                     {
                         attract_.reset( attract_.isSet( ) );
 
-                        bool cyclePlaylist = false;
+                        bool cyclePlaylist = true;
                         config_.getProperty( "attractModeCyclePlaylist", cyclePlaylist );
 
                         std::string cycleString;
@@ -1627,10 +1627,16 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
 
         else if ( input_.keystate(UserInput::KeyCodeTogglePlaylist) )
         {
+            if (currentPage_->getPlaylistName() == "favorites" )
+{
+}
+else
+{
             attract_.reset( );
             page->togglePlaylist( );
             state = RETROFE_PLAYLIST_REQUEST;
-        }
+}
+	}
 
         else if ( input_.keystate(UserInput::KeyCodeSkipForward) )
         {
