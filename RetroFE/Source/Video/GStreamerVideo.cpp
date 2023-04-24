@@ -285,13 +285,7 @@ bool GStreamerVideo::play(std::string file)
         {
             gchar *elementName = gst_element_get_name(element);
 
-                if (g_str_has_prefix(elementName, "avdec_h264"))
-                {
-                    // Modify the properties of the avdec_h264 element here
-                    // set "thread-type" property to 2 and "max-threads" to 1
-                    g_object_set(G_OBJECT(element), "thread-type", 2, "max-threads", 2, NULL);
-                }
-                if (g_str_has_prefix(elementName, "avdec_h265"))
+                if (g_str_has_prefix(elementName, "avdec_h264") || g_str_has_prefix(elementName, "avdec_h265"))
                 {
                     // Modify the properties of the avdec_h265 element here
                     // set "thread-type" property to 2 and "max-threads" to 1
@@ -369,14 +363,6 @@ void GStreamerVideo::draw()
 
 void GStreamerVideo::update(float /* dt */)
 {
-    SDL_LockMutex(SDL::getMutex());
-    if(!texture_ && width_ != 0 && height_ != 0)
-    {
-        texture_ = SDL_CreateTexture(SDL::getRenderer(monitor_), SDL_PIXELFORMAT_IYUV,
-                                    SDL_TEXTUREACCESS_STREAMING, width_, height_);
-        SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
-    }
-
 	if(playbin_)
 	{
 		if(volume_ > 1.0)
@@ -391,6 +377,14 @@ void GStreamerVideo::update(float /* dt */)
 		else
 			gst_stream_volume_set_mute( GST_STREAM_VOLUME( playbin_ ), false );
 	}
+
+    SDL_LockMutex(SDL::getMutex());
+    if(!texture_ && width_ != 0 && height_ != 0)
+    {
+        texture_ = SDL_CreateTexture(SDL::getRenderer(monitor_), SDL_PIXELFORMAT_IYUV,
+                                    SDL_TEXTUREACCESS_STREAMING, width_, height_);
+        SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
+    }
 
     if(videoBuffer_)
     {
