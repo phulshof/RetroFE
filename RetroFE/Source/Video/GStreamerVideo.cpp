@@ -71,29 +71,40 @@ SDL_Texture *GStreamerVideo::getTexture() const
     return texture_;
 }
 
-void GStreamerVideo::processNewBuffer (GstElement * /* fakesink */, GstBuffer *buf, GstPad *new_pad, gpointer userdata)
+void GStreamerVideo::processNewBuffer(GstElement * /* fakesink */, GstBuffer *buf, GstPad *new_pad, gpointer userdata)
 {
     GStreamerVideo *video = (GStreamerVideo *)userdata;
 
-    SDL_LockMutex(SDL::getMutex());
-    if (!video->frameReady_ && video && video->isPlaying_)
+    if (video && video->isPlaying_)
     {
-        if(!video->width_ || !video->height_)
+        SDL_LockMutex(SDL::getMutex());
+        bool shouldUpdateVideoBuffer = !video->frameReady_;
+        SDL_UnlockMutex(SDL::getMutex());
+        if (shouldUpdateVideoBuffer)
         {
-            GstCaps *caps = gst_pad_get_current_caps (new_pad);
-            GstStructure *s = gst_caps_get_structure(caps, 0);
-
-            gst_structure_get_int(s, "width", &video->width_);
-            gst_structure_get_int(s, "height", &video->height_);
-        }
-
-        if(video->height_ && video->width_ && !video->videoBuffer_)
-        {
-            video->videoBuffer_ = gst_buffer_ref(buf);
-            video->frameReady_ = true;
+            if (!video->width_ || !video->height_)
+            {
+                GstCaps *caps = gst_pad_get_current_caps(new_pad);
+                GstStructure *s = gst_caps_get_structure(caps, 0);
+                gst_structure_get_int(s, "width", &video->width_);
+                gst_structure_get_int(s, "height", &video->height_);
+                gst_caps_unref(caps);  // Don't forget to unref the caps
+            }
+            if (video->height_ && video->width_)
+            {
+                SDL_LockMutex(SDL::getMutex());
+                bool shouldRefBuffer = !video->videoBuffer_;
+                SDL_UnlockMutex(SDL::getMutex());
+                if (shouldRefBuffer)
+                {
+                    video->videoBuffer_ = gst_buffer_ref(buf);
+                    SDL_LockMutex(SDL::getMutex());
+                    video->frameReady_ = true;
+                    SDL_UnlockMutex(SDL::getMutex());
+                }
+            }
         }
     }
-    SDL_UnlockMutex(SDL::getMutex());
 }
 
 
