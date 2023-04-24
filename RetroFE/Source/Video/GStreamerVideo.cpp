@@ -74,7 +74,6 @@ SDL_Texture *GStreamerVideo::getTexture() const
 void GStreamerVideo::processNewBuffer(GstElement * /* fakesink */, GstBuffer *buf, GstPad *new_pad, gpointer userdata)
 {
     GStreamerVideo *video = (GStreamerVideo *)userdata;
-
     if (video && video->isPlaying_)
     {
         SDL_LockMutex(SDL::getMutex());
@@ -457,32 +456,27 @@ void GStreamerVideo::update(float /* dt */)
 
     if(videoBus_)
     {
-        GstMessage *msg = gst_bus_pop(videoBus_);
+        GstMessage *msg = gst_bus_pop_filtered(videoBus_, GST_MESSAGE_EOS);
         if(msg)
         {
-            if(GST_MESSAGE_TYPE(msg) == GST_MESSAGE_EOS)
+            playCount_++;
+
+            // If the number of loops is 0 or greater than the current playCount_, seek the playback to the beginning.
+            if(!numLoops_ || numLoops_ > playCount_)
             {
-                playCount_++;
-
-                //todo: nesting hazard
-                // if number of loops is 0, set to infinite (todo: this is misleading, rename variable)
-                if(!numLoops_ || numLoops_ > playCount_)
-                {
-                    gst_element_seek(playbin_,
-                                     1.0,
-                                     GST_FORMAT_TIME,
-                                     GST_SEEK_FLAG_FLUSH,
-                                     GST_SEEK_TYPE_SET,
-                                     0,
-                                     GST_SEEK_TYPE_NONE,
-                                     GST_CLOCK_TIME_NONE);
-                }
-                else
-                {
-                    isPlaying_ = false;
-                }
+                gst_element_seek(playbin_,
+                             1.0,
+                             GST_FORMAT_TIME,
+                             GST_SEEK_FLAG_FLUSH,
+                             GST_SEEK_TYPE_SET,
+                             0,
+                             GST_SEEK_TYPE_NONE,
+                             GST_CLOCK_TIME_NONE);
             }
-
+            else
+            {
+                isPlaying_ = false;
+            }
             gst_message_unref(msg);
         }
     }
