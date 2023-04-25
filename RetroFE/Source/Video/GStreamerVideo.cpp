@@ -76,10 +76,8 @@ void GStreamerVideo::processNewBuffer(GstElement * /* fakesink */, GstBuffer *bu
     GStreamerVideo *video = (GStreamerVideo *)userdata;
     if (video && video->isPlaying_)
     {
-        SDL_LockMutex(SDL::getMutex());
         bool shouldUpdateVideoBuffer = !video->frameReady_;
-        SDL_UnlockMutex(SDL::getMutex());
-        if (shouldUpdateVideoBuffer)
+		if (shouldUpdateVideoBuffer)
         {
             if (!video->width_ || !video->height_)
             {
@@ -91,15 +89,11 @@ void GStreamerVideo::processNewBuffer(GstElement * /* fakesink */, GstBuffer *bu
             }
             if (video->height_ && video->width_)
             {
-                SDL_LockMutex(SDL::getMutex());
                 bool shouldRefBuffer = !video->videoBuffer_;
-                SDL_UnlockMutex(SDL::getMutex());
                 if (shouldRefBuffer)
                 {
                     video->videoBuffer_ = gst_buffer_ref(buf);
-                    SDL_LockMutex(SDL::getMutex());
                     video->frameReady_ = true;
-                    SDL_UnlockMutex(SDL::getMutex());
                 }
             }
         }
@@ -378,7 +372,6 @@ void GStreamerVideo::update(float /* dt */)
 			gst_stream_volume_set_mute( GST_STREAM_VOLUME( playbin_ ), false );
 	}
 
-    SDL_LockMutex(SDL::getMutex());
     if(!texture_ && width_ != 0 && height_ != 0)
     {
         texture_ = SDL_CreateTexture(SDL::getRenderer(monitor_), SDL_PIXELFORMAT_IYUV,
@@ -474,7 +467,6 @@ void GStreamerVideo::update(float /* dt */)
             gst_message_unref(msg);
         }
     }
-    SDL_UnlockMutex(SDL::getMutex());
 }
 
 
