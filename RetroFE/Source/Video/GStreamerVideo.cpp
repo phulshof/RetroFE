@@ -283,10 +283,12 @@ bool GStreamerVideo::play(std::string file)
         }
         }), this);
 
+		videoBus_ = gst_pipeline_get_bus(GST_PIPELINE(playbin_));
+
         g_object_set(G_OBJECT(videoSink_), "signal-handoffs", TRUE, NULL);
         g_signal_connect(videoSink_, "handoff", G_CALLBACK(processNewBuffer), this);
 
-        videoBus_ = gst_pipeline_get_bus(GST_PIPELINE(playbin_));
+        
 
         /* Start playing */
         GstStateChangeReturn playState = gst_element_set_state(GST_ELEMENT(playbin_), GST_STATE_PLAYING);
