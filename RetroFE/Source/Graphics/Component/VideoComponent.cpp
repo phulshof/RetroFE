@@ -27,7 +27,6 @@ VideoComponent::VideoComponent(IVideo *videoInst, Page &p, std::string videoFile
     , videoFile_(videoFile)
     , videoInst_(videoInst)
     , isPlaying_(false)
-	, lastRect_({0, 0, 0, 0})
 {
 //   AllocateGraphicsMemory();
 }
@@ -90,6 +89,7 @@ void VideoComponent::freeGraphicsMemory()
 void VideoComponent::draw()
 {
     SDL_Rect rect;
+
     rect.x = static_cast<int>(baseViewInfo.XRelativeToOrigin());
     rect.y = static_cast<int>(baseViewInfo.YRelativeToOrigin());
     rect.h = static_cast<int>(baseViewInfo.ScaledHeight());
@@ -98,17 +98,9 @@ void VideoComponent::draw()
     videoInst_->draw();
     SDL_Texture *texture = videoInst_->getTexture();
 
-    if (texture)
+    if(texture)
     {
-        if (lastRect_.x != rect.x || lastRect_.y != rect.y || lastRect_.w != rect.w || lastRect_.h != rect.h)
-        {
-            lastRect_ = rect;
-            SDL::renderCopy(texture, baseViewInfo.Alpha, NULL, &rect, baseViewInfo, page.getLayoutWidth(baseViewInfo.Monitor), page.getLayoutHeight(baseViewInfo.Monitor));
-        }
-        else
-        {
-            SDL::renderCopy(texture, baseViewInfo.Alpha, NULL, &lastRect_, baseViewInfo, page.getLayoutWidth(baseViewInfo.Monitor), page.getLayoutHeight(baseViewInfo.Monitor));
-        }
+        SDL::renderCopy(texture, baseViewInfo.Alpha, NULL, &rect, baseViewInfo, page.getLayoutWidth(baseViewInfo.Monitor), page.getLayoutHeight(baseViewInfo.Monitor));
     }
 }
 

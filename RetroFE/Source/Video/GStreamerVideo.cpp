@@ -83,6 +83,7 @@ void GStreamerVideo::processNewBuffer(GstElement * /* fakesink */, GstBuffer *bu
 			gst_structure_get_int(s, "width", &video->width_);
 			gst_structure_get_int(s, "height", &video->height_);
 			gst_caps_unref(caps);  // Don't forget to unref the caps
+			gst_structure_free(s);
 		}
         if (video->height_ && video->width_ && !video->videoBuffer_)
         {
@@ -372,8 +373,7 @@ void GStreamerVideo::update(float /* dt */)
                                     SDL_TEXTUREACCESS_STREAMING, width_, height_);
         SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
     }
-	
-		
+
     if(videoBuffer_)
     {
         GstVideoMeta *meta;
