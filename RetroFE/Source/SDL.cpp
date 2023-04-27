@@ -43,7 +43,7 @@ bool SDL::initialize( Configuration &config )
     int         audioChannels = 1;
     int         audioBuffers  = 4096;
     bool        hideMouse;
-
+	
     Logger::write( Logger::ZONE_INFO, "SDL", "Initializing" );
     if ( SDL_Init( SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS ) != 0 )
     {
@@ -207,18 +207,29 @@ bool SDL::initialize( Configuration &config )
             }
             else
             {
-                renderer_[i] = SDL_CreateRenderer( window_[i], -1, SDL_RENDERER_ACCELERATED );
-                if ( renderer_[i] == NULL )
-                {
-                    std::string error = SDL_GetError( );
-                    Logger::write( Logger::ZONE_ERROR, "SDL", "Create renderer " + std::to_string(i) + " failed: " + error );
-                    return false;
-                }
+                bool vSync = false;
+				config.getProperty("vSync", vSync);
+				if (vSync) 
+				{
+					renderer_[i] = SDL_CreateRenderer(window_[i], -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+				} 
+				else 
+				{
+					renderer_[i] = SDL_CreateRenderer(window_[i], -1, SDL_RENDERER_ACCELERATED);
+				}
+				if (renderer_[i] == NULL) 
+				{
+					std::string error = SDL_GetError();
+					Logger::write(Logger::ZONE_ERROR, "SDL", "Create renderer " + std::to_string(i) + " failed: " + error);
+					return false;
+				}
             }
         }
     }
 
-    if ( SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1") != SDL_TRUE )
+    
+	
+	if ( SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1") != SDL_TRUE )
     {
         Logger::write( Logger::ZONE_ERROR, "SDL", "Improve scale quality. Continuing with low-quality settings." );
     }
