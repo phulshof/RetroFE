@@ -74,21 +74,28 @@ SDL_Texture *GStreamerVideo::getTexture() const
 void GStreamerVideo::processNewBuffer(GstElement * /* fakesink */, GstBuffer *buf, GstPad *new_pad, gpointer userdata)
 {
     GStreamerVideo *video = (GStreamerVideo *)userdata;
-    if (video && video->isPlaying_ && !video->frameReady_)
+    if (video && video->isPlaying_)
     {
-        if(!video->width_ || !video->height_)
-		{
-			GstCaps *caps = gst_pad_get_current_caps(new_pad);
-			GstStructure *s = gst_caps_get_structure(caps, 0);
-			gst_structure_get_int(s, "width", &video->width_);
-			gst_structure_get_int(s, "height", &video->height_);
-			gst_caps_unref(caps);  // Don't forget to unref the caps
-			gst_structure_free(s);
-		}
-        if (video->height_ && video->width_ && !video->videoBuffer_)
+        bool shouldUpdateVideoBuffer = !video->frameReady_;
+		if (shouldUpdateVideoBuffer)
         {
-            video->videoBuffer_ = gst_buffer_ref(buf);
-            video->frameReady_ = true;
+            if (!video->width_ || !video->height_)
+            {
+                GstCaps *caps = gst_pad_get_current_caps(new_pad);
+                GstStructure *s = gst_caps_get_structure(caps, 0);
+                gst_structure_get_int(s, "width", &video->width_);
+                gst_structure_get_int(s, "height", &video->height_);
+                gst_caps_unref(caps);  // Don't forget to unref the caps
+            }
+            if (video->height_ && video->width_)
+            {
+                bool shouldRefBuffer = !video->videoBuffer_;
+                if (shouldRefBuffer)
+                {
+                    video->videoBuffer_ = gst_buffer_ref(buf);
+                    video->frameReady_ = true;
+                }
+            }
         }
     }
 }
