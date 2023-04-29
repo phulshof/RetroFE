@@ -24,6 +24,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <vector>
 #include <SDL2/SDL.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -275,6 +276,24 @@ bool GStreamerVideo::play(std::string file)
         }
         g_object_set(G_OBJECT(playbin_), "uri", uriFile, "video-sink", videoBin_, NULL);
         g_free( uriFile );
+		
+		#ifdef WIN32
+		std::vector<std::string> decoderPluginNames = {"d3d11h264dec", "d3d11h265dec"}; //add decoder names to disable when HardwareVideoAccel = false
+		bool HardwareVideoAccel = Configuration::HardwareVideoAccel;
+		if (!HardwareVideoAccel)
+		{
+			for (auto& pluginName : decoderPluginNames)
+			{
+			GstElementFactory *factory = gst_element_factory_find(pluginName.c_str());
+			if (factory)
+			{
+				gst_plugin_feature_set_rank(GST_PLUGIN_FEATURE(factory), GST_RANK_NONE);
+				g_object_unref(factory);
+			}
+			}
+		}
+		#endif
+
 
         isPlaying_ = true;
         

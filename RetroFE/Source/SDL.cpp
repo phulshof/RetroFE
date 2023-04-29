@@ -63,6 +63,10 @@ bool SDL::initialize( Configuration &config )
             SDL_ShowCursor( SDL_TRUE );
         }
     }
+	
+	bool HardwareVideoAccel = false;
+	config.getProperty("HardwareVideoAccel", HardwareVideoAccel);
+	Configuration::HardwareVideoAccel = HardwareVideoAccel; // Set the static member variable
 
     // check for a few other necessary Configurations
     config.getProperty( "numScreens", numScreens_ );
