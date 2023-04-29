@@ -1315,7 +1315,8 @@ bool RetroFE::run( )
             }
             break;
         }
-
+		bool vSync = false;
+		config_.getProperty("vSync", vSync);
         // Handle screen updates and attract mode
         if ( running )
         {
@@ -1333,7 +1334,7 @@ bool RetroFE::run( )
                 sleepTime = fpsIdleTime - deltaTime*1000;
             else
                 sleepTime = fpsTime - deltaTime*1000;
-            if ( sleepTime > 0 && sleepTime < 1000 )
+            if ( sleepTime > 0 && sleepTime < 1000 && !vSync)
             {
                 SDL_Delay( static_cast<unsigned int>( sleepTime ) );
             }
