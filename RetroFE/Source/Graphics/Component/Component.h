@@ -65,11 +65,10 @@ public:
     virtual void setText(std::string text, int id = -1) {};
     virtual void setImage(std::string filePath, int id = -1) {};
     int getId( );
+    std::string playlistName;
 
 protected:
     Page &page;
-
-    std::string playlistName;
 
 private:
 
