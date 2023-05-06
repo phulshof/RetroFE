@@ -136,7 +136,7 @@ bool GStreamerVideo::stop()
     {
         return false;
     }
-
+    
     if(videoSink_)
     {
         g_object_set(G_OBJECT(videoSink_), "signal-handoffs", FALSE, NULL);
@@ -192,7 +192,7 @@ bool GStreamerVideo::play(std::string file)
     {
         if(!playbin_)
         {
-            playbin_ = gst_element_factory_make("playbin", "player");
+            playbin_ = gst_element_factory_make("playbin3", "player");
             videoBin_ = gst_bin_new("SinkBin");
             videoSink_  = gst_element_factory_make("fakesink", "video_sink");
             videoConvert_  = gst_element_factory_make("capsfilter", "video_convert");
@@ -255,7 +255,24 @@ bool GStreamerVideo::play(std::string file)
         g_free( uriFile );
 
         isPlaying_ = true;
+        
+        g_signal_connect(playbin_, "element-setup", G_CALLBACK(+[](GstElement *playbin, GstElement *element, gpointer data) {
+        GStreamerVideo *video = static_cast<GStreamerVideo *>(data);
 
+        if (video)
+        {
+            gchar *elementName = gst_element_get_name(element);
+
+                if (g_str_has_prefix(elementName, "avdec_h264"))
+                {
+                    // Modify the properties of the avdec_h264 element here
+                    // set "thread-type" property to 2
+                    g_object_set(G_OBJECT(element), "thread-type", 2, NULL);
+                }
+
+            g_free(elementName);
+        }
+        }), this);
 
         g_object_set(G_OBJECT(videoSink_), "signal-handoffs", TRUE, NULL);
         g_signal_connect(videoSink_, "handoff", G_CALLBACK(processNewBuffer), this);
