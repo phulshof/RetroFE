@@ -970,7 +970,9 @@ bool Page::pushCollection(CollectionInfo *collection)
     collections_.push_back(info);
 
     // build playlist menu
-    playlistMenu_->setItems(&collection->playlistItems);
+    if (playlistMenu_ && collection->playlistItems.size()) {
+        playlistMenu_->setItems(&collection->playlistItems);
+    }
 
     playlist_ = info.playlist;
     playlistChange();
@@ -1006,7 +1008,9 @@ bool Page::popCollection()
     info = &collections_.back();
 
     // build playlist menu
-    playlistMenu_->setItems(&info->collection->playlistItems);
+    if (playlistMenu_ && info->collection->playlistItems.size()) {
+        playlistMenu_->setItems(&info->collection->playlistItems);
+    }
 
     playlist_ = info->playlist;
     playlistChange();

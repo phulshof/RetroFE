@@ -142,6 +142,7 @@ public:
     unsigned long long getCurrent( );
     unsigned long long getDuration( );
     bool  isPaused( );
+    ScrollingList* playlistMenu_;//todo make getter
 
 private:
     void playlistChange();
@@ -159,7 +160,6 @@ private:
     typedef std::list<MenuInfo_S> CollectionVector_T;
 
     std::vector<ScrollingList *> activeMenu_;
-    ScrollingList *playlistMenu_;
     unsigned int menuDepth_;
     MenuVector_T menus_;
     CollectionVector_T collections_;

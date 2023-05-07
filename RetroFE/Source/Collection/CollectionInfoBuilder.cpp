@@ -444,6 +444,7 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
                 ImportBasicList(info, playlistFile, playlistFilter);
 
                 info->playlists[basename] = new std::vector<Item *>();
+
                 Item* playlistItem = new Item();
                 playlistItem->name = info->name;
                 playlistItem->title = info->name;

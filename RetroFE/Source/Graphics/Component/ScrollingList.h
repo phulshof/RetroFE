@@ -102,7 +102,7 @@ public:
     void resetScrollPeriod( );
     void updateScrollPeriod( );
     void scroll( bool forward );
-    bool playlistType_;
+    bool playlistType_;//todo make getter
 
 private:
 

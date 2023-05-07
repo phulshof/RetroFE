@@ -114,9 +114,9 @@ ScrollingList::~ScrollingList( )
 
 void ScrollingList::setItems( std::vector<Item *> *items )
 {
-    items_ = items;
+        items_ = items;
     if ( items_ )
-    {
+        {
         itemIndex_ = loopDecrement( 0, selectedOffsetIndex_, items_->size( ) );
     }
 }

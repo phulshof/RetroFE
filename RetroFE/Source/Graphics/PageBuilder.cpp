@@ -366,7 +366,11 @@ bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
         ScrollingList *scrollingList = buildMenu(componentXml,*page);
         xml_attribute<> *indexXml = componentXml->first_attribute("menuIndex");
         int index = indexXml ? Utils::convertInt(indexXml->value()) : -1;
-        page->pushMenu(scrollingList, index);
+        if (scrollingList->playlistType_) {
+            page->playlistMenu_ = scrollingList;
+        } else {
+            page->pushMenu(scrollingList, index);
+        }
     }
 
     for(xml_node<> *componentXml = layout->first_node("container"); componentXml; componentXml = componentXml->next_sibling("container"))
