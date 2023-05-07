@@ -66,6 +66,7 @@ public:
     void setUnloadSound(Sound *chunk);
     void setHighlightSound(Sound *chunk);
     void setSelectSound(Sound *chunk);
+    void setSelectedItem();
     bool addComponent(Component *c);
     void pageScroll(ScrollDirection direction);
     void letterScroll(ScrollDirection direction);

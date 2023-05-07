@@ -152,11 +152,22 @@ void Page::setSelectSound(Sound *chunk)
   selectSoundChunk_ = chunk;
 }
 
+void Page::setSelectedItem()
+{
+    for (unsigned int i = 0; i < activeMenu_.size(); i++)
+    {
+        if (!activeMenu_[i]->playlistType_) {
+            selectedItem_ = activeMenu_[i]->getSelectedItem();
+            break;
+        }
+    }
+}
 
 void Page::onNewItemSelected()
 {
     if(!(activeMenu_.size() > 0 && activeMenu_[0])) return;
-    selectedItem_ = activeMenu_[0]->getSelectedItem();
+
+    setSelectedItem();
 
     for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
     {
@@ -178,7 +189,8 @@ void Page::onNewItemSelected()
 void Page::onNewScrollItemSelected()
 {
     if(!(activeMenu_.size() > 0 && activeMenu_[0])) return;
-    selectedItem_ = activeMenu_[0]->getSelectedItem();
+
+    setSelectedItem();
 
     for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
     {
@@ -191,7 +203,8 @@ void Page::onNewScrollItemSelected()
 void Page::highlightLoadArt()
 {
     if(!(activeMenu_.size() > 0 && activeMenu_[0])) return;
-    selectedItem_ = activeMenu_[0]->getSelectedItem();
+
+    setSelectedItem();
 
     for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
     {
