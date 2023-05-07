@@ -37,6 +37,7 @@ public:
                    Page          &p,
                    bool          layoutMode,
                    bool          commonMode,
+                   bool          playlistType,
                    Font         *font,
                    std::string   layoutKey,
                    std::string   imageType,
@@ -101,6 +102,7 @@ public:
     void resetScrollPeriod( );
     void updateScrollPeriod( );
     void scroll( bool forward );
+    bool playlistType_;
 
 private:
 

@@ -60,6 +60,7 @@ public:
     void nextCyclePlaylist(std::vector<std::string> list);
     void prevCyclePlaylist(std::vector<std::string> list);
     void pushMenu(ScrollingList *s, int index = -1);
+    void updatePlaylistMenuPosition();
     bool isMenusFull();
     void setLoadSound(Sound *chunk);
     void setUnloadSound(Sound *chunk);
@@ -158,6 +159,7 @@ private:
     typedef std::list<MenuInfo_S> CollectionVector_T;
 
     std::vector<ScrollingList *> activeMenu_;
+    ScrollingList *playlistMenu_;
     unsigned int menuDepth_;
     MenuVector_T menus_;
     CollectionVector_T collections_;

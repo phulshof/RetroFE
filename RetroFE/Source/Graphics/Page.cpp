@@ -40,6 +40,8 @@ Page::Page(Configuration &config, int layoutWidth, int layoutHeight)
     , selectSoundChunk_(NULL)
     , minShowTime_(0)
     , jukebox_(false)
+    , playlistMenu_(NULL)
+    , elapsedTime_(0)
 {
     for (int i = 0; i < SDL::getNumScreens(); i++)
     {
@@ -441,6 +443,8 @@ void Page::playlistChange()
     {
         (*it)->setPlaylist(playlist_->first);
     }
+
+    updatePlaylistMenuPosition();
 }
 
 
@@ -942,7 +946,11 @@ bool Page::pushCollection(CollectionInfo *collection)
         {
             ScrollingList *menu    = *it;
             ScrollingList *newMenu = new ScrollingList(*menu);
-            pushMenu(newMenu, menuDepth_);
+            if (&newMenu->playlistType_) {
+                playlistMenu_ = newMenu;
+            } else {
+                pushMenu(newMenu, menuDepth_);
+            }
         }
     }
 
@@ -960,6 +968,9 @@ bool Page::pushCollection(CollectionInfo *collection)
     info.playlist = collection->playlists.begin();
     info.queueDelete = false;
     collections_.push_back(info);
+
+    // build playlist menu
+    playlistMenu_->setItems(&collection->playlistItems);
 
     playlist_ = info.playlist;
     playlistChange();
@@ -993,6 +1004,10 @@ bool Page::popCollection()
     // get the next collection off of the stack
     collections_.pop_back();
     info = &collections_.back();
+
+    // build playlist menu
+    playlistMenu_->setItems(&info->collection->playlistItems);
+
     playlist_ = info->playlist;
     playlistChange();
 
@@ -1161,10 +1176,12 @@ void Page::nextPlaylist()
     {
         playlist_++;
         // wrap
-        if(playlist_ == info.collection->playlists.end()) playlist_ = info.collection->playlists.begin();
+        if(playlist_ == info.collection->playlists.end()) 
+            playlist_ = info.collection->playlists.begin();
 
         // find the first playlist
-        if(playlist_->second->size() != 0) break;
+        if(playlist_->second->size() != 0) 
+            break;
     }
 
     for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
@@ -1234,6 +1251,13 @@ void Page::selectPlaylist(std::string playlist)
     playlistChange();
 }
 
+void Page::updatePlaylistMenuPosition()
+{
+    if (playlistMenu_) {
+        MenuInfo_S& info = collections_.back();
+        playlistMenu_->setScrollOffsetIndex(distance(info.collection->playlists.begin(), playlist_));
+    }
+}
 
 void Page::nextCyclePlaylist(std::vector<std::string> list)
 {

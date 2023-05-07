@@ -44,6 +44,7 @@ ScrollingList::ScrollingList( Configuration &c,
                               Page          &p,
                               bool           layoutMode,
                               bool           commonMode,
+                              bool          playlistType,
                               Font          *font,
                               std::string    layoutKey,
                               std::string    imageType,
@@ -52,6 +53,7 @@ ScrollingList::ScrollingList( Configuration &c,
     , horizontalScroll( false )
     , layoutMode_( layoutMode )
     , commonMode_( commonMode )
+    , playlistType_( playlistType )
     , spriteList_( NULL )
     , scrollPoints_( NULL )
     , tweenPoints_( NULL )
@@ -76,6 +78,7 @@ ScrollingList::ScrollingList( const ScrollingList &copy )
     , horizontalScroll( copy.horizontalScroll )
     , layoutMode_( copy.layoutMode_ )
     , commonMode_( copy.commonMode_ )
+    , playlistType_(copy.playlistType_)
     , spriteList_( NULL )
     , itemIndex_( 0 )
     , selectedOffsetIndex_( copy.selectedOffsetIndex_ )
@@ -764,6 +767,8 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
         names.push_back( item->rating );
     if ( typeLC == "score" )
         names.push_back( item->score );
+    if (typeLC.rfind("playlist", 0) == 0)
+        names.push_back(item->name);
     names.push_back("default");
 
     for ( unsigned int n = 0; n < names.size() && !t; ++n )

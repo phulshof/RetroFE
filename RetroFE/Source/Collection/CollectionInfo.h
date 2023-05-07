@@ -39,6 +39,7 @@ public:
     std::string metadataType;
     std::string launcher;
     std::vector<Item *> items;
+    std::vector<Item*> playlistItems;
 
     typedef std::map<std::string, std::vector <Item *> *> Playlists_T;
     Playlists_T playlists;
