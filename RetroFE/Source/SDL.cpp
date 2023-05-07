@@ -219,7 +219,6 @@ bool SDL::initialize( Configuration &config )
 				if (vSync == true) 
 				{
 					renderer_[i] = SDL_CreateRenderer(window_[i], -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-					SDL_RenderSetVSync(renderer_[i], 1);
 					Logger::write( Logger::ZONE_INFO, "SDL", "vSync Enabled" );
 				} 
 				else 
