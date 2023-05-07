@@ -24,6 +24,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <vector>
 #include <SDL2/SDL.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -71,29 +72,39 @@ SDL_Texture *GStreamerVideo::getTexture() const
     return texture_;
 }
 
-void GStreamerVideo::processNewBuffer (GstElement * /* fakesink */, GstBuffer *buf, GstPad *new_pad, gpointer userdata)
+void GStreamerVideo::processNewBuffer(GstElement * /* fakesink */, GstBuffer *buf, GstPad *new_pad, gpointer userdata)
 {
     GStreamerVideo *video = (GStreamerVideo *)userdata;
-
-    SDL_LockMutex(SDL::getMutex());
-    if (!video->frameReady_ && video && video->isPlaying_)
+    if (video && video->isPlaying_)
     {
-        if(!video->width_ || !video->height_)
+        SDL_LockMutex(SDL::getMutex());
+        bool shouldUpdateVideoBuffer = !video->frameReady_;
+        SDL_UnlockMutex(SDL::getMutex());
+        if (shouldUpdateVideoBuffer)
         {
-            GstCaps *caps = gst_pad_get_current_caps (new_pad);
-            GstStructure *s = gst_caps_get_structure(caps, 0);
-
-            gst_structure_get_int(s, "width", &video->width_);
-            gst_structure_get_int(s, "height", &video->height_);
-        }
-
-        if(video->height_ && video->width_ && !video->videoBuffer_)
-        {
-            video->videoBuffer_ = gst_buffer_ref(buf);
-            video->frameReady_ = true;
+            if (!video->width_ || !video->height_)
+            {
+                GstCaps *caps = gst_pad_get_current_caps(new_pad);
+                GstStructure *s = gst_caps_get_structure(caps, 0);
+                gst_structure_get_int(s, "width", &video->width_);
+                gst_structure_get_int(s, "height", &video->height_);
+                gst_caps_unref(caps);  // Don't forget to unref the caps
+            }
+            if (video->height_ && video->width_)
+            {
+                SDL_LockMutex(SDL::getMutex());
+                bool shouldRefBuffer = !video->videoBuffer_;
+                SDL_UnlockMutex(SDL::getMutex());
+                if (shouldRefBuffer)
+                {
+                    video->videoBuffer_ = gst_buffer_ref(buf);
+                    SDL_LockMutex(SDL::getMutex());
+                    video->frameReady_ = true;
+                    SDL_UnlockMutex(SDL::getMutex());
+                }
+            }
         }
     }
-    SDL_UnlockMutex(SDL::getMutex());
 }
 
 
@@ -144,7 +155,19 @@ bool GStreamerVideo::stop()
 
     if(playbin_)
     {
-        (void)gst_element_set_state(playbin_, GST_STATE_NULL);
+        GstStateChangeReturn ret = gst_element_set_state(playbin_, GST_STATE_NULL);
+        if (ret == GST_STATE_CHANGE_FAILURE) 
+        {
+            Logger::write(Logger::ZONE_ERROR, "Video", "Failed to set playbin to NULL state");
+            return false;
+        }
+
+        ret = gst_element_get_state(playbin_, NULL, NULL, GST_CLOCK_TIME_NONE);
+        if (ret == GST_STATE_CHANGE_FAILURE) 
+        {
+            Logger::write(Logger::ZONE_ERROR, "Video", "Failed to wait for playbin to reach NULL state");
+            return false;
+        }
     }
 
     if(texture_)
@@ -253,6 +276,24 @@ bool GStreamerVideo::play(std::string file)
         }
         g_object_set(G_OBJECT(playbin_), "uri", uriFile, "video-sink", videoBin_, NULL);
         g_free( uriFile );
+		
+		#ifdef WIN32
+		std::vector<std::string> decoderPluginNames = {"d3d11h264dec", "d3d11h265dec"}; //add decoder names to disable when HardwareVideoAccel = false
+		bool HardwareVideoAccel = Configuration::HardwareVideoAccel;
+		if (!HardwareVideoAccel)
+		{
+			for (auto& pluginName : decoderPluginNames)
+			{
+			GstElementFactory *factory = gst_element_factory_find(pluginName.c_str());
+			if (factory)
+			{
+				gst_plugin_feature_set_rank(GST_PLUGIN_FEATURE(factory), GST_RANK_NONE);
+				g_object_unref(factory);
+			}
+			}
+		}
+		#endif
+
 
         isPlaying_ = true;
         
@@ -263,24 +304,27 @@ bool GStreamerVideo::play(std::string file)
         {
             gchar *elementName = gst_element_get_name(element);
 
-                if (g_str_has_prefix(elementName, "avdec_h264"))
+                if (g_str_has_prefix(elementName, "avdec_h264") || g_str_has_prefix(elementName, "avdec_h265"))
                 {
-                    // Modify the properties of the avdec_h264 element here
-                    // set "thread-type" property to 2
-                    g_object_set(G_OBJECT(element), "thread-type", 2, NULL);
+                    // Modify the properties of the avdec_h265 element here
+                    // set "thread-type" property to 2 and "max-threads" to 1
+                    g_object_set(G_OBJECT(element), "thread-type", 2, "max-threads", 2, NULL);
                 }
 
             g_free(elementName);
         }
         }), this);
 
+		videoBus_ = gst_pipeline_get_bus(GST_PIPELINE(playbin_));
+
         g_object_set(G_OBJECT(videoSink_), "signal-handoffs", TRUE, NULL);
         g_signal_connect(videoSink_, "handoff", G_CALLBACK(processNewBuffer), this);
 
-        videoBus_ = gst_pipeline_get_bus(GST_PIPELINE(playbin_));
+        
 
         /* Start playing */
         GstStateChangeReturn playState = gst_element_set_state(GST_ELEMENT(playbin_), GST_STATE_PLAYING);
+        //gst_debug_bin_to_dot_file(GST_BIN(playbin_), GST_DEBUG_GRAPH_SHOW_ALL, "pipeline");
         if (playState != GST_STATE_CHANGE_ASYNC)
         {
             isPlaying_ = false;
@@ -340,14 +384,6 @@ void GStreamerVideo::draw()
 
 void GStreamerVideo::update(float /* dt */)
 {
-    SDL_LockMutex(SDL::getMutex());
-    if(!texture_ && width_ != 0 && height_ != 0)
-    {
-        texture_ = SDL_CreateTexture(SDL::getRenderer(monitor_), SDL_PIXELFORMAT_IYUV,
-                                    SDL_TEXTUREACCESS_STREAMING, width_, height_);
-        SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
-    }
-
 	if(playbin_)
 	{
 		if(volume_ > 1.0)
@@ -362,6 +398,14 @@ void GStreamerVideo::update(float /* dt */)
 		else
 			gst_stream_volume_set_mute( GST_STREAM_VOLUME( playbin_ ), false );
 	}
+
+    SDL_LockMutex(SDL::getMutex());
+    if(!texture_ && width_ != 0 && height_ != 0)
+    {
+        texture_ = SDL_CreateTexture(SDL::getRenderer(monitor_), SDL_PIXELFORMAT_IYUV,
+                                    SDL_TEXTUREACCESS_STREAMING, width_, height_);
+        SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
+    }
 
     if(videoBuffer_)
     {
@@ -427,32 +471,27 @@ void GStreamerVideo::update(float /* dt */)
 
     if(videoBus_)
     {
-        GstMessage *msg = gst_bus_pop(videoBus_);
+        GstMessage *msg = gst_bus_pop_filtered(videoBus_, GST_MESSAGE_EOS);
         if(msg)
         {
-            if(GST_MESSAGE_TYPE(msg) == GST_MESSAGE_EOS)
+            playCount_++;
+
+            // If the number of loops is 0 or greater than the current playCount_, seek the playback to the beginning.
+            if(!numLoops_ || numLoops_ > playCount_)
             {
-                playCount_++;
-
-                //todo: nesting hazard
-                // if number of loops is 0, set to infinite (todo: this is misleading, rename variable)
-                if(!numLoops_ || numLoops_ > playCount_)
-                {
-                    gst_element_seek(playbin_,
-                                     1.0,
-                                     GST_FORMAT_TIME,
-                                     GST_SEEK_FLAG_FLUSH,
-                                     GST_SEEK_TYPE_SET,
-                                     0,
-                                     GST_SEEK_TYPE_NONE,
-                                     GST_CLOCK_TIME_NONE);
-                }
-                else
-                {
-                    isPlaying_ = false;
-                }
+                gst_element_seek(playbin_,
+                             1.0,
+                             GST_FORMAT_TIME,
+                             GST_SEEK_FLAG_FLUSH,
+                             GST_SEEK_TYPE_SET,
+                             0,
+                             GST_SEEK_TYPE_NONE,
+                             GST_CLOCK_TIME_NONE);
             }
-
+            else
+            {
+                isPlaying_ = false;
+            }
             gst_message_unref(msg);
         }
     }

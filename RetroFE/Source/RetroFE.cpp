@@ -1315,7 +1315,8 @@ bool RetroFE::run( )
             }
             break;
         }
-
+		bool vSync = false;
+		config_.getProperty("vSync", vSync);
         // Handle screen updates and attract mode
         if ( running )
         {
@@ -1333,7 +1334,7 @@ bool RetroFE::run( )
                 sleepTime = fpsIdleTime - deltaTime*1000;
             else
                 sleepTime = fpsTime - deltaTime*1000;
-            if ( sleepTime > 0 && sleepTime < 1000 )
+            if ( sleepTime > 0 && sleepTime < 1000 && !vSync)
             {
                 SDL_Delay( static_cast<unsigned int>( sleepTime ) );
             }
@@ -1347,7 +1348,7 @@ bool RetroFE::run( )
                     {
                         attract_.reset( attract_.isSet( ) );
 
-                        bool cyclePlaylist = false;
+                        bool cyclePlaylist = true;
                         config_.getProperty( "attractModeCyclePlaylist", cyclePlaylist );
 
                         std::string cycleString;
@@ -1627,10 +1628,16 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
 
         else if ( input_.keystate(UserInput::KeyCodeTogglePlaylist) )
         {
+            if (currentPage_->getPlaylistName() == "favorites" )
+{
+}
+else
+{
             attract_.reset( );
             page->togglePlaylist( );
             state = RETROFE_PLAYLIST_REQUEST;
-        }
+}
+	}
 
         else if ( input_.keystate(UserInput::KeyCodeSkipForward) )
         {

@@ -54,8 +54,6 @@ public:
 
 private:
     static void processNewBuffer (GstElement *fakesink, GstBuffer *buf, GstPad *pad, gpointer data);
-    static gboolean busCallback(GstBus *bus, GstMessage *msg, gpointer data);
-
     GstElement *playbin_;
     GstElement *videoBin_;
     GstElement *videoSink_;

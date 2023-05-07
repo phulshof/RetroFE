@@ -33,6 +33,7 @@
 #endif
 
 std::string Configuration::absolutePath;
+bool Configuration::HardwareVideoAccel = false;
 
 Configuration::Configuration()
 {
