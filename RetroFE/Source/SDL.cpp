@@ -67,6 +67,9 @@ bool SDL::initialize( Configuration &config )
 	bool HardwareVideoAccel = false;
 	config.getProperty("HardwareVideoAccel", HardwareVideoAccel);
 	Configuration::HardwareVideoAccel = HardwareVideoAccel; // Set the static member variable
+	int AvdecMaxThreads = 2;
+	config.getProperty("AvdecMaxThreads", AvdecMaxThreads);
+	Configuration::AvdecMaxThreads = AvdecMaxThreads;
 
     // check for a few other necessary Configurations
     config.getProperty( "numScreens", numScreens_ );
@@ -213,9 +216,11 @@ bool SDL::initialize( Configuration &config )
             {
                 bool vSync = false;
 				config.getProperty("vSync", vSync);
-				if (vSync) 
+				if (vSync == true) 
 				{
 					renderer_[i] = SDL_CreateRenderer(window_[i], -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+					SDL_RenderSetVSync(renderer_[i], 1);
+					Logger::write( Logger::ZONE_INFO, "SDL", "vSync Enabled" );
 				} 
 				else 
 				{

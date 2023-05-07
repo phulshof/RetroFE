@@ -307,8 +307,8 @@ bool GStreamerVideo::play(std::string file)
                 if (g_str_has_prefix(elementName, "avdec_h264") || g_str_has_prefix(elementName, "avdec_h265"))
                 {
                     // Modify the properties of the avdec_h265 element here
-                    // set "thread-type" property to 2 and "max-threads" to 1
-                    g_object_set(G_OBJECT(element), "thread-type", 2, "max-threads", 2, NULL);
+                    // set "thread-type" property to 2 and AvdecMaxThreads in settings.conf (defaults to 2)
+                    g_object_set(G_OBJECT(element), "thread-type", 2, "max-threads", Configuration::AvdecMaxThreads, NULL);
                 }
 
             g_free(elementName);
@@ -400,7 +400,8 @@ void GStreamerVideo::update(float /* dt */)
 	}
 
     SDL_LockMutex(SDL::getMutex());
-    if(!texture_ && width_ != 0 && height_ != 0)
+    
+	if(!texture_ && width_ != 0 && height_ != 0)
     {
         texture_ = SDL_CreateTexture(SDL::getRenderer(monitor_), SDL_PIXELFORMAT_IYUV,
                                     SDL_TEXTUREACCESS_STREAMING, width_, height_);
@@ -448,28 +449,38 @@ void GStreamerVideo::update(float /* dt */)
             }
         }
         else
-        {
-            GstMapInfo y_info, u_info, v_info;
-            void *y_plane, *u_plane, *v_plane;
-            int y_stride, u_stride, v_stride;
+		{
+			GstMapInfo bufInfo;
+			void *y_plane, *u_plane, *v_plane;
+			int y_stride, u_stride, v_stride;
 
-            gst_video_meta_map(meta, 0, &y_info, &y_plane, &y_stride, GST_MAP_READ);
-            gst_video_meta_map(meta, 1, &u_info, &u_plane, &u_stride, GST_MAP_READ);
-            gst_video_meta_map(meta, 2, &v_info, &v_plane, &v_stride, GST_MAP_READ);
-            SDL_UpdateYUVTexture(texture_, NULL,
-                                 (const Uint8*)y_plane, y_stride,
-                                 (const Uint8*)u_plane, u_stride,
-                                 (const Uint8*)v_plane, v_stride);
-            gst_video_meta_unmap(meta, 0, &y_info);
-            gst_video_meta_unmap(meta, 1, &u_info);
-            gst_video_meta_unmap(meta, 2, &v_info);
-        }
+			// Map the buffer only once
+			gst_buffer_map(videoBuffer_, &bufInfo, GST_MAP_READ);
 
-        gst_buffer_unref(videoBuffer_);
-        videoBuffer_ = NULL;
-    }
+			// Map Y, U, and V planes using offsets and strides from meta
+			y_stride = meta->stride[0];
+			u_stride = meta->stride[1];
+			v_stride = meta->stride[2];
 
-    if(videoBus_)
+			y_plane = bufInfo.data + meta->offset[0];
+			u_plane = bufInfo.data + meta->offset[1];
+			v_plane = bufInfo.data + meta->offset[2];
+
+			SDL_UpdateYUVTexture(texture_, NULL,
+								(const Uint8*)y_plane, y_stride,
+								(const Uint8*)u_plane, u_stride,
+								(const Uint8*)v_plane, v_stride);
+
+			// Unmap the buffer only once
+			gst_buffer_unmap(videoBuffer_, &bufInfo);
+		}
+		gst_buffer_unref(videoBuffer_);
+		videoBuffer_ = NULL;
+	}
+	
+	SDL_UnlockMutex(SDL::getMutex());
+    
+	if(videoBus_)
     {
         GstMessage *msg = gst_bus_pop_filtered(videoBus_, GST_MESSAGE_EOS);
         if(msg)
@@ -495,7 +506,7 @@ void GStreamerVideo::update(float /* dt */)
             gst_message_unref(msg);
         }
     }
-    SDL_UnlockMutex(SDL::getMutex());
+    
 }
 
 
