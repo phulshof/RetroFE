@@ -446,9 +446,9 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
                 info->playlists[basename] = new std::vector<Item *>();
 
                 Item* playlistItem = new Item();
-                playlistItem->name = info->name;
-                playlistItem->title = info->name;
-                playlistItem->fullTitle = info->name;
+                playlistItem->name = basename;
+                playlistItem->title = basename;
+                playlistItem->fullTitle = basename;
                 playlistItem->leaf = false;
                 playlistItem->collectionInfo = info;
                 info->playlistItems.push_back(playlistItem);

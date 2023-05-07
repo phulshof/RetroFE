@@ -114,10 +114,10 @@ ScrollingList::~ScrollingList( )
 
 void ScrollingList::setItems( std::vector<Item *> *items )
 {
-        items_ = items;
-    if ( items_ )
-        {
-        itemIndex_ = loopDecrement( 0, selectedOffsetIndex_, items_->size( ) );
+    items_ = items;
+    if (items_)
+    {
+        itemIndex_ = loopDecrement(0, selectedOffsetIndex_, items_->size());
     }
 }
 
@@ -1055,6 +1055,9 @@ void ScrollingList::updateScrollPeriod(  )
 
 void ScrollingList::scroll( bool forward )
 {
+    // playlist menus don't scroll
+    if (playlistType_)
+        return;
 
     if ( !items_ || items_->size(  ) == 0 ) return;
     if ( !scrollPoints_ || scrollPoints_->size(  ) == 0 ) return;
