@@ -117,13 +117,19 @@ void ReloadableMedia::freeGraphicsMemory()
 
 void ReloadableMedia::reloadTexture()
 {
+    std::string typeLC = Utils::toLower(type_);
+    Item* selectedItem = page.getSelectedItem(displayOffset_);
+
     if(loadedComponent_)
     {
-        delete loadedComponent_;
-        loadedComponent_ = NULL;
+        // delete image/video/text if no selected Item, or if not a playlist type or playlists are different
+        if (!selectedItem || !(typeLC.rfind("playlist", 0) == 0 && (page.getPlaylistName() == loadedComponent_->playlistName)))
+        {
+            delete loadedComponent_;
+            loadedComponent_ = NULL;
+        }
     }
 
-    Item *selectedItem = page.getSelectedItem(displayOffset_);
     if(!selectedItem) return;
 
     config_.getProperty("currentCollection", currentCollection_);
@@ -138,7 +144,6 @@ void ReloadableMedia::reloadTexture()
         names.push_back(selectedItem->cloneof);
     }
 
-    std::string typeLC = Utils::toLower(type_);
     if (typeLC == "isfavorite")
     {
         if (selectedItem->isFavorite)
@@ -169,6 +174,13 @@ void ReloadableMedia::reloadTexture()
         for(unsigned int n = 0; n < names.size() && !loadedComponent_; ++n)
         {
             std::string basename = names[n];
+
+            // support reloadable video based on playlist# type
+            if (basename != "default" && typeLC.rfind("playlist", 0) == 0)
+            {
+                basename = page.getPlaylistName();
+            }
+
             if(systemMode_)
             {
 
@@ -229,6 +241,7 @@ void ReloadableMedia::reloadTexture()
 
             if(loadedComponent_)
             {
+                loadedComponent_->playlistName = page.getPlaylistName();
                 loadedComponent_->allocateGraphicsMemory();
                 baseViewInfo.ImageWidth = loadedComponent_->baseViewInfo.ImageWidth;
                 baseViewInfo.ImageHeight = loadedComponent_->baseViewInfo.ImageHeight;
@@ -404,6 +417,7 @@ void ReloadableMedia::reloadTexture()
 
         if (loadedComponent_ != NULL)
         {
+             loadedComponent_->playlistName = page.getPlaylistName();
              loadedComponent_->allocateGraphicsMemory();
              baseViewInfo.ImageWidth = loadedComponent_->baseViewInfo.ImageWidth;
              baseViewInfo.ImageHeight = loadedComponent_->baseViewInfo.ImageHeight;
