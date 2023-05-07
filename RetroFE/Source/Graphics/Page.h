@@ -159,6 +159,7 @@ private:
 
     typedef std::vector< std::vector<ScrollingList *> > MenuVector_T;
     typedef std::list<MenuInfo_S> CollectionVector_T;
+    void setActiveMenuItemsFromPlaylist(MenuInfo_S info, ScrollingList* menu);
 
     std::vector<ScrollingList *> activeMenu_;
     unsigned int menuDepth_;

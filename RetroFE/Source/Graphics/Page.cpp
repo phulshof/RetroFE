@@ -163,6 +163,17 @@ void Page::setSelectedItem()
     }
 }
 
+void Page::setActiveMenuItemsFromPlaylist(MenuInfo_S info, ScrollingList* menu)
+{
+    // keep playlist menu
+    if (menu->playlistType_ && info.collection->playlistItems.size()) {
+        menu->setItems(&info.collection->playlistItems);
+    }
+    else {
+        menu->setItems(playlist_->second);
+    }
+}
+
 void Page::onNewItemSelected()
 {
     if(!(activeMenu_.size() > 0 && activeMenu_[0])) return;
@@ -1203,13 +1214,7 @@ void Page::nextPlaylist()
 
     for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
     {
-        ScrollingList *menu = *it;
-        // keep playlist menu
-        if (menu->playlistType_ && info.collection->playlistItems.size()) {
-            menu->setItems(&info.collection->playlistItems);
-        } else {
-            menu->setItems(playlist_->second);
-        }
+        setActiveMenuItemsFromPlaylist(info, *it);
     }
     playlistChange();
 }
@@ -1235,13 +1240,7 @@ void Page::prevPlaylist()
 
     for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
     {
-        ScrollingList *menu = *it;
-        // keep playlist menu
-        if (menu->playlistType_ && info.collection->playlistItems.size()) {
-            menu->setItems(&info.collection->playlistItems);
-        } else {
-            menu->setItems(playlist_->second);
-        }
+        setActiveMenuItemsFromPlaylist(info, *it);
     }
     playlistChange();
 }
@@ -1272,12 +1271,7 @@ void Page::selectPlaylist(std::string playlist)
 
     for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
     {
-        ScrollingList *menu = *it;
-        if (menu->playlistType_ && info.collection->playlistItems.size()) {
-            menu->setItems(&info.collection->playlistItems);
-        } else {
-            menu->setItems(playlist_->second);
-        }
+        setActiveMenuItemsFromPlaylist(info, *it);
     }
     playlistChange();
 }
