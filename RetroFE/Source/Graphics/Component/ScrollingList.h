@@ -45,6 +45,7 @@ public:
 
     ScrollingList( const ScrollingList &copy );
     virtual ~ScrollingList( );
+    std::vector<Item*> getItems();
     void triggerEnterEvent( );
     void triggerExitEvent( );
     void triggerMenuEnterEvent( int menuIndex = -1 );

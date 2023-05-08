@@ -995,19 +995,24 @@ bool Page::pushCollection(CollectionInfo *collection)
             pushMenu(newMenu, menuDepth_);
         }
     }
-
-    activeMenu_ = menus_[menuDepth_];
-    for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
-    {
-        ScrollingList *menu = *it;
-        menu->collectionName = collection->name;
-        // add playlist menu items
-        if (menu->playlistType_ && collection->playlistItems.size()) {
-            menu->setItems(&collection->playlistItems);
-        } else {
-            // add item collection menu
-            menu->setItems(&collection->items);
+    if (menus_.size()) {
+        activeMenu_ = menus_[menuDepth_];
+        for (std::vector<ScrollingList*>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
+        {
+            ScrollingList* menu = *it;
+            menu->collectionName = collection->name;
+            // add playlist menu items
+            if (menu->playlistType_ && collection->playlistItems.size()) {
+                menu->setItems(&collection->playlistItems);
+            }
+            else {
+                // add item collection menu
+                menu->setItems(&collection->items);
+            }
         }
+    }
+    else {
+        Logger::write(Logger::ZONE_WARNING, "RetroFE", "layout.xml doesn't have any menus");
     }
 
     // build the collection info instance
@@ -1297,8 +1302,16 @@ void Page::selectPlaylist(std::string playlist)
 void Page::updatePlaylistMenuPosition()
 {
     if (playlistMenu_) {
-        MenuInfo_S& info = collections_.back();
-        playlistMenu_->setScrollOffsetIndex(distance(info.collection->playlists.begin(), playlist_));
+        unsigned int i = 0;
+        std::string name = getPlaylistName();
+        std::vector<Item*> items = playlistMenu_->getItems();
+        for (std::vector<Item *>::iterator it = items.begin(); it != items.end(); ++it) {
+            Item* item = *it;
+            if (item->name == name) {
+                playlistMenu_->setScrollOffsetIndex(i);
+            }
+            i++;
+        }
     }
 }
 

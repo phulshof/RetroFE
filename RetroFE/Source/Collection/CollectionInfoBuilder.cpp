@@ -422,6 +422,7 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
         info->playlists["favorites"] = new std::vector<Item *>();
         return;
     }
+    std::map<std::string, Item*> playlistItems;
 
     while((dirp = readdir(dp)) != NULL)
     {
@@ -451,7 +452,7 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
                 playlistItem->fullTitle = basename;
                 playlistItem->leaf = false;
                 playlistItem->collectionInfo = info;
-                info->playlistItems.push_back(playlistItem);
+                playlistItems[basename] = playlistItem;
 
                 // add the playlist list 
                 for(std::map<std::string, Item *>::iterator it = playlistFilter.begin(); it != playlistFilter.end(); it++)
@@ -486,6 +487,28 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
                     playlistFilter.erase( it->first );
                 }
             }
+        }
+    }
+    // if cyclePlaylist then order playlist menu items by that
+    std::string cycleString;
+    conf_.getProperty("cyclePlaylist", cycleString);
+    std::vector<std::string> cycleVector;
+    Utils::listToVector(cycleString, cycleVector, ',');
+    if (cycleVector.size())
+    {
+        // add in order according to cycle list
+        for (std::vector<std::string>::iterator itP = cycleVector.begin(); itP != cycleVector.end(); itP++)
+        {
+            if (playlistItems[*itP]) {
+                info->playlistItems.push_back(playlistItems[*itP]);
+            }
+        }
+    }
+    else {
+        // convert lookup playlist map to vector
+        for (std::map<std::string, Item*>::iterator itP = playlistItems.begin(); itP != playlistItems.end(); itP++)
+        {
+            info->playlistItems.push_back(itP->second);
         }
     }
 

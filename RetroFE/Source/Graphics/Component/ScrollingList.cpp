@@ -111,6 +111,10 @@ ScrollingList::~ScrollingList( )
     }
 }
 
+std::vector<Item*> ScrollingList::getItems()
+{
+    return *items_;
+}
 
 void ScrollingList::setItems( std::vector<Item *> *items )
 {
