@@ -1309,6 +1309,8 @@ void Page::updatePlaylistMenuPosition()
             Item* item = *it;
             if (item->name == name) {
                 playlistMenu_->setScrollOffsetIndex(i);
+
+                return;
             }
             i++;
         }

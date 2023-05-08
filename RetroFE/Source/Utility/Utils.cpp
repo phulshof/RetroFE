@@ -256,15 +256,22 @@ std::string Utils::trimEnds(std::string str)
 
 void Utils::listToVector( std::string str, std::vector<std::string> &vec, char delimiter = ',' )
 {
+    std::string value;
     std::size_t current, previous = 0;
     current = str.find( delimiter );
     while (current != std::string::npos)
     {
-        vec.push_back( Utils::trimEnds( str.substr( previous, current - previous ) ) );
+        value = Utils::trimEnds(str.substr(previous, current - previous));
+        if (value != "") {
+            vec.push_back(value);
+        }
         previous = current + 1;
         current  = str.find( delimiter, previous );
     }
-    vec.push_back( Utils::trimEnds( str.substr( previous, current - previous ) ) );
+    value = Utils::trimEnds(str.substr(previous, current - previous));
+    if (value != "") {
+        vec.push_back(value);
+    }
 }
 
 
@@ -273,4 +280,11 @@ int Utils::gcd( int a, int b )
     if (b == 0)
         return a;
     return gcd( b, a % b );
+}
+
+std::string Utils::trim(std::string& str)
+{
+    str.erase(str.find_last_not_of(' ') + 1);         //suffixing spaces
+    str.erase(0, str.find_first_not_of(' '));       //prefixing spaces
+    return str;
 }
