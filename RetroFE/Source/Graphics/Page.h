@@ -67,6 +67,7 @@ public:
     void setHighlightSound(Sound *chunk);
     void setSelectSound(Sound *chunk);
     void setSelectedItem();
+    ScrollingList* getAnActiveMenu();
     bool addComponent(Component *c);
     void pageScroll(ScrollDirection direction);
     void letterScroll(ScrollDirection direction);
