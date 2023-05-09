@@ -43,7 +43,7 @@ public:
     void getMediaPropertyAbsolutePath(std::string collectionName, std::string mediaType, bool system, std::string &value);
     void getCollectionAbsolutePath(std::string collectionName, std::string &value);
     static std::string absolutePath;
-	
+	static int AvdecMaxThreads;
 	static bool HardwareVideoAccel; // Declare HardwareVideoAccel as a static member variable
 
 private:

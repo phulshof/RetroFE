@@ -369,6 +369,8 @@ bool RetroFE::run( )
     config_.getProperty( "fpsIdle", fpsIdle );
     double fpsTime     = 1000.0 / static_cast<double>(fps);
     double fpsIdleTime = 1000.0 / static_cast<double>(fpsIdle);
+	bool vSync = false;
+	config_.getProperty("vSync", vSync);
 
     int initializeStatus = 0;
     bool inputClear      = false;
@@ -1315,8 +1317,7 @@ bool RetroFE::run( )
             }
             break;
         }
-		bool vSync = false;
-		config_.getProperty("vSync", vSync);
+		
         // Handle screen updates and attract mode
         if ( running )
         {
@@ -1330,15 +1331,18 @@ bool RetroFE::run( )
 
             deltaTime = currentTime_ - lastTime;
             double sleepTime;
-            if (state == RETROFE_IDLE)
+			if (state == RETROFE_IDLE)
                 sleepTime = fpsIdleTime - deltaTime*1000;
             else
                 sleepTime = fpsTime - deltaTime*1000;
-            if ( sleepTime > 0 && sleepTime < 1000 && !vSync)
-            {
-                SDL_Delay( static_cast<unsigned int>( sleepTime ) );
-            }
-
+            if ( sleepTime > 0 && sleepTime < 1000 )
+			{
+				if (vSync == false)
+				{
+					SDL_Delay( static_cast<unsigned int>( sleepTime ) );
+				}
+			}
+		
             if ( currentPage_ )
             {
                 if (!splashMode)
