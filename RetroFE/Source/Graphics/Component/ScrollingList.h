@@ -37,6 +37,7 @@ public:
                    Page          &p,
                    bool          layoutMode,
                    bool          commonMode,
+                   bool          playlistType,
                    Font         *font,
                    std::string   layoutKey,
                    std::string   imageType,
@@ -44,6 +45,7 @@ public:
 
     ScrollingList( const ScrollingList &copy );
     virtual ~ScrollingList( );
+    std::vector<Item*> getItems();
     void triggerEnterEvent( );
     void triggerExitEvent( );
     void triggerMenuEnterEvent( int menuIndex = -1 );
@@ -101,6 +103,7 @@ public:
     void resetScrollPeriod( );
     void updateScrollPeriod( );
     void scroll( bool forward );
+    bool playlistType_;//todo make getter
 
 private:
 

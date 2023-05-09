@@ -60,11 +60,14 @@ public:
     void nextCyclePlaylist(std::vector<std::string> list);
     void prevCyclePlaylist(std::vector<std::string> list);
     void pushMenu(ScrollingList *s, int index = -1);
+    void updatePlaylistMenuPosition();
     bool isMenusFull();
     void setLoadSound(Sound *chunk);
     void setUnloadSound(Sound *chunk);
     void setHighlightSound(Sound *chunk);
     void setSelectSound(Sound *chunk);
+    void setSelectedItem();
+    ScrollingList* getAnActiveMenu();
     bool addComponent(Component *c);
     void pageScroll(ScrollDirection direction);
     void letterScroll(ScrollDirection direction);
@@ -141,6 +144,7 @@ public:
     unsigned long long getCurrent( );
     unsigned long long getDuration( );
     bool  isPaused( );
+    ScrollingList* playlistMenu_;//todo make getter
 
 private:
     void playlistChange();
@@ -156,6 +160,7 @@ private:
 
     typedef std::vector< std::vector<ScrollingList *> > MenuVector_T;
     typedef std::list<MenuInfo_S> CollectionVector_T;
+    void setActiveMenuItemsFromPlaylist(MenuInfo_S info, ScrollingList* menu);
 
     std::vector<ScrollingList *> activeMenu_;
     unsigned int menuDepth_;

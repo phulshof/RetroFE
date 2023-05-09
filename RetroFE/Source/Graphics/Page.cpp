@@ -40,6 +40,8 @@ Page::Page(Configuration &config, int layoutWidth, int layoutHeight)
     , selectSoundChunk_(NULL)
     , minShowTime_(0)
     , jukebox_(false)
+    , playlistMenu_(NULL)
+    , elapsedTime_(0)
 {
     for (int i = 0; i < SDL::getNumScreens(); i++)
     {
@@ -150,11 +152,43 @@ void Page::setSelectSound(Sound *chunk)
   selectSoundChunk_ = chunk;
 }
 
+void Page::setSelectedItem()
+{
+    ScrollingList* amenu = getAnActiveMenu();
+    if (!amenu) return;
+
+    selectedItem_ = amenu->getSelectedItem();
+}
+
+ScrollingList* Page::getAnActiveMenu() {
+    if (activeMenu_.size()) {
+        for (unsigned int i = 0; i < activeMenu_.size(); i++)
+        {
+            if (!activeMenu_[i]->playlistType_) {
+                return activeMenu_[i];
+            }
+        }
+    }
+    
+    return NULL;
+}
+
+void Page::setActiveMenuItemsFromPlaylist(MenuInfo_S info, ScrollingList* menu)
+{
+    // keep playlist menu
+    if (menu->playlistType_ && info.collection->playlistItems.size()) {
+        menu->setItems(&info.collection->playlistItems);
+    }
+    else {
+        menu->setItems(playlist_->second);
+    }
+}
 
 void Page::onNewItemSelected()
 {
-    if(!(activeMenu_.size() > 0 && activeMenu_[0])) return;
-    selectedItem_ = activeMenu_[0]->getSelectedItem();
+    if(!getAnActiveMenu()) return;
+
+    setSelectedItem();
 
     for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
     {
@@ -175,8 +209,9 @@ void Page::onNewItemSelected()
 
 void Page::onNewScrollItemSelected()
 {
-    if(!(activeMenu_.size() > 0 && activeMenu_[0])) return;
-    selectedItem_ = activeMenu_[0]->getSelectedItem();
+    if(!getAnActiveMenu()) return;
+
+    setSelectedItem();
 
     for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
     {
@@ -188,8 +223,9 @@ void Page::onNewScrollItemSelected()
 
 void Page::highlightLoadArt()
 {
-    if(!(activeMenu_.size() > 0 && activeMenu_[0])) return;
-    selectedItem_ = activeMenu_[0]->getSelectedItem();
+    if(!getAnActiveMenu()) return;
+
+    setSelectedItem();
 
     for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
     {
@@ -380,8 +416,10 @@ Item *Page::getSelectedItem()
 
 Item *Page::getSelectedItem(int offset)
 {
-    if(!(activeMenu_.size() > 0 && activeMenu_[0])) return NULL;
-    return activeMenu_[0]->getItemByOffset(offset);
+    ScrollingList* amenu = getAnActiveMenu();
+    if (!amenu) return NULL;
+
+    return amenu->getItemByOffset(offset);
 }
 
 
@@ -401,7 +439,8 @@ void Page::removeSelectedItem()
 
 void Page::setScrollOffsetIndex(unsigned int i)
 {
-    if(!(activeMenu_.size() > 0 && activeMenu_[0])) return;
+    if (!getAnActiveMenu()) return;
+
     for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
     {
         ScrollingList *menu = *it;
@@ -412,8 +451,10 @@ void Page::setScrollOffsetIndex(unsigned int i)
 
 unsigned int Page::getScrollOffsetIndex()
 {
-    if(!(activeMenu_.size() > 0 && activeMenu_[0])) return -1;
-    return activeMenu_[0]->getScrollOffsetIndex();
+    ScrollingList* amenu = getAnActiveMenu();
+    if (!amenu) return -1;
+
+    return amenu->getScrollOffsetIndex();
 }
 
 
@@ -441,6 +482,8 @@ void Page::playlistChange()
     {
         (*it)->setPlaylist(playlist_->first);
     }
+
+    updatePlaylistMenuPosition();
 }
 
 
@@ -814,46 +857,46 @@ void Page::setScrolling(ScrollDirection direction)
 
 bool Page::isHorizontalScroll()
 {
-    if(!(activeMenu_.size() > 0 && activeMenu_[0])) return false;
-    return activeMenu_[0]->horizontalScroll;
+    ScrollingList* amenu = getAnActiveMenu();
+    if(!amenu) return false;
+
+    return amenu->horizontalScroll;
 }
 
 
 void Page::pageScroll(ScrollDirection direction)
 {
-    if(activeMenu_.size() > 0 && activeMenu_[0])
-    {
-        if(direction == ScrollDirectionForward)
-        {
-            activeMenu_[0]->pageDown();
-        }
-        if(direction == ScrollDirectionBack)
-        {
-            activeMenu_[0]->pageUp();
-        }
+    ScrollingList* amenu = getAnActiveMenu();
+    if (!amenu) return;
 
-        unsigned int index = activeMenu_[0]->getScrollOffsetIndex();
-        for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
-        {
-            ScrollingList *menu = *it;
-            if (menu)
-                menu->setScrollOffsetIndex(index);
-        }
+    if(direction == ScrollDirectionForward)
+    {
+        amenu->pageDown();
+    } else if(direction == ScrollDirectionBack)
+    {
+        amenu->pageUp();
+    }
+
+    unsigned int index = amenu->getScrollOffsetIndex();
+    for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
+    {
+        ScrollingList *menu = *it;
+        if (menu)
+            menu->setScrollOffsetIndex(index);
     }
 }
 
-
 void Page::selectRandom()
 {
-    if(activeMenu_.size() > 0 && activeMenu_[0])
+    ScrollingList* amenu = getAnActiveMenu();
+    if (!amenu) return;
+
+    amenu->random();
+    unsigned int index = amenu->getScrollOffsetIndex();
+    for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
     {
-        activeMenu_[0]->random();
-        unsigned int index = activeMenu_[0]->getScrollOffsetIndex();
-        for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
-        {
-            ScrollingList *menu = *it;
-            menu->setScrollOffsetIndex(index);
-        }
+        ScrollingList *menu = *it;
+        menu->setScrollOffsetIndex(index);
     }
 }
 
@@ -920,15 +963,19 @@ void Page::cfwLetterSubScroll(ScrollDirection direction)
 
 unsigned int Page::getCollectionSize()
 {
-    if(!(activeMenu_.size() > 0 && activeMenu_[0])) return 0;
-    return activeMenu_[0]->getSize();
+    ScrollingList* amenu = getAnActiveMenu();
+    if (!amenu) return 0;
+
+    return amenu->getSize();
 }
 
 
 unsigned int Page::getSelectedIndex()
 {
-    if(!(activeMenu_.size() > 0 && activeMenu_[0])) return 0;
-    return activeMenu_[0]->getSelectedIndex();
+    ScrollingList* amenu = getAnActiveMenu();
+    if (!amenu) return 0;
+
+    return amenu->getSelectedIndex();
 }
 
 
@@ -936,22 +983,36 @@ bool Page::pushCollection(CollectionInfo *collection)
 {
 
     // grow the menu as needed
-    if(menus_.size() <= menuDepth_ && activeMenu_.size() > 0 && activeMenu_[0])
+    if(menus_.size() <= menuDepth_ && getAnActiveMenu())
     {
         for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
         {
             ScrollingList *menu    = *it;
             ScrollingList *newMenu = new ScrollingList(*menu);
+            if (&newMenu->playlistType_) {
+                playlistMenu_ = newMenu;
+            }
             pushMenu(newMenu, menuDepth_);
         }
     }
-
-    activeMenu_ = menus_[menuDepth_];
-    for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
-    {
-        ScrollingList *menu = *it;
-        menu->collectionName = collection->name;
-        menu->setItems(&collection->items);
+    if (menus_.size()) {
+        activeMenu_ = menus_[menuDepth_];
+        for (std::vector<ScrollingList*>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
+        {
+            ScrollingList* menu = *it;
+            menu->collectionName = collection->name;
+            // add playlist menu items
+            if (menu->playlistType_ && collection->playlistItems.size()) {
+                menu->setItems(&collection->playlistItems);
+            }
+            else {
+                // add item collection menu
+                menu->setItems(&collection->items);
+            }
+        }
+    }
+    else {
+        Logger::write(Logger::ZONE_WARNING, "RetroFE", "layout.xml doesn't have any menus");
     }
 
     // build the collection info instance
@@ -980,8 +1041,7 @@ bool Page::pushCollection(CollectionInfo *collection)
 
 bool Page::popCollection()
 {
-
-    if(!(activeMenu_.size() > 0 && activeMenu_[0])) return false;
+    if (!getAnActiveMenu()) return false;
     if(menuDepth_ <= 1) return false;
     if(collections_.size() <= 1) return false;
 
@@ -993,6 +1053,12 @@ bool Page::popCollection()
     // get the next collection off of the stack
     collections_.pop_back();
     info = &collections_.back();
+
+    // build playlist menu
+    if (playlistMenu_ && info->collection->playlistItems.size()) {
+        playlistMenu_->setItems(&info->collection->playlistItems);
+    }
+
     playlist_ = info->playlist;
     playlistChange();
 
@@ -1161,16 +1227,17 @@ void Page::nextPlaylist()
     {
         playlist_++;
         // wrap
-        if(playlist_ == info.collection->playlists.end()) playlist_ = info.collection->playlists.begin();
+        if(playlist_ == info.collection->playlists.end()) 
+            playlist_ = info.collection->playlists.begin();
 
         // find the first playlist
-        if(playlist_->second->size() != 0) break;
+        if(playlist_->second->size() != 0) 
+            break;
     }
 
     for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
     {
-        ScrollingList *menu = *it;
-        menu->setItems(playlist_->second);
+        setActiveMenuItemsFromPlaylist(info, *it);
     }
     playlistChange();
 }
@@ -1196,8 +1263,7 @@ void Page::prevPlaylist()
 
     for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
     {
-        ScrollingList *menu = *it;
-        menu->setItems(playlist_->second);
+        setActiveMenuItemsFromPlaylist(info, *it);
     }
     playlistChange();
 }
@@ -1228,12 +1294,28 @@ void Page::selectPlaylist(std::string playlist)
 
     for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
     {
-        ScrollingList *menu = *it;
-        menu->setItems(playlist_->second);
+        setActiveMenuItemsFromPlaylist(info, *it);
     }
     playlistChange();
 }
 
+void Page::updatePlaylistMenuPosition()
+{
+    if (playlistMenu_) {
+        unsigned int i = 0;
+        std::string name = getPlaylistName();
+        std::vector<Item*> items = playlistMenu_->getItems();
+        for (std::vector<Item *>::iterator it = items.begin(); it != items.end(); ++it) {
+            Item* item = *it;
+            if (item->name == name) {
+                playlistMenu_->setScrollOffsetIndex(i);
+
+                return;
+            }
+            i++;
+        }
+    }
+}
 
 void Page::nextCyclePlaylist(std::vector<std::string> list)
 {

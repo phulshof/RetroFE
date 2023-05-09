@@ -366,6 +366,9 @@ bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
         ScrollingList *scrollingList = buildMenu(componentXml,*page);
         xml_attribute<> *indexXml = componentXml->first_attribute("menuIndex");
         int index = indexXml ? Utils::convertInt(indexXml->value()) : -1;
+        if (scrollingList->playlistType_) {
+            page->playlistMenu_ = scrollingList;
+        }
         page->pushMenu(scrollingList, index);
     }
 
@@ -1000,14 +1003,21 @@ ScrollingList * PageBuilder::buildMenu(xml_node<> *menuXml, Page &page)
         Logger::write(Logger::ZONE_WARNING, "Layout", "Menu tag is missing <itemDefaults> tag.");
     }
 
+    bool playlistType = false;
     if(imageTypeXml)
     {
         imageType = imageTypeXml->value();
+        if (imageType.rfind("playlist", 0) == 0) {
+            playlistType = true;
+        }
     }
 
     if(videoTypeXml)
     {
         videoType = videoTypeXml->value();
+        if (videoType.rfind("playlist", 0) == 0) {
+            playlistType = true;
+        }
     }
 
     bool layoutMode = false;
@@ -1033,7 +1043,7 @@ ScrollingList * PageBuilder::buildMenu(xml_node<> *menuXml, Page &page)
     // on default, text will be rendered to the menu. Preload it into cache.
     Font *font = addFont(itemDefaults, NULL);
 
-    menu = new ScrollingList(config_, page, layoutMode, commonMode, font, layoutKey, imageType, videoType);
+    menu = new ScrollingList(config_, page, layoutMode, commonMode, playlistType, font, layoutKey, imageType, videoType);
     buildViewInfo(menuXml, menu->baseViewInfo);
 
     if(scrollTimeXml)
