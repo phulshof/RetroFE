@@ -45,6 +45,9 @@ public:
     void deInitialize();
     virtual void onNewItemSelected();
     virtual void onNewScrollItemSelected();
+    void returnToRememberSelectedItem();
+    void rememberSelectedItem();
+    std::map<std::string, unsigned int> getLastPlaylistOffsets();
     void highlightLoadArt();
     bool pushCollection(CollectionInfo *collection);
     bool popCollection();
@@ -66,7 +69,7 @@ public:
     void setUnloadSound(Sound *chunk);
     void setHighlightSound(Sound *chunk);
     void setSelectSound(Sound *chunk);
-    void setSelectedItem();
+    Item *getSelectedMenuItem();
     ScrollingList* getAnActiveMenu();
     bool addComponent(Component *c);
     void pageScroll(ScrollDirection direction);
@@ -144,7 +147,9 @@ public:
     unsigned long long getCurrent( );
     unsigned long long getDuration( );
     bool  isPaused( );
-    ScrollingList* playlistMenu_;//todo make getter
+    ScrollingList* getPlaylistMenu();
+    void setPlaylistMenu(ScrollingList*);
+    bool playlistExists(std::string);
 
 private:
     void playlistChange();
@@ -163,6 +168,8 @@ private:
     void setActiveMenuItemsFromPlaylist(MenuInfo_S info, ScrollingList* menu);
 
     std::vector<ScrollingList *> activeMenu_;
+    ScrollingList* anActiveMenu_;
+    ScrollingList* playlistMenu_;
     unsigned int menuDepth_;
     MenuVector_T menus_;
     CollectionVector_T collections_;
@@ -172,6 +179,7 @@ private:
     std::vector<Component *> LayerComponents;
     std::list<ScrollingList *> deleteMenuList_;
     std::list<CollectionInfo *> deleteCollectionList_;
+    std::map<std::string, unsigned int> lastPlaylistOffsets_;
 
     bool scrollActive_;
 

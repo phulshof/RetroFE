@@ -125,6 +125,21 @@ void ScrollingList::setItems( std::vector<Item *> *items )
     }
 }
 
+void ScrollingList::selectItemByName(std::string name)
+{
+    size_t size = items_->size();
+    unsigned int index = 0;
+
+    for (unsigned int i = 0; i < size; ++i)
+    {
+        index = loopDecrement(itemIndex_, i, size);
+
+        if (items_->at((index + selectedOffsetIndex_) % size)->name == name) {
+            itemIndex_ = index;
+            break;
+        }
+    }
+}
 
 unsigned int ScrollingList::loopIncrement( unsigned int offset, unsigned int i, unsigned int size )
 {
@@ -274,24 +289,24 @@ Item *ScrollingList::getItemByOffset( int offset )
 }
 
 
-Item *ScrollingList::getSelectedItem( )
+Item* ScrollingList::getSelectedItem()
 {
-    if ( !items_ || items_->size( ) == 0 ) return NULL;
-    return items_->at( loopIncrement( itemIndex_, selectedOffsetIndex_, items_->size( ) ) );
+    if (!items_ || items_->size() == 0) return NULL;
+    return items_->at(loopIncrement(itemIndex_, selectedOffsetIndex_, items_->size()));
 }
 
 
-void ScrollingList::pageUp( )
+void ScrollingList::pageUp()
 {
-    if ( components_.size( ) == 0 ) return;
-    itemIndex_ = loopDecrement( itemIndex_, components_.size( ), items_->size( ) );
+    if (components_.size() == 0) return;
+    itemIndex_ = loopDecrement(itemIndex_, components_.size(), items_->size());
 }
 
 
-void ScrollingList::pageDown( )
+void ScrollingList::pageDown()
 {
-    if ( components_.size( ) == 0 ) return;
-    itemIndex_ = loopIncrement( itemIndex_, components_.size( ), items_->size( ) );
+    if (components_.size() == 0) return;
+    itemIndex_ = loopIncrement(itemIndex_, components_.size(), items_->size());
 }
 
 
@@ -1134,4 +1149,9 @@ void ScrollingList::scroll( bool forward )
     }
 
     return;
+}
+
+bool ScrollingList::isPlaylist()
+{
+    return playlistType_;
 }

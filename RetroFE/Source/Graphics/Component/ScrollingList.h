@@ -66,6 +66,7 @@ public:
     bool allocateTexture( unsigned int index, Item *i );
     void deallocateTexture( unsigned int index );
     void setItems( std::vector<Item *> *items );
+    void selectItemByName(std::string name);
     void destroyItems( );
     void setPoints( std::vector<ViewInfo *> *scrollPoints, std::vector<AnimationEvents *> *tweenPoints );
     unsigned int getSelectedIndex( );
@@ -89,6 +90,7 @@ public:
     void setSelectedIndex( int selectedIndex );
     Item *getItemByOffset( int offset );
     Item *getSelectedItem( );
+    unsigned int getSelectedItemPosition();
     void allocateGraphicsMemory( );
     void freeGraphicsMemory( );
     void update( float dt );
@@ -103,8 +105,7 @@ public:
     void resetScrollPeriod( );
     void updateScrollPeriod( );
     void scroll( bool forward );
-    bool playlistType_;//todo make getter
-
+    bool isPlaylist();
 private:
 
     void resetTweens( Component *c, AnimationEvents *sets, ViewInfo *currentViewInfo, ViewInfo *nextViewInfo, double scrollTime );
@@ -113,6 +114,8 @@ private:
 
     bool layoutMode_;
     bool commonMode_;
+    bool playlistType_;
+
     std::vector<Component *> *spriteList_;
     std::vector<ViewInfo *> *scrollPoints_;
     std::vector<AnimationEvents *> *tweenPoints_;
