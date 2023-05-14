@@ -542,10 +542,9 @@ bool RetroFE::run( )
             {
                 bool rememberMenu = false;
                 config_.getProperty("rememberMenu", rememberMenu);
-                if (rememberMenu) {
+                // don't return to rembered item for favorites, go to next in list
+                if (rememberMenu && currentPage_->getPlaylistName() != "favorites") {
                     currentPage_->returnToRememberSelectedItem();
-                } else {
-                    currentPage_->onNewItemSelected();
                 }
                 currentPage_->onNewItemSelected();
                 state = RETROFE_PLAYLIST_LOAD_ART;
@@ -557,7 +556,7 @@ bool RetroFE::run( )
             if (currentPage_->isIdle( ))
             {
                 currentPage_->reallocateMenuSpritePoints( );
-                currentPage_->playlistEnter( );
+                currentPage_->playlistEnter();
                 state = RETROFE_PLAYLIST_ENTER;
             }
             break;
@@ -1651,6 +1650,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         else if ( input_.keystate(UserInput::KeyCodeRemovePlaylist) )
         {
             attract_.reset( );
+            page->rememberSelectedItem();
             page->removePlaylist( );
             state = RETROFE_PLAYLIST_REQUEST;
         }
@@ -1658,6 +1658,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         else if ( input_.keystate(UserInput::KeyCodeAddPlaylist) )
         {
             attract_.reset( );
+            page->rememberSelectedItem();
             page->addPlaylist( );
             state = RETROFE_PLAYLIST_REQUEST;
         }
@@ -1666,8 +1667,9 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         {
             if (currentPage_->getPlaylistName() != "favorites" )
             {
-                attract_.reset( );
-                page->togglePlaylist( );
+                attract_.reset();
+                page->rememberSelectedItem();
+                page->togglePlaylist();
                 state = RETROFE_PLAYLIST_REQUEST;
             }
         }

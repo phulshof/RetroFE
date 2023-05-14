@@ -245,7 +245,8 @@ void Page::highlightLoadArt()
 {
     if(!getAnActiveMenu()) return;
 
-    selectedItem_ = getSelectedMenuItem();
+    // loading new items art
+    setSelectedItem();
 
     for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
     {
@@ -427,11 +428,15 @@ void Page::stop()
     }
 }
 
+void Page::setSelectedItem()
+{
+    selectedItem_ = getSelectedMenuItem();
+}
 
 Item *Page::getSelectedItem()
 {
     if (!selectedItem_) {
-        selectedItem_ = getSelectedMenuItem();
+       setSelectedItem();
     }
 
     return selectedItem_;
@@ -599,6 +604,9 @@ void Page::highlightExit()
 
 void Page::playlistEnter()
 {
+    // entered in new playlist set selected item
+    setSelectedItem();
+
     Item *item = selectedItem_;
 
     if(!item) return;
@@ -661,6 +669,9 @@ void Page::playlistExit()
 
 void Page::menuJumpEnter()
 {
+    // jumped into new item
+    setSelectedItem();
+
     Item *item = selectedItem_;
 
     if(!item) return;
@@ -1533,12 +1544,27 @@ void Page::removePlaylist()
     std::vector<Item *> *items = collection->playlists["favorites"];
     std::vector<Item *>::iterator it = std::find(items->begin(), items->end(), selectedItem_);
 
+
     if(it != items->end())
     {
+        unsigned int index = NULL;
+        ScrollingList* amenu = NULL;
+        // get the deleted item's position
+        if (getPlaylistName() == "favorites") {
+            amenu = getAnActiveMenu();
+            if (amenu) {
+               index = amenu->getScrollOffsetIndex();
+            }
+        }
         items->erase(it);
         selectedItem_->isFavorite = false;
         collection->sortPlaylists();
         collection->saveRequest = true;
+
+        // set to position to the old deleted position
+        if (amenu) {
+            amenu->setScrollOffsetIndex(index);
+        }
     }
     collection->Save();
 }
@@ -1552,7 +1578,7 @@ void Page::addPlaylist()
     CollectionInfo *collection = info.collection;
 
     std::vector<Item *> *items = collection->playlists["favorites"];
-    if(playlist_->first != "favorites" && std::find(items->begin(), items->end(), selectedItem_) == items->end())
+    if(getPlaylistName() != "favorites" && std::find(items->begin(), items->end(), selectedItem_) == items->end())
     {
         items->push_back(selectedItem_);
         selectedItem_->isFavorite = true;
@@ -1567,7 +1593,7 @@ void Page::togglePlaylist()
 {
     if (!selectedItem_) return;
 
-    if (playlist_->first != "favorites")
+    if (getPlaylistName() != "favorites")
     {
         if (selectedItem_->isFavorite)
             removePlaylist();
