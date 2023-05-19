@@ -11,6 +11,4 @@ Configuration/Configuration/obj/**
 Artifacts/**
 BP Files/Page.cpp
 BP Files/RetroFE.cpp
-RetroFE/Source/Graphics/Page.cpp
-RetroFE/Source/RetroFE.cpp
 /.vs/RetroFE-MF-Dev/v17
