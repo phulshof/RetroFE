@@ -396,18 +396,24 @@ bool RetroFE::run( )
         SDL_Event e;
         if ( splashMode && SDL_PollEvent( &e ) )
         {
-            if ( input_.update( e ) && input_.keystate(UserInput::KeyCodeSelect) )
+            if (input_.update(e))
             {
-                exitSplashMode = true;
-                while ( SDL_PollEvent( &e ) )
-                {
-                    if ( e.type == SDL_JOYDEVICEADDED || e.type == SDL_JOYDEVICEREMOVED )
+                if (input_.keystate(UserInput::KeyCodeSelect)) {
+                    exitSplashMode = true;
+                    while (SDL_PollEvent(&e))
                     {
-                        input_.update( e );
+                        if (e.type == SDL_JOYDEVICEADDED || e.type == SDL_JOYDEVICEREMOVED)
+                        {
+                            input_.update(e);
+                        }
                     }
+                    input_.resetStates();
+                    attract_.reset();
                 }
-                input_.resetStates( );
-                attract_.reset( );
+                else if (input_.keystate(UserInput::KeyCodeQuit)) {
+                    running = false;
+                    break;
+                }
             }
         }
 
@@ -1672,7 +1678,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
                 page->togglePlaylist();
                 state = RETROFE_PLAYLIST_REQUEST;
             }
-        }
+	}
 
         else if ( input_.keystate(UserInput::KeyCodeSkipForward) )
         {
