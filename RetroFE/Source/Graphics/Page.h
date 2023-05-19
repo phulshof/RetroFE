@@ -150,6 +150,7 @@ public:
     ScrollingList* getPlaylistMenu();
     void setPlaylistMenu(ScrollingList*);
     bool playlistExists(std::string);
+	void Page::setSelectedItem();
 
 private:
     void playlistChange();
