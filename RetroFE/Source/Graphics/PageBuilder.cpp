@@ -1395,6 +1395,8 @@ void PageBuilder::getTweenSet(xml_node<> *node, Animation *animation)
 void PageBuilder::getAnimationEvents(xml_node<> *node, TweenSet &tweens)
 {
     xml_attribute<> *durationXml = node->first_attribute("duration");
+    std::string actionSetting;
+    config_.getProperty("action", actionSetting);
 
     if(!durationXml)
     {
@@ -1408,6 +1410,7 @@ void PageBuilder::getAnimationEvents(xml_node<> *node, TweenSet &tweens)
             xml_attribute<> *from = animate->first_attribute("from");
             xml_attribute<> *to = animate->first_attribute("to");
             xml_attribute<> *algorithmXml = animate->first_attribute("algorithm");
+            xml_attribute<>* setting = animate->first_attribute("setting");
 
             std::string animateType;
             if (type)
@@ -1426,6 +1429,10 @@ void PageBuilder::getAnimationEvents(xml_node<> *node, TweenSet &tweens)
             }
             else
             {
+                // if in settings action="<something>" and the action has setting="<something>" then perform animation
+                if (setting && setting->value() != actionSetting) {
+                    continue;
+                }
                 float fromValue = 0.0f;
                 bool  fromDefined = true;
                 if (from)
