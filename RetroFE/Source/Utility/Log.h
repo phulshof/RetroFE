@@ -20,6 +20,7 @@
 #include <sstream>
 #include <streambuf>
 #include <iostream>
+#include "../Database/Configuration.h"
 
 class Logger
 {
@@ -33,12 +34,13 @@ public:
         ZONE_ERROR
 
     };
-    static bool initialize(std::string file);
+    static bool initialize(std::string file, Configuration* config);
     static void write(Zone zone, std::string component, std::string message);
     static void deInitialize();
 private:
 
-    static std::streambuf *cerrStream_;
-    static std::streambuf *coutStream_;
+    static std::streambuf* cerrStream_;
+    static std::streambuf* coutStream_;
     static std::ofstream writeFileStream_;
+    static Configuration* config_;
 };
