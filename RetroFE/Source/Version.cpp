@@ -22,10 +22,11 @@
 std::string retrofe_version_major = "0";
 std::string retrofe_version_minor = "10";
 std::string retrofe_version_build = "34";
+std::string retrofe_version_coinops = "1";
 
 
 std::string Version::getString( )
 {
-    std::string return_string = retrofe_version_major + "." + retrofe_version_minor + "." + retrofe_version_build;
+    std::string return_string = retrofe_version_major + "." + retrofe_version_minor + "." + retrofe_version_build + "." + retrofe_version_coinops;
     return return_string;
 }
