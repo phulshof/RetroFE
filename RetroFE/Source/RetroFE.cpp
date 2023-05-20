@@ -312,10 +312,15 @@ bool RetroFE::run( )
     fontcache_.initialize( );
 
     // Define control configuration
-    std::string controlsConfPath = Utils::combinePath( Configuration::absolutePath, "controls.conf" );
-    if ( !config_.import( "controls", controlsConfPath ) )
+    std::string controlsConfPath = Utils::combinePath( Configuration::absolutePath, "controls" );
+    for (int i = 9; i > 0; i--)
+        config_.import("controls", controlsConfPath + std::to_string(i) + ".conf"); 
+    config_.import("controls", controlsConfPath + ".conf");
+
+    if (config_.propertiesEmpty())
     {
-        Logger::write( Logger::ZONE_ERROR, "RetroFE", "Could not import \"" + controlsConfPath + "\"" );
+        Logger::write(Logger::ZONE_ERROR, "RetroFE", "No controls.conf found");
+
         return false;
     }
 
@@ -332,9 +337,10 @@ bool RetroFE::run( )
 
     initializeThread = SDL_CreateThread( initialize, "RetroFEInit", (void *)this );
 
-    if ( !initializeThread )
+    if (!initializeThread)
     {
         Logger::write( Logger::ZONE_INFO, "RetroFE", "Could not initialize RetroFE" );
+
         return false;
     }
 
@@ -506,6 +512,11 @@ bool RetroFE::run( )
                     config_.setProperty( "currentCollection", firstCollection );
                     CollectionInfo *info = getCollection(firstCollection);
 
+                    if (info == NULL) {
+                        state = RETROFE_QUIT_REQUEST;
+
+                        break;
+                    }
                     currentPage_->pushCollection(info);
 
                     config_.getProperty( "firstPlaylist", firstPlaylist_ );
@@ -1898,6 +1909,11 @@ CollectionInfo *RetroFE::getCollection(std::string collectionName)
 
     std::string path = Utils::combinePath( Configuration::absolutePath, "collections", collectionName );
     dp = opendir( path.c_str( ) );
+    if (dp == NULL) {
+        Logger::write(Logger::ZONE_ERROR, "RetroFE", "Failed to load collection " + collectionName);
+
+        return NULL;
+    }
 
     // Loading sub collection files
     while ( (dirp = readdir( dp )) != NULL )

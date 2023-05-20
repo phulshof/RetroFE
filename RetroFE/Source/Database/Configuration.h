@@ -36,6 +36,7 @@ public:
     bool getProperty(std::string key, bool &value);
     void childKeyCrumbs(std::string parent, std::vector<std::string> &children);
     void setProperty(std::string key, std::string value);
+    bool propertiesEmpty();
     bool propertyExists(std::string key);
     bool propertyPrefixExists(std::string key);
     bool getPropertyAbsolutePath(std::string key, std::string &value);
