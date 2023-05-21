@@ -25,3 +25,8 @@ v0.10.34.1
 	- added globalFavLast=yes to save favorites and lastplayed to "Favorites" collection that all collections can access or not, using cyclePlaylist in collection (monkofthefunk)
 	- fixed playlist menu after globalFavLast merge (monkofthefunk)
 	- fixed remebering last favorite selected in playlist (monkofthefunk)
+	- added %X_RES% and %Y_RES% variables for horizontal and vertical in settings.conf for AndyBurn (inigomontoya)
+	- added %CMD% variable for executable field in launcher files, will expand to system's cmd.exe (inigomontoya)
+	- changed parsing behavior for settings.conf, will now accept "on" as well as "yes" and "true" (inigomontoya)
+	- enabled SDL logging to report backend being used, either direct3d or opengl (inigomontoya)
+	- added ScaleQuality to settings.conf.  0=nearest 1=linear 2=anisotropic.  Defaults to 1.  https://wiki.libsdl.org/SDL2/SDL_HINT_RENDER_SCALE_QUALITY (inigomontoya)
