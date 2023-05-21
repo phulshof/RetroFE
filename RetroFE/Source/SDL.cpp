@@ -211,6 +211,13 @@ bool SDL::initialize( Configuration &config )
             ss << "Creating "<< windowWidth_[i] << "x" << windowHeight_[i] << " window (fullscreen: " << fullscreenStr << ")" << " on display " << screenNum;
             Logger::write( Logger::ZONE_INFO, "SDL", ss.str( ));
             window_[i] = SDL_CreateWindow( "RetroFE", SDL_WINDOWPOS_CENTERED_DISPLAY(screenNum), SDL_WINDOWPOS_CENTERED_DISPLAY(screenNum), windowWidth_[i], windowHeight_[i], windowFlags );
+			
+			std::string ScaleQuality = "1";
+			config.getProperty("ScaleQuality", ScaleQuality);
+			if ( SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, ScaleQuality.c_str()) != SDL_TRUE )
+			{
+				Logger::write( Logger::ZONE_ERROR, "SDL", "Improve scale quality. Continuing with low-quality settings." );
+			}
 
             if ( window_[i] == NULL )
             {
@@ -244,15 +251,22 @@ bool SDL::initialize( Configuration &config )
 					Logger::write(Logger::ZONE_ERROR, "SDL", "Create renderer " + std::to_string(i) + " failed: " + error);
 					return false;
 				}
+				else 
+				{
+					SDL_RendererInfo info;
+					if (SDL_GetRendererInfo(renderer_[i], &info) == 0) 
+					{
+						std::string logMessage = "Current rendering backend for renderer " + std::to_string(i) + ": ";
+						logMessage += info.name;
+						Logger::write(Logger::ZONE_INFO, "SDL", logMessage);
+					}		 
+					else 
+					{
+						Logger::write(Logger::ZONE_ERROR, "SDL", "Could not retrieve renderer info for renderer " + std::to_string(i));
+					}
+				}
             }
         }
-    }
-
-    
-	
-	if ( SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1") != SDL_TRUE )
-    {
-        Logger::write( Logger::ZONE_ERROR, "SDL", "Improve scale quality. Continuing with low-quality settings." );
     }
 
     bool minimize_on_focus_loss_;
