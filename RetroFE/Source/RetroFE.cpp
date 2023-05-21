@@ -567,8 +567,7 @@ bool RetroFE::run( )
             {
                 bool rememberMenu = false;
                 config_.getProperty("rememberMenu", rememberMenu);
-                // don't return to rembered item for favorites, go to next in list
-                if (rememberMenu && currentPage_->getPlaylistName() != "favorites") {
+                if (rememberMenu) {
                     currentPage_->returnToRememberSelectedItem();
                 }
                 currentPage_->onNewItemSelected();
