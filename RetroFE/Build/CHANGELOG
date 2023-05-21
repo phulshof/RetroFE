@@ -23,3 +23,4 @@ v0.10.34.1
 	- added collection's settings.conf to override global settings.conf firstPlaylist, attractModeCyclePlaylist, cyclePlaylist, attractModeSkipPlaylist (monkofthefunk)
 	- added disabled favtoggle while in favs (bp)
 	- added globalFavLast=yes to save favorites and lastplayed to "Favorites" collection that all collections can access or not, using cyclePlaylist in collection (monkofthefunk)
+	- fixed playlist menu after globalFavLast merge (monkofthefunk)

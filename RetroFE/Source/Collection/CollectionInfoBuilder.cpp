@@ -416,7 +416,7 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
 
     std::map<std::string, Item*> playlistItems;
     std::string path = Utils::combinePath(Configuration::absolutePath, "collections", info->name, "playlists");
-    loadPlaylistItems(info, playlistItems, path);
+    loadPlaylistItems(info, &playlistItems, path);
 
     bool globalFavLast = false;
     (void)conf_.getProperty("globalFavLast", globalFavLast);
@@ -428,7 +428,7 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
             info->playlists["favorites"]->clear();
         }
         std::string path = Utils::combinePath(Configuration::absolutePath, "collections", "Favorites", "playlists");
-        loadPlaylistItems(info, playlistItems, path);
+        loadPlaylistItems(info, &playlistItems, path);
     }
 
     if (!playlistItems.size()) {
@@ -479,7 +479,7 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
     return;
 }
 
-void CollectionInfoBuilder::loadPlaylistItems(CollectionInfo* info, std::map<std::string, Item*> playlistItems, std::string path)
+void CollectionInfoBuilder::loadPlaylistItems(CollectionInfo* info, std::map<std::string, Item*>* playlistItems, std::string path)
 {
     // get playlist cycle
     std::string settingPrefix = "collections." + info->name + ".";
@@ -541,7 +541,7 @@ void CollectionInfoBuilder::loadPlaylistItems(CollectionInfo* info, std::map<std
                 playlistItem->fullTitle = basename;
                 playlistItem->leaf = false;
                 playlistItem->collectionInfo = info;
-                playlistItems[basename] = playlistItem;
+                playlistItems->insert({ basename, playlistItem });
 
                 // add the playlist list 
                 for (std::map<std::string, Item*>::iterator it = playlistFilter.begin(); it != playlistFilter.end(); it++)

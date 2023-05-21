@@ -15,6 +15,7 @@
  */
 #pragma once
 
+#include "CollectionInfo.h"
 #include "../Database/MetadataDatabase.h"
 #include <string>
 #include <map>
@@ -32,7 +33,7 @@ public:
     CollectionInfo *buildCollection(std::string collectionName);
     CollectionInfo *buildCollection(std::string collectionName, std::string mergedCollectionName);
     void addPlaylists(CollectionInfo *info);
-    void loadPlaylistItems(CollectionInfo* info, std::map<std::string, Item*> playlistItems, std::string path);
+    void loadPlaylistItems(CollectionInfo* info, std::map<std::string, Item*>* playlistItems, std::string path);
     void updateLastPlayedPlaylist(CollectionInfo *info, Item *item, int size);
     void injectMetadata(CollectionInfo *info);
     static bool createCollectionDirectory(std::string collectionName);
