@@ -19,6 +19,7 @@
 #include "Database/Configuration.h"
 #include "Utility/Log.h"
 #include <SDL2/SDL_mixer.h>
+#include "Utility/utils.h"
 
 std::vector<SDL_Window *>   SDL::window_;
 std::vector<SDL_Renderer *> SDL::renderer_;
@@ -91,7 +92,7 @@ bool SDL::initialize( Configuration &config )
         SDL_DisplayMode mode;
         bool            windowBorder = false;
         bool            windowResize = false;
-        Uint32          windowFlags  = SDL_WINDOW_OPENGL;
+        Uint32          windowFlags  = SDL_WINDOW_VULKAN;
 
         config.getProperty( "windowBorder", windowBorder );
         if ( !windowBorder )
@@ -133,7 +134,13 @@ bool SDL::initialize( Configuration &config )
             if ( i == 0 )
                 config.getProperty( "horizontal", hString );
             config.getProperty( "horizontal" + std::to_string(i), hString );
-            if ( hString == "" )
+            #if defined(__linux)
+			if ( hString == "%X_RES%" )
+			{
+				hString = Utils::replace(hString, "%X_RES%", std::getenv("X_RES"));
+			}
+			#endif
+			if ( hString == "" )
             {
                 Logger::write( Logger::ZONE_ERROR, "Configuration", "Missing property \"horizontal\"" + std::to_string(i) );
                 return false;
@@ -150,7 +157,13 @@ bool SDL::initialize( Configuration &config )
             if ( i == 0 )
                 config.getProperty( "vertical", vString );
             config.getProperty( "vertical" + std::to_string(i), vString );
-            if ( vString == "" )
+            #if defined(__linux)
+			if ( vString == "%Y_RES%" )
+			{
+				vString = Utils::replace(vString, "%Y_RES%", std::getenv("Y_RES"));
+			}
+			#endif
+			if ( vString == "" )
             {
                 Logger::write( Logger::ZONE_ERROR, "Configuration", "Missing property \"vertical\"" + std::to_string(i) );
                 return false;
