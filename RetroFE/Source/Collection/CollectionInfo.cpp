@@ -34,12 +34,15 @@
 #include <cstring>
 #endif
 
-CollectionInfo::CollectionInfo(std::string name,
-                               std::string listPath,
-                               std::string extensions,
-                               std::string metadataType,
-                               std::string metadataPath)
-    : name(name)
+CollectionInfo::CollectionInfo(
+    Configuration& c,
+    std::string name,
+    std::string listPath,
+    std::string extensions,
+    std::string metadataType,
+    std::string metadataPath)
+    : conf_(c)
+    , name(name)
     , listpath(listPath)
     , saveRequest(false)
     , metadataType(metadataType)
@@ -47,7 +50,7 @@ CollectionInfo::CollectionInfo(std::string name,
     , subsSplit(false)
     , hasSubs(false)
     , metadataPath_(metadataPath)
-	, extensions_(extensions)
+    , extensions_(extensions)
 {
 }
 
@@ -79,8 +82,14 @@ bool CollectionInfo::Save()
     bool retval = true;
     if(saveRequest)
     {
-        std::string dir  = Utils::combinePath(Configuration::absolutePath, "collections", name, "playlists");
-        std::string file = Utils::combinePath(Configuration::absolutePath, "collections", name, "playlists/favorites.txt");
+        std::string playlistCollectionName = name;
+        bool globalFavLast = false;
+        (void)conf_.getProperty("globalFavLast", globalFavLast);
+        if (globalFavLast) {
+            playlistCollectionName = "Favorites";
+        }
+        std::string dir  = Utils::combinePath(Configuration::absolutePath, "collections", playlistCollectionName, "playlists");
+        std::string file = Utils::combinePath(Configuration::absolutePath, "collections", playlistCollectionName, "playlists", "favorites.txt");
         Logger::write(Logger::ZONE_INFO, "Collection", "Saving " + file);
 
         std::ofstream filestream;
@@ -121,7 +130,7 @@ bool CollectionInfo::Save()
             std::vector<Item *> *saveitems = playlists["favorites"];
             for(std::vector<Item *>::iterator it = saveitems->begin(); it != saveitems->end(); it++)
             {
-                if ((*it)->collectionInfo->name == name)
+                if ((*it)->collectionInfo->name == (*it)->name)
                 {
                     filestream << (*it)->name << std::endl;
                 }

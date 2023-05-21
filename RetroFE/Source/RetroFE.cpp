@@ -2092,7 +2092,7 @@ CollectionInfo *RetroFE::getMenuCollection( std::string collectionName )
     std::string menuFile = Utils::combinePath( menuPath, collectionName + ".txt" );
     std::vector<Item *> menuVector;
     CollectionInfoBuilder cib( config_, *metadb_ );
-    CollectionInfo *collection = new CollectionInfo( collectionName, menuPath, "", "", "" );
+    CollectionInfo *collection = new CollectionInfo(config_, collectionName, menuPath, "", "", "" );
     cib.ImportBasicList( collection, menuFile, menuVector );
     for ( std::vector<Item *>::iterator it = menuVector.begin( ); it != menuVector.end( ); ++it)
     {
