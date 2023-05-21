@@ -271,7 +271,7 @@ bool Configuration::getProperty(std::string key, bool &value)
 
     if(retVal)
     {
-        if(!strValue.compare("yes") || !strValue.compare("true"))
+        if(!strValue.compare("yes") || !strValue.compare("true") || !strValue.compare("on"))
         {
             value = true;
         }
