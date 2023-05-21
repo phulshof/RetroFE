@@ -92,7 +92,7 @@ bool SDL::initialize( Configuration &config )
         SDL_DisplayMode mode;
         bool            windowBorder = false;
         bool            windowResize = false;
-        Uint32          windowFlags  = SDL_WINDOW_VULKAN;
+        Uint32          windowFlags  = SDL_WINDOW_OPENGL;
 
         config.getProperty( "windowBorder", windowBorder );
         if ( !windowBorder )
