@@ -19,7 +19,7 @@
 #include "Database/Configuration.h"
 #include "Utility/Log.h"
 #include <SDL2/SDL_mixer.h>
-#include "Utility/utils.h"
+#include "Utility/Utils.h"
 
 std::vector<SDL_Window *>   SDL::window_;
 std::vector<SDL_Renderer *> SDL::renderer_;
