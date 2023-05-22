@@ -134,18 +134,18 @@ bool SDL::initialize( Configuration &config )
             if ( i == 0 )
                 config.getProperty( "horizontal", hString );
             config.getProperty( "horizontal" + std::to_string(i), hString );
-            #if defined(__linux)
-			if ( hString == "%X_RES%" )
-			{
-				hString = Utils::replace(hString, "%X_RES%", std::getenv("X_RES"));
-			}
-			#endif
-			if ( hString == "" )
+            if ( hString == "" )
             {
                 Logger::write( Logger::ZONE_ERROR, "Configuration", "Missing property \"horizontal\"" + std::to_string(i) );
                 return false;
             }
-            else if ( hString != "stretch" && (i != 0 || !config.getProperty( "horizontal", windowWidth_[i] )) && !config.getProperty( "horizontal" + std::to_string(i), windowWidth_[i] ))
+            #if defined(__linux)
+			else if ( hString == "%X_RES%" )
+			{
+				hString = std::getenv("X_RES");
+			}
+			#endif
+			else if ( hString != "stretch" && (i != 0 || !config.getProperty( "horizontal", windowWidth_[i] )) && !config.getProperty( "horizontal" + std::to_string(i), windowWidth_[i] ))
             {
                 Logger::write( Logger::ZONE_ERROR, "Configuration", "Invalid property value for \"horizontal\"" + std::to_string(i) );
                 return false;
@@ -157,18 +157,18 @@ bool SDL::initialize( Configuration &config )
             if ( i == 0 )
                 config.getProperty( "vertical", vString );
             config.getProperty( "vertical" + std::to_string(i), vString );
-            #if defined(__linux)
-			if ( vString == "%Y_RES%" )
-			{
-				vString = Utils::replace(vString, "%Y_RES%", std::getenv("Y_RES"));
-			}
-			#endif
-			if ( vString == "" )
+            if ( vString == "" )
             {
                 Logger::write( Logger::ZONE_ERROR, "Configuration", "Missing property \"vertical\"" + std::to_string(i) );
                 return false;
             }
-            else if ( vString != "stretch" && (i != 0 || !config.getProperty( "vertical", windowHeight_[i] )) && !config.getProperty( "vertical" + std::to_string(i), windowHeight_[i] ) )
+            #if defined(__linux)
+			else if ( vString == "%Y_RES%" )
+			{
+				vString = std::getenv("Y_RES");
+			}
+			#endif
+			else if ( vString != "stretch" && (i != 0 || !config.getProperty( "vertical", windowHeight_[i] )) && !config.getProperty( "vertical" + std::to_string(i), windowHeight_[i] ) )
             {
                 Logger::write( Logger::ZONE_ERROR, "Configuration", "Invalid property value for \"vertical\"" + std::to_string(i) );
                 return false;
