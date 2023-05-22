@@ -212,14 +212,17 @@ bool SDL::initialize( Configuration &config )
             Logger::write( Logger::ZONE_INFO, "SDL", ss.str( ));
             window_[i] = SDL_CreateWindow( "RetroFE", SDL_WINDOWPOS_CENTERED_DISPLAY(screenNum), SDL_WINDOWPOS_CENTERED_DISPLAY(screenNum), windowWidth_[i], windowHeight_[i], windowFlags );
 			
-			std::string ScaleQuality = "1";
-			config.getProperty("ScaleQuality", ScaleQuality);
-#ifdef WIN32			
-			if ( SDL_SetHint(SDL_HINT_RENDER_DRIVER, "direct3d11") != SDL_TRUE )
+			
+#ifdef WIN32
+			std::string SDLRenderDriver = "direct3d";
+			config.getProperty("SDLRenderDriver", SDLRenderDriver);
+			if ( SDL_SetHint(SDL_HINT_RENDER_DRIVER, SDLRenderDriver.c_str()) != SDL_TRUE )
 			{
-				Logger::write( Logger::ZONE_ERROR, "SDL", "Error setting renderer to Direct3D11" );
+				Logger::write( Logger::ZONE_ERROR, "SDL", "Error setting renderer to" + SDLRenderDriver );
 			}
 #endif			
+			std::string ScaleQuality = "1";
+			config.getProperty("ScaleQuality", ScaleQuality);
 			if ( SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, ScaleQuality.c_str()) != SDL_TRUE )
 			{
 				Logger::write( Logger::ZONE_ERROR, "SDL", "Improve scale quality. Continuing with low-quality settings." );
