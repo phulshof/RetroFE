@@ -565,11 +565,14 @@ bool RetroFE::run( )
         case RETROFE_PLAYLIST_EXIT:
             if (currentPage_->isIdle( ))
             {
-                if (currentPage_->fromPreviousPlaylist) {
-                    currentPage_->playlistPrevExit();
-                }
-                else {
-                    currentPage_->playlistNextExit();
+                // lots of different toggles and menu jumps trigger this by accident
+                if (currentPage_->fromPlaylistNav) {
+                    if (currentPage_->fromPreviousPlaylist) {
+                        currentPage_->playlistPrevExit();
+                    }
+                    else {
+                        currentPage_->playlistNextExit();
+                    }
                 }
                 bool rememberMenu = false;
                 config_.getProperty("rememberMenu", rememberMenu);

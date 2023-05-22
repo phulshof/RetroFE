@@ -44,6 +44,7 @@ Page::Page(Configuration &config, int layoutWidth, int layoutHeight)
     , elapsedTime_(0)
     , anActiveMenu_(NULL)
     , fromPreviousPlaylist (false)
+    , fromPlaylistNav(false)
 {
     for (int i = 0; i < SDL::getNumScreens(); i++)
     {
@@ -564,6 +565,7 @@ void Page::playlistExit()
 
 void Page::playlistNextEnter()
 {
+    fromPlaylistNav = true;
     fromPreviousPlaylist = false;
     triggerEventOnAllMenus("playlistNextEnter");
 }
@@ -572,10 +574,12 @@ void Page::playlistNextExit()
 {
     fromPreviousPlaylist = false;
     triggerEventOnAllMenus("playlistNextExit");
+    fromPlaylistNav = false;
 }
 
 void Page::playlistPrevEnter()
 {
+    fromPlaylistNav = true;
     fromPreviousPlaylist = true;
     triggerEventOnAllMenus("playlistPrevEnter");
 }
@@ -584,6 +588,7 @@ void Page::playlistPrevExit()
 {
     fromPreviousPlaylist = true;
     triggerEventOnAllMenus("playlistPrevExit");
+    fromPlaylistNav = false;
 }
 
 void Page::menuJumpEnter()
@@ -947,8 +952,6 @@ std::string Page::getPlaylistName()
 
 void Page::favPlaylist()
 {
-    playlistNextEnter();
-
     if(playlist_->first == "favorites")
     {
         selectPlaylist("all");

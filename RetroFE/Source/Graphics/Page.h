@@ -157,6 +157,7 @@ public:
     bool playlistExists(std::string);
     void setSelectedItem();
     bool fromPreviousPlaylist = false;
+    bool fromPlaylistNav = false;
 
 private:
     void playlistChange();
