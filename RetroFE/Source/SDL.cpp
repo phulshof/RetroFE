@@ -214,6 +214,12 @@ bool SDL::initialize( Configuration &config )
 			
 			std::string ScaleQuality = "1";
 			config.getProperty("ScaleQuality", ScaleQuality);
+#ifdef WIN32			
+			if ( SDL_SetHint(SDL_HINT_RENDER_DRIVER, "direct3d11") != SDL_TRUE )
+			{
+				Logger::write( Logger::ZONE_ERROR, "SDL", "Error setting renderer to Direct3D11" );
+			}
+#endif			
 			if ( SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, ScaleQuality.c_str()) != SDL_TRUE )
 			{
 				Logger::write( Logger::ZONE_ERROR, "SDL", "Improve scale quality. Continuing with low-quality settings." );
