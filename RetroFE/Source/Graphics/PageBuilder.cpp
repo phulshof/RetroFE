@@ -995,6 +995,8 @@ ScrollingList * PageBuilder::buildMenu(xml_node<> *menuXml, Page &page)
     xml_attribute<> *scrollAccelerationXml = menuXml->first_attribute("scrollAcceleration");
     xml_attribute<> *minScrollTimeXml      = menuXml->first_attribute("minScrollTime");
     xml_attribute<> *scrollOrientationXml  = menuXml->first_attribute("orientation");
+    xml_attribute<>* selectedImage         = menuXml->first_attribute("selectedImage");
+
 
     if(menuTypeXml)
     {
@@ -1047,7 +1049,7 @@ ScrollingList * PageBuilder::buildMenu(xml_node<> *menuXml, Page &page)
     // on default, text will be rendered to the menu. Preload it into cache.
     Font *font = addFont(itemDefaults, NULL);
 
-    menu = new ScrollingList(config_, page, layoutMode, commonMode, playlistType, font, layoutKey, imageType, videoType);
+    menu = new ScrollingList(config_, page, layoutMode, commonMode, playlistType, selectedImage, font, layoutKey, imageType, videoType);
     buildViewInfo(menuXml, menu->baseViewInfo);
 
     if(scrollTimeXml)

@@ -38,6 +38,7 @@ public:
                    bool          layoutMode,
                    bool          commonMode,
                    bool          playlistType,
+                   bool          selectedImage,
                    Font         *font,
                    std::string   layoutKey,
                    std::string   imageType,
@@ -68,6 +69,7 @@ public:
     void deallocateTexture( unsigned int index );
     void setItems( std::vector<Item *> *items );
     void selectItemByName(std::string name);
+    std::string getSelectedItemName();
     void destroyItems( );
     void setPoints( std::vector<ViewInfo *> *scrollPoints, std::vector<AnimationEvents *> *tweenPoints );
     unsigned int getSelectedIndex( );
@@ -116,6 +118,7 @@ private:
     bool layoutMode_;
     bool commonMode_;
     bool playlistType_;
+    bool selectedImage_;
 
     std::vector<Component *> *spriteList_;
     std::vector<ViewInfo *> *scrollPoints_;

@@ -397,7 +397,6 @@ bool RetroFE::run( )
 
         float lastTime = 0;
         float deltaTime = 0;
-        bool previousPlaylist = false;
 
         // Exit splash mode when an active key is pressed
         SDL_Event e;

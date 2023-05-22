@@ -45,6 +45,7 @@ ScrollingList::ScrollingList( Configuration &c,
                               bool           layoutMode,
                               bool           commonMode,
                               bool          playlistType,
+                              bool          selectedImage,
                               Font          *font,
                               std::string    layoutKey,
                               std::string    imageType,
@@ -54,6 +55,7 @@ ScrollingList::ScrollingList( Configuration &c,
     , layoutMode_( layoutMode )
     , commonMode_( commonMode )
     , playlistType_( playlistType )
+    , selectedImage_( selectedImage)
     , spriteList_( NULL )
     , scrollPoints_( NULL )
     , tweenPoints_( NULL )
@@ -79,6 +81,7 @@ ScrollingList::ScrollingList( const ScrollingList &copy )
     , layoutMode_( copy.layoutMode_ )
     , commonMode_( copy.commonMode_ )
     , playlistType_(copy.playlistType_)
+    , selectedImage_(copy.selectedImage_)
     , spriteList_( NULL )
     , itemIndex_( 0 )
     , selectedOffsetIndex_( copy.selectedOffsetIndex_ )
@@ -139,6 +142,14 @@ void ScrollingList::selectItemByName(std::string name)
             break;
         }
     }
+}
+
+std::string ScrollingList::getSelectedItemName()
+{
+    if (!items_->size())
+        return "";
+    
+    return items_->at((itemIndex_ + selectedOffsetIndex_) % items_->size())->name;
 }
 
 unsigned int ScrollingList::loopIncrement( unsigned int offset, unsigned int i, unsigned int size )
@@ -735,6 +746,8 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
         names.push_back(item->name);
     names.push_back("default");
 
+    std::string name;
+    std::string selectedItemName = getSelectedItemName();
     for ( unsigned int n = 0; n < names.size() && !t; ++n )
     {
         // check collection path for art
@@ -769,7 +782,13 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
             }
             else
             {
-                t = imageBuild.CreateImage( imagePath, page, names[n], baseViewInfo.Monitor );
+                name = names[n];
+                if (selectedImage_ && item->name == selectedItemName) {
+                    t = imageBuild.CreateImage(imagePath, page, name + "-selected", baseViewInfo.Monitor);
+                }
+                if (!t) {
+                    t = imageBuild.CreateImage(imagePath, page, name, baseViewInfo.Monitor);
+                }
             }
         }
 
@@ -793,7 +812,13 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
             }
             else
             {
-                t = imageBuild.CreateImage( imagePath, page, names[n], baseViewInfo.Monitor );
+                name = names[n];
+                if (selectedImage_ && item->name == selectedItemName) {
+                    t = imageBuild.CreateImage(imagePath, page, name + "-selected", baseViewInfo.Monitor);
+                }
+                if (!t) {
+                    t = imageBuild.CreateImage(imagePath, page, name, baseViewInfo.Monitor);
+                }
             }
         }
     }
@@ -830,7 +855,13 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
         }
         else
         {
-            t = imageBuild.CreateImage( imagePath, page, imageType_, baseViewInfo.Monitor );
+            name = imageType_;
+            if (selectedImage_ && item->name == selectedItemName) {
+                t = imageBuild.CreateImage(imagePath, page, name + "-selected", baseViewInfo.Monitor);
+            }
+            if (!t) {
+                t = imageBuild.CreateImage(imagePath, page, name, baseViewInfo.Monitor);
+            }
         }
     }
 
@@ -843,7 +874,13 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
         }
         else
         {
-            t = imageBuild.CreateImage( item->filepath, page, imageType_, baseViewInfo.Monitor );
+            name = imageType_;
+            if (selectedImage_ && item->name == selectedItemName) {
+                t = imageBuild.CreateImage(item->filepath, page, name + "-selected", baseViewInfo.Monitor);
+            }
+            if (!t) {
+                t = imageBuild.CreateImage(item->filepath, page, name, baseViewInfo.Monitor);
+            }
         }
     }
 
@@ -874,7 +911,13 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
                 }
             }
 
-            t = imageBuild.CreateImage( imagePath, page, names[n], baseViewInfo.Monitor );
+            name = names[n];
+            if (selectedImage_ && item->name == selectedItemName) {
+                t = imageBuild.CreateImage(imagePath, page, name + "-selected", baseViewInfo.Monitor);
+            }
+            if (!t) {
+                t = imageBuild.CreateImage(imagePath, page, name, baseViewInfo.Monitor);
+            }
 
             // check sub-collection path for art
             if ( !t && !commonMode_ )
@@ -888,7 +931,13 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
                 {
                     config_.getMediaPropertyAbsolutePath( item->collectionInfo->name, imageType_, false, imagePath );
                 }
-                t = imageBuild.CreateImage( imagePath, page, names[n], baseViewInfo.Monitor );
+                name = names[n];
+                if (selectedImage_ && item->name == selectedItemName) {
+                    t = imageBuild.CreateImage(imagePath, page, name + "-selected", baseViewInfo.Monitor);
+                }
+                if (!t) {
+                    t = imageBuild.CreateImage(imagePath, page, name, baseViewInfo.Monitor);
+                }
             }
         }
 
@@ -917,13 +966,25 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
             }
             if ( !t )
             {
-                t = imageBuild.CreateImage( imagePath, page, imageType_, baseViewInfo.Monitor );
+                name = imageType_;
+                if (selectedImage_ && item->name == selectedItemName) {
+                    t = imageBuild.CreateImage(imagePath, page, name + "-selected", baseViewInfo.Monitor);
+                }
+                if (!t) {
+                    t = imageBuild.CreateImage(imagePath, page, name, baseViewInfo.Monitor);
+                }
             }
         }
         // check rom directory path for art
         if ( !t )
         {
-            t = imageBuild.CreateImage( item->filepath, page, imageType_, baseViewInfo.Monitor );
+            name = imageType_;
+            if (selectedImage_ && item->name == selectedItemName) {
+                t = imageBuild.CreateImage(item->filepath, page, name + "-selected", baseViewInfo.Monitor);
+            }
+            if (!t) {
+                t = imageBuild.CreateImage(item->filepath, page, name, baseViewInfo.Monitor);
+            }
         }
 
     }
