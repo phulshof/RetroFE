@@ -62,6 +62,7 @@ public:
     void triggerAttractEvent( int menuIndex = -1 );
     void triggerAttractExitEvent( int menuIndex = -1 );
     void triggerJukeboxJumpEvent( int menuIndex = -1 );
+    void triggerEventOnAll(std::string event, int menuIndex);
 
     bool allocateTexture( unsigned int index, Item *i );
     void deallocateTexture( unsigned int index );

@@ -397,6 +397,7 @@ bool RetroFE::run( )
 
         float lastTime = 0;
         float deltaTime = 0;
+        bool previousPlaylist = false;
 
         // Exit splash mode when an active key is pressed
         SDL_Event e;
@@ -565,6 +566,12 @@ bool RetroFE::run( )
         case RETROFE_PLAYLIST_EXIT:
             if (currentPage_->isIdle( ))
             {
+                if (currentPage_->fromPreviousPlaylist) {
+                    currentPage_->playlistPrevExit();
+                }
+                else {
+                    currentPage_->playlistNextExit();
+                }
                 bool rememberMenu = false;
                 config_.getProperty("rememberMenu", rememberMenu);
                 if (rememberMenu) {
@@ -1677,6 +1684,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
                  (input_.keystate(UserInput::KeyCodePlaylistLeft) && !page->isHorizontalScroll( )))
         {
             attract_.reset( );
+            page->playlistPrevEnter();
             page->prevPlaylist( );
             state = RETROFE_PLAYLIST_REQUEST;
         }
@@ -1723,6 +1731,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
                 }
                 std::vector<std::string> cycleVector;
                 Utils::listToVector(cycleString, cycleVector, ',');
+                page->playlistPrevEnter();
                 page->prevCyclePlaylist(cycleVector);
                 state = RETROFE_PLAYLIST_REQUEST;
             }

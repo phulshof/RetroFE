@@ -512,145 +512,90 @@ void ScrollingList::freeGraphicsMemory( )
 
 void ScrollingList::triggerEnterEvent( )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "enter" );
-    }
+    triggerEventOnAll("enter", 0);
 }
 
 void ScrollingList::triggerExitEvent( )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at(i );
-        if ( c ) c->triggerEvent( "exit" );
-    }
+    triggerEventOnAll("exit", 0);
 }
 
 void ScrollingList::triggerMenuEnterEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "menuEnter", menuIndex );
-    }
+    triggerEventOnAll("menuEnter", menuIndex);
 }
 
 void ScrollingList::triggerMenuExitEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "menuExit", menuIndex );
-    }
+    triggerEventOnAll("menuExit", menuIndex);
 }
 
 void ScrollingList::triggerGameEnterEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "gameEnter", menuIndex );
-    }
+    triggerEventOnAll("gameEnter", menuIndex);
 }
 
 void ScrollingList::triggerGameExitEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "gameExit", menuIndex );
-    }
+    triggerEventOnAll("gameExit", menuIndex);
 }
 
 void ScrollingList::triggerHighlightEnterEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "highlightEnter", menuIndex );
-    }
+    triggerEventOnAll("highlightEnter", menuIndex);
 }
 
 void ScrollingList::triggerHighlightExitEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "highlightExit", menuIndex );
-    }
+    triggerEventOnAll("highlightExit", menuIndex);
 }
 
 void ScrollingList::triggerPlaylistEnterEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "playlistEnter", menuIndex );
-    }
+    triggerEventOnAll("playlistEnter", menuIndex);
 }
 
 void ScrollingList::triggerPlaylistExitEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "playlistExit", menuIndex );
-    }
+    triggerEventOnAll("playlistExit", menuIndex);
 }
 
 void ScrollingList::triggerMenuJumpEnterEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "menuJumpEnter", menuIndex );
-    }
+    triggerEventOnAll("menuJumpEnter", menuIndex);
 }
 
 void ScrollingList::triggerMenuJumpExitEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "menuJumpExit", menuIndex );
-    }
+    triggerEventOnAll("menuJumpExit", menuIndex);
 }
 
 void ScrollingList::triggerAttractEnterEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "attractEnter", menuIndex );
-    }
+    triggerEventOnAll("attractEnter", menuIndex);
 }
 
 void ScrollingList::triggerAttractEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "attract", menuIndex );
-    }
+    triggerEventOnAll("attract", menuIndex);
 }
 
 void ScrollingList::triggerAttractExitEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "attractExit", menuIndex );
-    }
+    triggerEventOnAll("attractExit", menuIndex);
 }
 
 void ScrollingList::triggerJukeboxJumpEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
+    triggerEventOnAll("jukeboxJump", menuIndex);
+}
+
+void ScrollingList::triggerEventOnAll(std::string event, int menuIndex)
+{
+    for (unsigned int i = 0; i < components_.size(); ++i)
     {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "jukeboxJump", menuIndex );
+        Component* c = components_.at(i);
+        if (c) c->triggerEvent(event, menuIndex);
     }
 }
 

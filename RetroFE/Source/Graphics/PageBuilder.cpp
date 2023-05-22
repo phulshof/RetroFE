@@ -885,6 +885,10 @@ AnimationEvents *PageBuilder::createTweenInstance(xml_node<> *componentXml)
     buildTweenSet(tweens, componentXml, "onGameExit",       "gameExit");
     buildTweenSet(tweens, componentXml, "onPlaylistEnter",  "playlistEnter");
     buildTweenSet(tweens, componentXml, "onPlaylistExit",   "playlistExit");
+    buildTweenSet(tweens, componentXml, "onPlaylistNextEnter", "playlistNextEnter");
+    buildTweenSet(tweens, componentXml, "onPlaylistNextExit", "playlistNextExit");
+    buildTweenSet(tweens, componentXml, "onPlaylistPrevEnter", "playlistPrevEnter");
+    buildTweenSet(tweens, componentXml, "onPlaylistPrevExit", "playlistPrevExit");
     buildTweenSet(tweens, componentXml, "onMenuJumpEnter",  "menuJumpEnter");
     buildTweenSet(tweens, componentXml, "onMenuJumpExit",   "menuJumpExit");
     buildTweenSet(tweens, componentXml, "onAttractEnter",   "attractEnter");

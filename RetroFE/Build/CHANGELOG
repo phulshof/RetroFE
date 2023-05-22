@@ -30,3 +30,4 @@ v0.10.34.1
 	- changed parsing behavior for settings.conf, will now accept "on" as well as "yes" and "true" (inigomontoya)
 	- enabled SDL logging to report backend being used, either direct3d or opengl (inigomontoya)
 	- added ScaleQuality to settings.conf.  0=nearest 1=linear 2=anisotropic.  Defaults to 1.  https://wiki.libsdl.org/SDL2/SDL_HINT_RENDER_SCALE_QUALITY (inigomontoya)
+	- added playlistNextEnter/Exit and playlistPrevEnter/Exit layout events upon playlist navigation changes (monkofthefunk)
