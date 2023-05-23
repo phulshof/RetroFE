@@ -128,8 +128,7 @@ public:
     void  addPlaylist();
     void  removePlaylist();
     void  togglePlaylist();
-    void  updateLastPlayedPlaylist( Item *item );
-    void  reallocateMenuSpritePoints();
+    void  reallocateMenuSpritePoints(bool updatePlaylistMenu = true);
     bool  isMenuScrolling();
     bool  isPlaying();
     void  resetScrollPeriod();

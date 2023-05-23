@@ -32,3 +32,4 @@ v0.10.34.1
 	- added ScaleQuality to settings.conf.  0=nearest 1=linear 2=anisotropic.  Defaults to 1.  https://wiki.libsdl.org/SDL2/SDL_HINT_RENDER_SCALE_QUALITY (inigomontoya)
 	- added playlistNextEnter/Exit and playlistPrevEnter/Exit layout events upon playlist navigation changes (monkofthefunk)
 	- fixed removed playlistNextEnter from fav toggle; ensured other RETROFE_PLAYLIST_REQUEST didn't trigger playlistNext/PrevExit events (monkofthefunk)
+	- fixed showing playlist menu upon item fav toggle and letter jump/random (don't trigger on playlist enter events) (monkofthefunk)

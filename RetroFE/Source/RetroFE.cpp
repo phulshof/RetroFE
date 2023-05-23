@@ -532,8 +532,8 @@ bool RetroFE::run( )
                     if (currentPage_->getPlaylistName() != firstPlaylist_ )
                         currentPage_->selectPlaylist( "all" );
 
-                    currentPage_->onNewItemSelected( );
-                    currentPage_->reallocateMenuSpritePoints( );
+                    currentPage_->onNewItemSelected();
+                    currentPage_->reallocateMenuSpritePoints(); // update playlist menu
 
                     state = RETROFE_LOAD_ART;
                 }
@@ -588,7 +588,7 @@ bool RetroFE::run( )
         case RETROFE_PLAYLIST_LOAD_ART:
             if (currentPage_->isIdle( ))
             {
-                currentPage_->reallocateMenuSpritePoints( );
+                currentPage_->reallocateMenuSpritePoints(); // update playlist menu
                 currentPage_->playlistEnter();
                 state = RETROFE_PLAYLIST_ENTER;
             }
@@ -632,7 +632,7 @@ bool RetroFE::run( )
         case RETROFE_MENUJUMP_LOAD_ART:
             if (currentPage_->isIdle( ))
             {
-                currentPage_->reallocateMenuSpritePoints( );
+                currentPage_->reallocateMenuSpritePoints(false); // skip updating playlist menu
                 currentPage_->menuJumpEnter( );
                 state = RETROFE_MENUJUMP_ENTER;
             }
@@ -751,8 +751,8 @@ bool RetroFE::run( )
                     }
                 }
 
-                currentPage_->onNewItemSelected( );
-                currentPage_->reallocateMenuSpritePoints( );
+                currentPage_->onNewItemSelected();
+                currentPage_->reallocateMenuSpritePoints(); // update playlist menu
 
                 state = RETROFE_NEXT_PAGE_MENU_LOAD_ART;
 
@@ -922,7 +922,6 @@ bool RetroFE::run( )
                         state = RETROFE_PLAYLIST_REQUEST;
                     }
                 }
-
             }
             break;
 
@@ -1298,8 +1297,8 @@ bool RetroFE::run( )
                     }
                 }
 
-                currentPage_->onNewItemSelected( );
-                currentPage_->reallocateMenuSpritePoints( );
+                currentPage_->onNewItemSelected();
+                currentPage_->reallocateMenuSpritePoints(); // update playlist menu
                 state = RETROFE_BACK_MENU_LOAD_ART;
             }
             break;
@@ -1350,8 +1349,8 @@ bool RetroFE::run( )
                 config_.setProperty( "currentCollection", "menu" );
                 CollectionInfo *info = getMenuCollection( "menu" );
                 currentPage_->pushCollection(info);
-                currentPage_->onNewItemSelected( );
-                currentPage_->reallocateMenuSpritePoints( );
+                currentPage_->onNewItemSelected();
+                currentPage_->reallocateMenuSpritePoints(); // update playlist menu
                 state = RETROFE_MENUMODE_START_LOAD_ART;
             }
             break;
@@ -1744,7 +1743,10 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             attract_.reset( );
             page->rememberSelectedItem();
             page->removePlaylist( );
-            state = RETROFE_PLAYLIST_REQUEST;
+
+            // don't trigger playlist change events but refresh item states
+            currentPage_->onNewItemSelected();
+            state = RETROFE_PLAYLIST_ENTER;
         }
 
         else if ( input_.keystate(UserInput::KeyCodeAddPlaylist) )
@@ -1752,7 +1754,10 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             attract_.reset( );
             page->rememberSelectedItem();
             page->addPlaylist( );
-            state = RETROFE_PLAYLIST_REQUEST;
+
+            // don't trigger playlist change events but refresh item states
+            currentPage_->onNewItemSelected();
+            state = RETROFE_PLAYLIST_ENTER;
         }
 
         else if ( input_.keystate(UserInput::KeyCodeTogglePlaylist) )
@@ -1762,9 +1767,12 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
                 attract_.reset();
                 page->rememberSelectedItem();
                 page->togglePlaylist();
-                state = RETROFE_PLAYLIST_REQUEST;
+
+                // don't trigger playlist change events but refresh item states
+                currentPage_->onNewItemSelected();
+                state = RETROFE_PLAYLIST_ENTER;
             }
-	}
+	    }
 
         else if ( input_.keystate(UserInput::KeyCodeSkipForward) )
         {
