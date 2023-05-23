@@ -128,7 +128,7 @@ bool Configuration::import(std::string collection, std::string keyPrefix, std::s
         }
         else
         {
-            Logger::write(Logger::ZONE_INFO, "Configuration", "Could not open " + file + "\"");
+            Logger::write(Logger::ZONE_WARNING, "Configuration", "Could not open " + file + "\"");
         }
 
         return false;

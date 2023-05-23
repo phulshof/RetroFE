@@ -33,3 +33,4 @@ v0.10.34.1
 	- added playlistNextEnter/Exit and playlistPrevEnter/Exit layout events upon playlist navigation changes (monkofthefunk)
 	- fixed removed playlistNextEnter from fav toggle; ensured other RETROFE_PLAYLIST_REQUEST didn't trigger playlistNext/PrevExit events (monkofthefunk)
 	- fixed showing playlist menu upon item fav toggle and letter jump/random (don't trigger on playlist enter events) (monkofthefunk)
+	- added collection's settings to support for multiple settings1-9.conf for theme specific media folder alias' used by the theme (monkofthefunk)
