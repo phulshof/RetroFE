@@ -375,7 +375,7 @@ bool SDL::deInitialize( )
 // Get the renderer
 SDL_Renderer* SDL::getRenderer( int index )
 {
-    return (index < numDisplays_ ? renderer_[index] : renderer_[0]);
+    return (index < std::min(numScreens_, numDisplays_) ? renderer_[index] : renderer_[0]);
 }
 
 
@@ -389,7 +389,7 @@ SDL_mutex* SDL::getMutex( )
 // Get the window
 SDL_Window* SDL::getWindow( int index )
 {
-    return (index < numDisplays_ ? window_[index] : window_[0]);
+    return (index < std::min(numScreens_, numDisplays_) ? window_[index] : window_[0]);
 }
 
 
