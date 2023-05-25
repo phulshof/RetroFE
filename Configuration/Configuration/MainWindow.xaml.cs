@@ -29,7 +29,7 @@ namespace Configuration
         {
 
             InitializeComponent();
-            if (!File.Exists(RetroFE.GetAbsolutePath() + "/Core/RetroFE.exe"))
+            if (!File.Exists(RetroFE.GetAbsolutePath() + "/retrofe/RetroFE.exe"))
             {
                 MessageBox.Show("Could not find RetroFE executable. Exiting.");
                 Close();

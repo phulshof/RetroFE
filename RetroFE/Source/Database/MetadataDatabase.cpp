@@ -308,7 +308,7 @@ bool MetadataDatabase::needsRefresh()
         struct stat exe;
         int metadbErr  = stat( Utils::combinePath(Configuration::absolutePath, "meta.db").c_str(), &metadb);
 #ifdef WIN32
-        int exeErr  = stat( Utils::combinePath(Configuration::absolutePath, "core", "RetroFE.exe").c_str(), &exe);
+        int exeErr  = stat( Utils::combinePath(Configuration::absolutePath, "retrofe", "RetroFE.exe").c_str(), &exe);
 #else
         int exeErr  = stat( Utils::combinePath(Configuration::absolutePath, "RetroFE").c_str(), &exe);
         if (exeErr)
