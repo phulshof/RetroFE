@@ -33,7 +33,6 @@ static bool StartLogging(Configuration* c);
 
 int main(int argc, char** argv)
 {
-
     // check to see if version or help was requested
     if (argc > 1)
     {
@@ -89,21 +88,26 @@ int main(int argc, char** argv)
 
         return 0;
     }
-
-    while (true)
-    {
-        if (!ImportConfiguration(&config))
+    try {
+        while (true)
         {
-            // Exit with a heads up...
-            std::string logFile = Utils::combinePath(Configuration::absolutePath, "log.txt");
-            fprintf(stderr, "RetroFE has failed to start due to configuration error.\nCheck log for details: %s\n", logFile.c_str());
-            return -1;
+            if (!ImportConfiguration(&config))
+            {
+                // Exit with a heads up...
+                std::string logFile = Utils::combinePath(Configuration::absolutePath, "log.txt");
+                fprintf(stderr, "RetroFE has failed to start due to configuration error.\nCheck log for details: %s\n", logFile.c_str());
+                return -1;
+            }
+            RetroFE p(config);
+            if (p.run()) // Check if we need to reboot after running
+                config.clearProperties();
+            else
+                break;
         }
-        RetroFE p(config);
-        if (p.run()) // Check if we need to reboot after running
-            config.clearProperties();
-        else
-            break;
+    }
+    catch (std::exception& e)
+    {
+        Logger::write(Logger::ZONE_ERROR, "EXCEPTION", e.what());
     }
 
     Logger::deInitialize();

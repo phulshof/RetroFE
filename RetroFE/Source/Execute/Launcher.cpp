@@ -179,7 +179,7 @@ void Launcher::LEDBlinky( int command, std::string collection, Item *collectionI
 	}
 	if ( LEDBlinkyDirectory != "" && !execute( exe, args, LEDBlinkyDirectory, wait ) )
 	{
-        Logger::write( Logger::ZONE_ERROR, "LEDBlinky", "Failed to launch." );
+        Logger::write( Logger::ZONE_WARNING, "LEDBlinky", "Failed to launch." );
 	}
 	return;
 }
@@ -243,7 +243,7 @@ bool Launcher::execute(std::string executable, std::string args, std::string cur
     if(system(executionString.c_str()) != 0)
 #endif
     {
-        Logger::write(Logger::ZONE_ERROR, "Launcher", "Failed to run: " + executable);
+        Logger::write(Logger::ZONE_WARNING, "Launcher", "Failed to run: " + executable);
     }
 
     else

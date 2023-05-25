@@ -222,6 +222,12 @@ std::string Utils::getParentDirectory(std::string directory)
     return directory;
 }
 
+std::string Utils::getEnvVar(std::string const& key)
+{
+    char const* val = std::getenv(key.c_str());
+
+    return val == NULL ? std::string() : std::string(val);
+}
 
 std::string Utils::getFileName(std::string filePath)
 {

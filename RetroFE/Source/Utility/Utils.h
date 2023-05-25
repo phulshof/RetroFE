@@ -29,6 +29,7 @@ public:
     static void replaceSlashesWithUnderscores(std::string &content);
     static std::string getDirectory(std::string filePath);
     static std::string getParentDirectory(std::string filePath);
+    static std::string getEnvVar(std::string const& key);
     static std::string getFileName(std::string filePath);
     static bool findMatchingFile(std::string prefix, std::vector<std::string> &extensions, std::string &file);
     static std::string toLower(std::string str);

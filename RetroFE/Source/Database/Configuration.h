@@ -29,7 +29,7 @@ public:
     static std::string trimEnds(std::string str);
 	void clearProperties( );
     // gets the global configuration
-    bool import(std::string keyPrefix, std::string file);
+    bool import(std::string keyPrefix, std::string file, bool mustExist = true);
     bool import(std::string collection, std::string keyPrefix, std::string file, bool mustExist = true);
     bool getProperty(std::string key, std::string &value);
     bool getProperty(std::string key, int &value);

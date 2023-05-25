@@ -105,9 +105,9 @@ void Configuration::clearProperties( )
 }
 
 
-bool Configuration::import(std::string keyPrefix, std::string file)
+bool Configuration::import(std::string keyPrefix, std::string file, bool mustExist)
 {
-    return import("", keyPrefix, file);
+    return import("", keyPrefix, file, mustExist);
 }
 
 bool Configuration::import(std::string collection, std::string keyPrefix, std::string file, bool mustExist)
