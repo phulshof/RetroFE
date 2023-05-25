@@ -33,7 +33,7 @@ std::vector<int>            SDL::rotation_;
 std::vector<bool>           SDL::mirror_;
 int                         SDL::numScreens_ = 1;
 int                         SDL::numDisplays_ = 1;
-
+int                         SDL::screenCount_;
 
 // Initialize SDL
 bool SDL::initialize( Configuration &config )
@@ -86,8 +86,8 @@ bool SDL::initialize( Configuration &config )
     Logger::write( Logger::ZONE_INFO, "SDL", "Number of displays requested: " + std::to_string( numScreens_ ) );
 
     // Preset the SDL settings for all monitors
-    int numDisplays = std::min(numScreens_, numDisplays_);
-    for (int i = 0; i < numDisplays; ++i)
+    screenCount_ = std::min(numScreens_, numDisplays_);
+    for (int i = 0; i < screenCount_; ++i)
     {
 
         SDL_DisplayMode mode;
@@ -338,7 +338,7 @@ bool SDL::deInitialize( )
         mutex_ = NULL;
     }
 
-    for ( int i = 0; i < numScreens_; ++i )
+    for ( int i = 0; i < screenCount_; ++i )
     {
         if ( renderer_.size( ) > 0 )
         {
@@ -375,7 +375,7 @@ bool SDL::deInitialize( )
 // Get the renderer
 SDL_Renderer* SDL::getRenderer( int index )
 {
-    return (index < std::min(numScreens_, numDisplays_) ? renderer_[index] : renderer_[0]);
+    return (index < screenCount_ ? renderer_[index] : renderer_[0]);
 }
 
 
@@ -389,7 +389,7 @@ SDL_mutex* SDL::getMutex( )
 // Get the window
 SDL_Window* SDL::getWindow( int index )
 {
-    return (index < std::min(numScreens_, numDisplays_) ? window_[index] : window_[0]);
+    return (index < screenCount_ ? window_[index] : window_[0]);
 }
 
 
@@ -398,7 +398,7 @@ bool SDL::renderCopy( SDL_Texture *texture, float alpha, SDL_Rect *src, SDL_Rect
 {
 
     // Skip rendering if the object is invisible anyway or if renderer does not exist
-    if ( alpha == 0 || viewInfo.Monitor >= numScreens_ || !renderer_[viewInfo.Monitor] )
+    if ( alpha == 0 || viewInfo.Monitor >= screenCount_ || !renderer_[viewInfo.Monitor] )
         return true;
 
     SDL_GetWindowSize( getWindow( viewInfo.Monitor ), &windowWidth_[viewInfo.Monitor], &windowHeight_[viewInfo.Monitor] );
