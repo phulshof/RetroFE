@@ -42,4 +42,5 @@ v0.10.34.1
 	- added logging to report the SDL render driver being used (inigomontoya)
 	- changed SDL screen config logic to iterate over number of screens preventing iterations beyond number of found displays (inigomontoya)
 	- prevent fav toggle on special playlists "street fighter and capcom fighters" or "street fighter" (monkofthefunk)
-	- fixed multi firing of onMenuIdle (monkofthefunk)
+	- fixed multi firing of onMenuIdle (monkofthefunk) <--reverted?
+	- Added MuteVideo in settings.conf, yes will mute GStreamer audio
