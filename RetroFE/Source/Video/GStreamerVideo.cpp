@@ -53,6 +53,7 @@ GStreamerVideo::GStreamerVideo( int monitor )
     , volume_(0.0)
     , currentVolume_(0.0)
     , monitor_(monitor)
+	, MuteVideo(Configuration::MuteVideo)
 {
     paused_ = false;
 }
@@ -386,17 +387,27 @@ void GStreamerVideo::update(float /* dt */)
 {
 	if(playbin_)
 	{
-		if(volume_ > 1.0)
-			volume_ = 1.0;
-        if ( currentVolume_ > volume_ || currentVolume_ + 0.005 >= volume_ )
-            currentVolume_ = volume_;
-        else
-            currentVolume_ += 0.005;
-		gst_stream_volume_set_volume( GST_STREAM_VOLUME( playbin_ ), GST_STREAM_VOLUME_FORMAT_LINEAR, static_cast<double>(currentVolume_));
-		if(currentVolume_ < 0.1)
+		if(MuteVideo)
+		{
+			// Keep the audio muted.
 			gst_stream_volume_set_mute( GST_STREAM_VOLUME( playbin_ ), true );
+		}
 		else
-			gst_stream_volume_set_mute( GST_STREAM_VOLUME( playbin_ ), false );
+		{
+			if(volume_ > 1.0)
+				volume_ = 1.0;
+			if ( currentVolume_ > volume_ || currentVolume_ + 0.005 >= volume_ )
+				currentVolume_ = volume_;
+			else
+				currentVolume_ += 0.005;
+
+			// Update the volume only if not muted.
+			gst_stream_volume_set_volume( GST_STREAM_VOLUME( playbin_ ), GST_STREAM_VOLUME_FORMAT_LINEAR, static_cast<double>(currentVolume_));
+			if(currentVolume_ < 0.1)
+				gst_stream_volume_set_mute( GST_STREAM_VOLUME( playbin_ ), true );
+			else
+				gst_stream_volume_set_mute( GST_STREAM_VOLUME( playbin_ ), false );
+		}
 	}
 
     SDL_LockMutex(SDL::getMutex());

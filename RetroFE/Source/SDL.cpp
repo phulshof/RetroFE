@@ -71,8 +71,10 @@ bool SDL::initialize( Configuration &config )
 	int AvdecMaxThreads = 2;
 	config.getProperty("AvdecMaxThreads", AvdecMaxThreads);
 	Configuration::AvdecMaxThreads = AvdecMaxThreads;
-
-    // check for a few other necessary Configurations
+	bool MuteVideo = false;
+	config.getProperty("MuteVideo", MuteVideo);
+	Configuration::MuteVideo = MuteVideo;
+	// check for a few other necessary Configurations
     config.getProperty( "numScreens", numScreens_ );
 
     if ( numScreens_ <= 0 )

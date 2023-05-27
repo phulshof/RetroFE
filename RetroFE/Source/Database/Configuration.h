@@ -46,6 +46,7 @@ public:
     static std::string absolutePath;
 	static int AvdecMaxThreads;
 	static bool HardwareVideoAccel; // Declare HardwareVideoAccel as a static member variable
+	static bool MuteVideo;
 
 private:
     bool getRawProperty(std::string key, std::string &value);
