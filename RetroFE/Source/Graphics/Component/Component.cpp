@@ -153,52 +153,50 @@ void Component::setTweens(AnimationEvents *set)
 void Component::update(float dt)
 {
     elapsedTweenTime_ += dt;
-    if (animationRequested_) {
-        if (animationRequestedType_ != "")
+    if (animationRequested_ && animationRequestedType_ != "")
+    {
+        Animation* newTweens;
+        // Check if this component is part of an active scrolling list
+        if (menuIndex_ >= MENU_INDEX_HIGH)
         {
-            Animation* newTweens;
-            // Check if this component is part of an active scrolling list
-            if (menuIndex_ >= MENU_INDEX_HIGH)
-            {
-                // Check for animation at index i
-                newTweens = tweens_->getAnimation(animationRequestedType_, MENU_INDEX_HIGH);
-                if (!(newTweens && newTweens->size() > 0))
-                {
-                    // Check for animation at the current menuIndex
-                    newTweens = tweens_->getAnimation(animationRequestedType_, menuIndex_ - MENU_INDEX_HIGH);
-                }
-            }
-            else
+            // Check for animation at index i
+            newTweens = tweens_->getAnimation(animationRequestedType_, MENU_INDEX_HIGH);
+            if (!(newTweens && newTweens->size() > 0))
             {
                 // Check for animation at the current menuIndex
-                newTweens = tweens_->getAnimation(animationRequestedType_, menuIndex_);
+                newTweens = tweens_->getAnimation(animationRequestedType_, menuIndex_ - MENU_INDEX_HIGH);
             }
-            if (newTweens && newTweens->size() > 0)
-            {
-                animationType_ = animationRequestedType_;
-                currentTweens_ = newTweens;
-                currentTweenIndex_ = 0;
-                elapsedTweenTime_ = 0;
-                storeViewInfo_ = baseViewInfo;
-                currentTweenComplete_ = false;
-            }
-            animationRequested_ = false;
         }
-
-        if (tweens_ && currentTweenComplete_)
+        else
         {
-            animationType_ = "idle";
-            currentTweens_ = tweens_->getAnimation("idle", menuIndex_);
-            if (currentTweens_ && currentTweens_->size() == 0 && !page.isMenuScrolling())
-            {
-                currentTweens_ = tweens_->getAnimation("menuIdle", menuIndex_);
-            }
+            // Check for animation at the current menuIndex
+            newTweens = tweens_->getAnimation(animationRequestedType_, menuIndex_);
+        }
+        if (newTweens && newTweens->size() > 0)
+        {
+            animationType_ = animationRequestedType_;
+            currentTweens_ = newTweens;
             currentTweenIndex_ = 0;
             elapsedTweenTime_ = 0;
             storeViewInfo_ = baseViewInfo;
             currentTweenComplete_ = false;
-            animationRequested_ = false;
         }
+        animationRequested_ = false;
+    }
+
+    if (tweens_ && currentTweenComplete_)
+    {
+        animationType_ = "idle";
+        currentTweens_ = tweens_->getAnimation("idle", menuIndex_);
+        if (currentTweens_ && currentTweens_->size() == 0 && !page.isMenuScrolling())
+        {
+            currentTweens_ = tweens_->getAnimation("menuIdle", menuIndex_);
+        }
+        currentTweenIndex_ = 0;
+        elapsedTweenTime_ = 0;
+        storeViewInfo_ = baseViewInfo;
+        currentTweenComplete_ = false;
+        animationRequested_ = false;
     }
 
     currentTweenComplete_ = animate();
