@@ -43,3 +43,4 @@ v0.10.34.1
 	- changed SDL screen config logic to iterate over number of screens preventing iterations beyond number of found displays (inigomontoya)
 	- prevent fav toggle on special playlists "street fighter and capcom fighters" or "street fighter" (monkofthefunk)
 	- fixed multi firing of onMenuIdle (monkofthefunk)
+	- revert multi firing fix, affects onMenuJump animations (monkofthefunk)
