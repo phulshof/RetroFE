@@ -110,6 +110,7 @@ private:
 
     void            render( );
     bool            back( bool &exit );
+    bool isStandalonePlaylist(std::string playlist);
     void            quit( );
     Page           *loadPage( );
     Page           *loadSplashPage( );

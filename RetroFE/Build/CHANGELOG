@@ -41,3 +41,5 @@ v0.10.34.1
 	- added ability to specify SDL render driver to use, SDLRenderDriver in settings.conf.  Acceptable values are direct3d11, opengl (inigomontoya)
 	- added logging to report the SDL render driver being used (inigomontoya)
 	- changed SDL screen config logic to iterate over number of screens preventing iterations beyond number of found displays (inigomontoya)
+	- prevent fav toggle on special playlists "street fighter and capcom fighters" or "street fighter" (monkofthefunk)
+	- fixed multi firing of onMenuIdle (monkofthefunk)

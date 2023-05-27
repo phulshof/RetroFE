@@ -1535,6 +1535,11 @@ bool RetroFE::back(bool &exit)
     return canGoBack;
 }
 
+bool RetroFE::isStandalonePlaylist(std::string playlist)
+{
+    return playlist == "street fighter and capcom fighters" ||
+        playlist == "street fighter";
+}
 
 // Process the user input
 RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
@@ -1693,8 +1698,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         else if ( input_.keystate(UserInput::KeyCodeCyclePlaylist) ||
                   input_.keystate(UserInput::KeyCodeNextCyclePlaylist) )
         {
-            if (currentPage_->getPlaylistName() != "street fighter and capcom fighters" &&
-                currentPage_->getPlaylistName() != "street fighter")
+            if (!isStandalonePlaylist(currentPage_->getPlaylistName()))
             {
                 attract_.reset();
                 std::string settingPrefix = "collections." + currentPage_->getCollectionName() + ".";
@@ -1717,8 +1721,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
 
         else if ( input_.keystate(UserInput::KeyCodePrevCyclePlaylist) )
         {
-            if (currentPage_->getPlaylistName() != "street fighter and capcom fighters" &&
-                currentPage_->getPlaylistName() != "street fighter")
+            if (!isStandalonePlaylist(currentPage_->getPlaylistName()))
             {
                 attract_.reset();
                 std::string settingPrefix = "collections." + currentPage_->getCollectionName() + ".";
@@ -1751,18 +1754,22 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
 
         else if ( input_.keystate(UserInput::KeyCodeAddPlaylist) )
         {
-            attract_.reset( );
-            page->rememberSelectedItem();
-            page->addPlaylist( );
+            if (!isStandalonePlaylist(currentPage_->getPlaylistName()))
+            {
+                attract_.reset();
+                    page->rememberSelectedItem();
+                    page->addPlaylist();
 
-            // don't trigger playlist change events but refresh item states
-            currentPage_->onNewItemSelected();
-            state = RETROFE_PLAYLIST_ENTER;
+                    // don't trigger playlist change events but refresh item states
+                    currentPage_->onNewItemSelected();
+                    state = RETROFE_PLAYLIST_ENTER;
+            }
         }
 
         else if ( input_.keystate(UserInput::KeyCodeTogglePlaylist) )
         {
-            if (currentPage_->getPlaylistName() != "favorites" )
+            if (currentPage_->getPlaylistName() != "favorites" && 
+                !isStandalonePlaylist(currentPage_->getPlaylistName()))
             {
                 attract_.reset();
                 page->rememberSelectedItem();
