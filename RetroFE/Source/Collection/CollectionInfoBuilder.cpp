@@ -372,7 +372,7 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
     std::string excludeAllFile = Utils::combinePath(Configuration::absolutePath, "collections", info->name, "exclude_all.txt");
 
     ImportBasicList(info, excludeAllFile, excludeAllFilter);
-
+    // adds items to "all" list except those found in "exclude_all.txt"
     if ( excludeAllFilter.size() > 0)
     {
         info->playlists["all"] = new std::vector<Item *>();
@@ -414,10 +414,12 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
         info->playlists["all"] = &info->items;
     }
 
+    // lookup playlist location and add playlists and what items they have
     std::map<std::string, Item*> playlistItems;
     std::string path = Utils::combinePath(Configuration::absolutePath, "collections", info->name, "playlists");
     loadPlaylistItems(info, &playlistItems, path);
 
+    // find and load favorites from global playlist if enabled
     bool globalFavLast = false;
     (void)conf_.getProperty("globalFavLast", globalFavLast);
     if (globalFavLast) {
@@ -431,9 +433,11 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
         loadPlaylistItems(info, &playlistItems, path);
     }
 
+    // no playlists found, done
     if (!playlistItems.size()) {
         return;
     }
+
     // if cyclePlaylist then order playlist menu items by that
     // get playlist cycle
     std::string settingPrefix = "collections." + info->name + ".";
@@ -466,6 +470,7 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
         }
     }
 
+    // intialize empty dynamic playlists
     if(info->playlists["favorites"] == NULL)
     {
         info->playlists["favorites"] = new std::vector<Item *>();
@@ -542,6 +547,7 @@ void CollectionInfoBuilder::loadPlaylistItems(CollectionInfo* info, std::map<std
                 playlistItem->leaf = false;
                 playlistItem->collectionInfo = info;
                 playlistItems->insert({ basename, playlistItem });
+                std::string sortType = Item::validSortType(basename) ? basename : "";
 
                 // add the playlist list 
                 for (std::map<std::string, Item*>::iterator it = playlistFilter.begin(); it != playlistFilter.end(); it++)
@@ -559,6 +565,7 @@ void CollectionInfoBuilder::loadPlaylistItems(CollectionInfo* info, std::map<std
                         }
                     }
 
+                    // go through all items and assign them to the playlist to be shown
                     for (std::vector<Item*>::iterator it = info->items.begin(); it != info->items.end(); it++)
                     {
                         if (((*it)->name == itemName || itemName == "*") && (*it)->collectionInfo->name == collectionName)
@@ -569,6 +576,7 @@ void CollectionInfoBuilder::loadPlaylistItems(CollectionInfo* info, std::map<std
                         }
                     }
                 }
+                // clean playlistFilter
                 while (playlistFilter.size() > 0)
                 {
                     std::map<std::string, Item*>::iterator it = playlistFilter.begin();

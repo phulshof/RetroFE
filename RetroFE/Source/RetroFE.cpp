@@ -2005,6 +2005,7 @@ CollectionInfo *RetroFE::getCollection(std::string collectionName)
     DIR *dp;
     struct dirent *dirp;
 
+    // check collection folder exists 
     std::string path = Utils::combinePath( Configuration::absolutePath, "collections", collectionName );
     dp = opendir( path.c_str( ) );
     if (dp == NULL) {
@@ -2038,19 +2039,26 @@ CollectionInfo *RetroFE::getCollection(std::string collectionName)
             }
         }
     }
-    if (dp) closedir( dp );
+    if (dp) closedir(dp);
 
+    // sort a collection's items
     bool menuSort = true;
     config_.getProperty( "collections." + collectionName + ".list.menuSort", menuSort );
+    if (menuSort) {
+        config_.getProperty("collections." + collectionName + ".list.sortType", collection->sortType);
+        if (!Item::validSortType(collection->sortType)) {
+            collection->sortType = "";
+        }
+        collection->sortItems();
+    }
 
-    if (menuSort)
-        collection->sortItems( );
+    // adds items to "all" list except those found in "exclude_all.txt"
+    cib.addPlaylists(collection);
+    collection->sortPlaylists();
 
+    // build collection menu if menu.txt exists
     MenuParser mp;
-    mp.buildMenuItems( collection, menuSort);
-
-    cib.addPlaylists( collection );
-    collection->sortPlaylists( );
+    mp.buildMenuItems(collection, menuSort);
 
     // Add extra info, if available
     for ( std::vector<Item *>::iterator it = collection->items.begin( ); it != collection->items.end( ); it++ )

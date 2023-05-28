@@ -187,10 +187,18 @@ bool CollectionInfo::itemIsLess(Item *lhs, Item *rhs)
 {
     if(lhs->leaf && !rhs->leaf) return true;
     if(!lhs->leaf && rhs->leaf) return false;
+
+    // sort by collections first
     if(lhs->collectionInfo->subsSplit && lhs->collectionInfo != rhs->collectionInfo)
         return lhs->collectionInfo->lowercaseName() < rhs->collectionInfo->lowercaseName();
     if(!lhs->collectionInfo->menusort && !lhs->leaf && !rhs->leaf)
         return false;
+
+    // sort by another attribute
+    std::string sortType = lhs->collectionInfo->sortType != "" ? lhs->collectionInfo->sortType : rhs->collectionInfo->sortType;
+    if (sortType != "" && lhs->sortByAttribute(sortType) != rhs->sortByAttribute(sortType))
+        return lhs->sortByAttribute(sortType) < rhs->sortByAttribute(sortType);
+    // default sort by name
     return lhs->lowercaseFullTitle() < rhs->lowercaseFullTitle();
 }
 
@@ -210,22 +218,10 @@ void CollectionInfo::sortPlaylists()
     {
         if ( itP->second != allItems )
         {
-            toSortItems.clear();
-            for(std::vector <Item *>::iterator itSort = itP->second->begin(); itSort != itP->second->end(); itSort++)
-            {
-                toSortItems.push_back((*itSort));
-            }
-            itP->second->clear();
-            for(std::vector <Item *>::iterator itAll = allItems->begin(); itAll != allItems->end(); itAll++)
-            {
-                for(std::vector <Item *>::iterator itSort = toSortItems.begin(); itSort != toSortItems.end(); itSort++)
-                {
-                    if ((*itAll) == (*itSort))
-                    {
-                        itP->second->push_back((*itAll));
-                    }
-                }
-            }
+            // temporarily set collection info's sortType so search has access to it
+            sortType = Item::validSortType(itP->first) ? itP->first : "";
+            std::sort(itP->second->begin(), itP->second->end(), itemIsLess);
         }
     }
+    sortType = "";
 }

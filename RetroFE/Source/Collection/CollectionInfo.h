@@ -44,14 +44,13 @@ public:
 
     typedef std::map<std::string, std::vector <Item *> *> Playlists_T;
     Playlists_T playlists;
-
+    std::string sortType;
     bool menusort;
     bool subsSplit;
     bool hasSubs;
+    static bool itemIsLess(Item* lhs, Item* rhs);
 private:
     Configuration& conf_;
     std::string metadataPath_;
     std::string extensions_;
-    static bool itemIsLess(Item *lhs, Item *rhs);
-
 };

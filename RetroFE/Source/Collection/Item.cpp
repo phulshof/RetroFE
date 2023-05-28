@@ -38,8 +38,6 @@ std::string Item::filename()
     return Utils::getFileName(filepath);
 }
 
-
-
 std::string Item::lowercaseTitle()
 {
     std::string lcstr = title;
@@ -54,6 +52,41 @@ std::string Item::lowercaseFullTitle()
     return lcstr;
 }
 
+bool Item::validSortType(std::string attribute)
+{
+    bool valid = false;
+    if (attribute == "year") valid = true;
+    else if (attribute == "manufacturer") valid = true;
+    else if (attribute == "developer") valid = true;
+    else if (attribute == "genre") valid = true;
+    else if (attribute == "numberPlayers") valid = true;
+    else if (attribute == "numberButtons") valid = true;
+    else if (attribute == "ctrlType") valid = true;
+    else if (attribute == "joyWays") valid = true;
+    else if (attribute == "rating") valid = true;
+    else if (attribute == "score") valid = true;
+
+    return valid;
+}
+
+std::string Item::sortByAttribute(std::string attribute)
+{
+    std::string value = "";
+    if (attribute == "year") value = year;
+    else if (attribute == "manufacturer") value = manufacturer;
+    else if (attribute == "developer") value = developer;
+    else if (attribute == "genre") value = genre;
+    else if (attribute == "numberPlayers") value = numberPlayers;
+    else if (attribute == "numberButtons") value = numberButtons;
+    else if (attribute == "ctrlType") value = ctrlType;
+    else if (attribute == "joyWays") value = joyWays;
+    else if (attribute == "rating") value = rating;
+    else if (attribute == "score") value = score;
+
+    std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+
+    return value;
+}
 
 void Item::setInfo( std::string key, std::string value )
 {
