@@ -243,6 +243,11 @@ bool Component::animate()
         for(unsigned int i = 0; i < tweens->size(); i++)
         {
             Tween *tween = tweens->tweens()->at(i);
+
+            // only animate if filter matches current playlist
+            if (tween->playlistFilter != "" && tween->playlistFilter != playlistName) {
+                continue;
+            }
             double elapsedTime = elapsedTweenTime_;
 
             //todo: too many levels of nesting

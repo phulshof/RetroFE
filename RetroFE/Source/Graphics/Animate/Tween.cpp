@@ -22,13 +22,14 @@
 std::map<std::string, TweenAlgorithm> Tween::tweenTypeMap_;
 std::map<std::string, TweenProperty> Tween::tweenPropertyMap_;
 
-Tween::Tween(TweenProperty property, TweenAlgorithm type, double start, double end, double duration)
+Tween::Tween(TweenProperty property, TweenAlgorithm type, double start, double end, double duration, std::string playlistFilter)
     : property(property)
     , duration(duration)
     , startDefined(true)
     , type(type)
     , start(start)
     , end(end)
+    , playlistFilter(playlistFilter)
 {
 }
 

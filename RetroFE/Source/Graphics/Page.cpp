@@ -517,12 +517,12 @@ void Page::playlistChange()
     {
         ScrollingList *menu = *it;
         if(menu)
-            menu->setPlaylist(playlist_->first);
+            menu->setPlaylist(getPlaylistName());
     }
 
     for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
     {
-        (*it)->setPlaylist(playlist_->first);
+        (*it)->setPlaylist(getPlaylistName());
     }
 
     updatePlaylistMenuPosition();
@@ -948,13 +948,13 @@ void Page::exitGame()
 
 std::string Page::getPlaylistName()
 {
-   return playlist_->first;
+   return playlist_._Ptr != NULL ? playlist_->first : "";
 }
 
 
 void Page::favPlaylist()
 {
-    if(playlist_->first == "favorites")
+    if(getPlaylistName() == "favorites")
     {
         selectPlaylist("all");
     }
@@ -1043,12 +1043,12 @@ void Page::selectPlaylist(std::string playlist)
             playlist_ = info.collection->playlists.begin();
 
         // find the first playlist
-        if(playlist_->second->size() != 0 && playlist_->first == playlist) 
+        if(playlist_->second->size() != 0 && getPlaylistName() == playlist) 
             break;
     }
 
     // Do not change playlist if it does not exist or if it's empty
-    if ( playlist_->second->size() == 0 || playlist_->first != playlist)
+    if ( playlist_->second->size() == 0 || getPlaylistName() != playlist)
       playlist_ = playlist_store;
 
     for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
@@ -1163,11 +1163,13 @@ bool Page::playlistExists(std::string playlist)
 
 void Page::update(float dt)
 {
+    std::string playlistName = getPlaylistName();
     for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
     {
         for(std::vector<ScrollingList *>::iterator it2 = menus_[std::distance(menus_.begin(), it)].begin(); it2 != menus_[std::distance(menus_.begin(), it)].end(); it2++)
         {
             ScrollingList *menu = *it2;
+            menu->playlistName = playlistName;
             menu->update(dt);
         }
     }
@@ -1181,9 +1183,11 @@ void Page::update(float dt)
 
     for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
     {
-        if(*it) (*it)->update(dt);
+        if (*it) {
+            (*it)->playlistName = playlistName;
+            (*it)->update(dt);
+        }
     }
-
 }
 
 

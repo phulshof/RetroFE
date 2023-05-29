@@ -677,7 +677,10 @@ void ScrollingList::update( float dt )
     for ( unsigned int i = 0; i < scrollPoints_->size( ); i++ )
     {
         Component *c = components_.at( i );
-        if ( c ) c->update(dt );
+        if (c) {
+            c->playlistName = playlistName;
+            c->update(dt);
+        }
     }
 }
 

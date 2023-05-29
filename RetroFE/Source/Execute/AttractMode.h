@@ -29,6 +29,7 @@ public:
     float idleCollectionTime;
 	int   minTime;
 	int   maxTime;
+    bool isFast;
     bool  isActive();
     bool  isSet();
 

@@ -48,3 +48,7 @@ v0.10.34.1
 	- added metadata sorting and setting sortType year, manufacturer, developer, genre, numberPlayers, numberButtons, ctrlType, joyWays, rating, score (monkofthefunk)
 	- able to add a playlist based on a metadata field to sort by that field (monkofthefunk)
 	- added menu jump for meta sorted playlists (monkofthefunk)
+	- added to only perform layout action if on playlist="" might support coma seperated list (monkofthefunk)
+	- fixed jump item meta miss match with previous item (monkofthefunk)
+	- remove acceleration from attract mode scroll (monkofthefunk)
+	- added attractModeFast = yes to control via setting; defaults to no (monkofthefunk)

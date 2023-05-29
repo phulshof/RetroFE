@@ -1417,6 +1417,7 @@ void PageBuilder::getAnimationEvents(xml_node<> *node, TweenSet &tweens)
             xml_attribute<> *to = animate->first_attribute("to");
             xml_attribute<> *algorithmXml = animate->first_attribute("algorithm");
             xml_attribute<>* setting = animate->first_attribute("setting");
+            xml_attribute<>* playlist = animate->first_attribute("playlist");
 
             std::string animateType;
             if (type)
@@ -1439,6 +1440,7 @@ void PageBuilder::getAnimationEvents(xml_node<> *node, TweenSet &tweens)
                 if (setting && setting->value() != actionSetting) {
                     continue;
                 }
+
                 float fromValue = 0.0f;
                 bool  fromDefined = true;
                 if (from)
@@ -1509,7 +1511,9 @@ void PageBuilder::getAnimationEvents(xml_node<> *node, TweenSet &tweens)
                         break;
                     }
 
-                    Tween *t = new Tween(property, algorithm, fromValue, toValue, durationValue);
+                    // if in layout action has playlist="<current playlist name>" then perform action
+                    std::string playlistFilter = playlist && playlist->value() ? playlist->value() : "";
+                    Tween *t = new Tween(property, algorithm, fromValue, toValue, durationValue, playlistFilter);
                     if (!fromDefined)
                       t->startDefined = false;
                     tweens.push(t);

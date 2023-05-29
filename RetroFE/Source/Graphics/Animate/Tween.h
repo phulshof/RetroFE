@@ -25,7 +25,7 @@ class Tween
 {
 public:
 
-    Tween(TweenProperty name, TweenAlgorithm type, double start, double end, double duration);
+    Tween(TweenProperty name, TweenAlgorithm type, double start, double end, double duration, std::string playlistFilter = "");
     float animate(double elapsedTime);
     float animate(double elapsedTime, double startValue);
     static float animateSingle(TweenAlgorithm type, double start, double end, double duration, double elapsedTime);
@@ -34,6 +34,7 @@ public:
     TweenProperty property;
     double duration;
     bool   startDefined;
+    std::string playlistFilter;
 
 private:
     static double easeInQuadratic(double elapsedTime, double duration, double b, double c);
