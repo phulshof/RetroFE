@@ -47,3 +47,4 @@ v0.10.34.1
 	- revert multi firing fix, affects onMenuJump animations (monkofthefunk)
 	- added metadata sorting and setting sortType year, manufacturer, developer, genre, numberPlayers, numberButtons, ctrlType, joyWays, rating, score (monkofthefunk)
 	- able to add a playlist based on a metadata field to sort by that field (monkofthefunk)
+	- added menu jump for meta sorted playlists (monkofthefunk)

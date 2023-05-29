@@ -54,32 +54,36 @@ std::string Item::lowercaseFullTitle()
 
 bool Item::validSortType(std::string attribute)
 {
+    std::transform(attribute.begin(), attribute.end(), attribute.begin(), ::tolower);
+
     bool valid = false;
     if (attribute == "year") valid = true;
     else if (attribute == "manufacturer") valid = true;
     else if (attribute == "developer") valid = true;
     else if (attribute == "genre") valid = true;
-    else if (attribute == "numberPlayers") valid = true;
-    else if (attribute == "numberButtons") valid = true;
-    else if (attribute == "ctrlType") valid = true;
-    else if (attribute == "joyWays") valid = true;
+    else if (attribute == "numberplayers") valid = true;
+    else if (attribute == "numberbuttons") valid = true;
+    else if (attribute == "ctrltype") valid = true;
+    else if (attribute == "joyways") valid = true;
     else if (attribute == "rating") valid = true;
     else if (attribute == "score") valid = true;
 
     return valid;
 }
 
-std::string Item::sortByAttribute(std::string attribute)
+std::string Item::getMetaAttribute(std::string attribute)
 {
+    std::transform(attribute.begin(), attribute.end(), attribute.begin(), ::tolower);
+
     std::string value = "";
     if (attribute == "year") value = year;
     else if (attribute == "manufacturer") value = manufacturer;
     else if (attribute == "developer") value = developer;
     else if (attribute == "genre") value = genre;
-    else if (attribute == "numberPlayers") value = numberPlayers;
-    else if (attribute == "numberButtons") value = numberButtons;
-    else if (attribute == "ctrlType") value = ctrlType;
-    else if (attribute == "joyWays") value = joyWays;
+    else if (attribute == "numberplayers") value = numberPlayers;
+    else if (attribute == "numberbuttons") value = numberButtons;
+    else if (attribute == "ctrltype") value = ctrlType;
+    else if (attribute == "joyways") value = joyWays;
     else if (attribute == "rating") value = rating;
     else if (attribute == "score") value = score;
 

@@ -340,7 +340,7 @@ void ScrollingList::letterDown( )
 }
 
 
-void ScrollingList::letterChange( bool increment )
+void ScrollingList::letterChange( bool increment)
 {
 
     if ( !items_ || items_->size( ) == 0 ) return;
@@ -402,15 +402,71 @@ void ScrollingList::letterChange( bool increment )
 }
 
 
-void ScrollingList::subUp( )
+void ScrollingList::metaUp(std::string attribute)
 {
-    subChange( true );
+    metaChange(true, attribute);
 }
 
 
-void ScrollingList::subDown( )
+void ScrollingList::metaDown(std::string attribute)
 {
-    subChange( false );
+    metaChange(false, attribute);
+}
+
+
+void ScrollingList::metaChange(bool increment, std::string attribute)
+{
+
+    if (!items_ || items_->size() == 0) return;
+
+    Item* startItem = items_->at((itemIndex_ + selectedOffsetIndex_) % items_->size());
+    std::string startValue = items_->at((itemIndex_ + selectedOffsetIndex_) % items_->size())->getMetaAttribute(attribute);
+
+    for (unsigned int i = 0; i < items_->size(); ++i)
+    {
+        unsigned int index = 0;
+        if (increment)
+        {
+            index = loopIncrement(itemIndex_, i, items_->size());
+        }
+        else
+        {
+            index = loopDecrement(itemIndex_, i, items_->size());
+        }
+
+        std::string endValue = items_->at((index + selectedOffsetIndex_) % items_->size())->getMetaAttribute(attribute);
+
+        if (startValue != endValue) {
+            itemIndex_ = index;
+            break;
+        }
+    }
+
+    if (!increment) // For decrement, find the first game of the new meta attribute
+    {
+        bool prevLetterSubToCurrent = false;
+        config_.getProperty("prevLetterSubToCurrent", prevLetterSubToCurrent);
+        if (!prevLetterSubToCurrent || items_->at((itemIndex_ + 1 + selectedOffsetIndex_) % items_->size()) == startItem)
+        {
+            startValue = items_->at((itemIndex_ + selectedOffsetIndex_) % items_->size())->getMetaAttribute(attribute);
+
+            for (unsigned int i = 0; i < items_->size(); ++i)
+            {
+                unsigned int index = loopDecrement(itemIndex_, i, items_->size());
+
+                std::string endValue = items_->at((index + selectedOffsetIndex_) % items_->size())->getMetaAttribute(attribute);
+
+                if (startValue != endValue) {
+                    itemIndex_ = loopIncrement(index, 1, items_->size());
+                    break;
+                }
+            }
+        }
+        else
+        {
+            itemIndex_ = loopIncrement(itemIndex_, 1, items_->size());
+        }
+    }
 }
 
 

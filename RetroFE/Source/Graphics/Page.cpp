@@ -766,9 +766,11 @@ void Page::letterScroll(ScrollDirection direction)
     }
 }
 
-
-void Page::subScroll(ScrollDirection direction)
+// if playlist is same name as metadata to sort upon, then jump by unique sorted metadata
+void Page::metaScroll(ScrollDirection direction, std::string attribute)
 {
+    std::transform(attribute.begin(), attribute.end(), attribute.begin(), ::tolower);
+
     for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
     {
         ScrollingList *menu = *it;
@@ -776,11 +778,11 @@ void Page::subScroll(ScrollDirection direction)
         {
             if(direction == ScrollDirectionForward)
             {
-                menu->subDown();
+                menu->metaDown(attribute);
             }
             if(direction == ScrollDirectionBack)
             {
-                menu->subUp();
+                menu->metaUp(attribute);
             }
         }
     }

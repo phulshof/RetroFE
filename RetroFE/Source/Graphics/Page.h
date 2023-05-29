@@ -74,7 +74,7 @@ public:
     bool addComponent(Component *c);
     void pageScroll(ScrollDirection direction);
     void letterScroll(ScrollDirection direction);
-    void subScroll(ScrollDirection direction);
+    void metaScroll(ScrollDirection direction, std::string attribute);
     void cfwLetterSubScroll(ScrollDirection direction);
     unsigned int getCollectionSize();
     unsigned int getSelectedIndex();

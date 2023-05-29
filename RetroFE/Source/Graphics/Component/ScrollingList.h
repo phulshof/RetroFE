@@ -80,8 +80,9 @@ public:
     void letterUp( );
     void letterDown( );
     void letterChange( bool increment );
-    void subUp( );
-    void subDown( );
+    void metaUp(std::string attribute);
+    void metaDown(std::string attribute);
+    void metaChange(bool increment, std::string attribute);
     void subChange( bool increment );
     void cfwLetterSubUp( );
     void cfwLetterSubDown( );
