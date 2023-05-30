@@ -948,7 +948,7 @@ void Page::exitGame()
 
 std::string Page::getPlaylistName()
 {
-   return playlist_._Ptr != NULL ? playlist_->first : "";
+   return !collections_.empty() ? playlist_->first : "";
 }
 
 
