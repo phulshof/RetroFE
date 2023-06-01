@@ -111,6 +111,8 @@ private:
     void            render( );
     bool            back( bool &exit );
     bool isStandalonePlaylist(std::string playlist);
+    bool isInAttractModeSkipPlaylist(std::string playlist);
+    void goToNextAttractModePlaylistByCycle(std::vector<std::string> cycleVector);
     void            quit( );
     Page           *loadPage( );
     Page           *loadSplashPage( );
@@ -139,7 +141,7 @@ private:
 	int                attractModePlaylistCollectionNumber_;
 	bool               reboot_;
 	std::string        firstPlaylist_;
-
+    std::map<std::string, bool> lkupAttractModeSkipPlaylist_;
     std::map<std::string, unsigned int> lastMenuOffsets_;
     std::map<std::string, std::string>  lastMenuPlaylists_;
 };
