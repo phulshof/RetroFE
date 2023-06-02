@@ -45,6 +45,7 @@ ReloadableMedia::ReloadableMedia(Configuration &config, bool systemMode, bool la
     , imageType_(imageType)
     , jukebox_(jukebox)
     , jukeboxNumLoops_(jukeboxNumLoops)
+    , numberOfImages_(27)
 {
     allocateGraphicsMemory();
 }
@@ -336,6 +337,13 @@ void ReloadableMedia::reloadTexture()
         {
             basename = selectedItem->fullTitle.at(0);
             defined  = true;
+        }
+        else if (typeLC == "position")
+        {
+            if (!selectedItem->collectionInfo->items.empty()) {
+                basename = std::to_string(int(ceil(float(page.getSelectedIndex() + 1) / float(page.getCollectionSize()) * float(numberOfImages_))));
+                defined = true;
+            }
         }
 
         if (!selectedItem->leaf) // item is not a leaf

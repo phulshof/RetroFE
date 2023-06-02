@@ -67,4 +67,5 @@ private:
     std::string imageType_;
     bool jukebox_;
     int  jukeboxNumLoops_;
+    int numberOfImages_;
 };

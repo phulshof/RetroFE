@@ -54,3 +54,4 @@ v0.10.34.1
 	- added attractModeFast = yes to control via setting; defaults to no (monkofthefunk)
 	- added support for action if playlist is within comma seperated playlist="pl1,pl2,p3" to make one action work for many playlists (monkofthefunk)
 	- added attractModeSkipPlaylist support multiple comma seperated (monkofthefunk)
+	- added reloadable image of type="position" from 1-27 position/1.png to display position in the games list (monkofthefunk)
