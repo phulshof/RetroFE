@@ -30,6 +30,9 @@
 #include <stack>
 #include <map>
 #include <string>
+#ifdef WIN32
+    #include <windows.h>
+#endif
 
 
 class CollectionInfo;
@@ -49,8 +52,15 @@ public:
     void     allocateGraphicsMemory( );
     void     launchEnter( );
     void     launchExit( );
+#ifdef WIN32	
+    void sendMessage(WPARAM wParam, LPARAM lParam);
+#endif	
 
 private:
+#ifdef WIN32	
+    HWND hwnd;
+	void RetroFE::initializeHwnd( );
+#endif
     volatile bool initialized;
     volatile bool initializeError;
     SDL_Thread   *initializeThread;

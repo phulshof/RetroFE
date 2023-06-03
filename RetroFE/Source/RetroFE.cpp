@@ -76,8 +76,32 @@ RetroFE::RetroFE( Configuration &c )
     attractMode_                         = false;
     attractModePlaylistCollectionNumber_ = 0;
     firstPlaylist_                       = "all"; // todo
+#ifdef WIN32
+    initializeHwnd();
+#endif
 }
 
+#ifdef WIN32
+void RetroFE::initializeHwnd( ) {
+    const int maxAttempts = 10;
+    const int sleepDuration = 500; // In milliseconds
+    int attempt = 0;
+    while (attempt < maxAttempts) {
+        hwnd = FindWindow(NULL, "MediaPlayerHiddenWindow");
+        if (hwnd != NULL) {
+            break;
+        }
+        attempt++;
+        SDL_Delay(sleepDuration);
+    }
+}
+
+void RetroFE::sendMessage( WPARAM wParam, LPARAM lParam ) {
+    if (hwnd != NULL) {
+        PostMessage(hwnd, 0x8001, wParam, lParam);
+    }
+}
+#endif
 
 RetroFE::~RetroFE( )
 {
@@ -476,6 +500,9 @@ bool RetroFE::run( )
         // Load art on entering RetroFE
         case RETROFE_LOAD_ART:
             currentPage_->start( );
+#ifdef WIN32            
+			sendMessage(50,0);		
+#endif			
             state = RETROFE_ENTER;
             break;
 
@@ -1368,6 +1395,9 @@ bool RetroFE::run( )
         // Start the onExit animation
         case RETROFE_QUIT_REQUEST:
             currentPage_->stop( );
+#ifdef WIN32
+            sendMessage(51,0);
+#endif              			
             state = RETROFE_QUIT;
             break;
 
