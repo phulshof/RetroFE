@@ -1395,9 +1395,6 @@ bool RetroFE::run( )
         // Start the onExit animation
         case RETROFE_QUIT_REQUEST:
             currentPage_->stop( );
-#ifdef WIN32
-            postMessage(51,0);
-#endif              			
             state = RETROFE_QUIT;
             break;
 
@@ -1958,6 +1955,9 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         else if (input_.keystate(UserInput::KeyCodeQuit))
         {
             attract_.reset( );
+#ifdef WIN32
+            postMessage(51,0);
+#endif              			
             state = RETROFE_QUIT_REQUEST;
         }
 
