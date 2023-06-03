@@ -53,7 +53,7 @@ public:
     void     launchEnter( );
     void     launchExit( );
 #ifdef WIN32	
-    void sendMessage(WPARAM wParam, LPARAM lParam);
+    void postMessage(WPARAM wParam, LPARAM lParam);
 #endif	
 
 private:

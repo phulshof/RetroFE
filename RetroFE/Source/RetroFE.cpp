@@ -96,7 +96,7 @@ void RetroFE::initializeHwnd( ) {
     }
 }
 
-void RetroFE::sendMessage( WPARAM wParam, LPARAM lParam ) {
+void RetroFE::postMessage( WPARAM wParam, LPARAM lParam ) {
     if (hwnd != NULL) {
         PostMessage(hwnd, 0x8001, wParam, lParam);
     }
@@ -501,7 +501,7 @@ bool RetroFE::run( )
         case RETROFE_LOAD_ART:
             currentPage_->start( );
 #ifdef WIN32            
-			sendMessage(50,0);		
+			postMessage(50,0);		
 #endif			
             state = RETROFE_ENTER;
             break;
@@ -1396,7 +1396,7 @@ bool RetroFE::run( )
         case RETROFE_QUIT_REQUEST:
             currentPage_->stop( );
 #ifdef WIN32
-            sendMessage(51,0);
+            postMessage(51,0);
 #endif              			
             state = RETROFE_QUIT;
             break;
