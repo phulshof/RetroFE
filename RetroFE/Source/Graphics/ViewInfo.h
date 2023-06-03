@@ -73,6 +73,7 @@ public:
     float        ContainerHeight;
     int          Monitor;
     float        Volume;
+    bool         Restart;
 
 private:
     float AbsoluteHeight() const;

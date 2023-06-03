@@ -61,6 +61,7 @@ bool Tween::getTweenProperty(std::string name, TweenProperty &property)
         tweenPropertyMap_["containerheight"] = TWEEN_PROPERTY_CONTAINER_HEIGHT;
         tweenPropertyMap_["volume"]          = TWEEN_PROPERTY_VOLUME;
         tweenPropertyMap_["nop"]             = TWEEN_PROPERTY_NOP;
+        tweenPropertyMap_["restart"] = TWEEN_PROPERTY_RESTART;
     }
 
     std::transform(name.begin(), name.end(), name.begin(), ::tolower);

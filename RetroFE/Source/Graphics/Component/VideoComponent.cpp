@@ -61,6 +61,11 @@ void VideoComponent::update(float dt)
             baseViewInfo.ImageHeight = static_cast<float>(videoInst_->getHeight());
             baseViewInfo.ImageWidth = static_cast<float>(videoInst_->getWidth());
         }
+
+        if (baseViewInfo.Restart) {
+            baseViewInfo.Restart = false;
+            restart();
+        }
     }
 
     Component::update(dt);
