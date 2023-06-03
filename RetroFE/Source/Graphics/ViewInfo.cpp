@@ -53,6 +53,7 @@ ViewInfo::ViewInfo()
     , ContainerHeight(-1)
 	, Monitor(0)
     , Volume(0)
+    , Restart(false)
 {
 }
 

@@ -56,3 +56,5 @@ v0.10.34.1
 	- added attractModeSkipPlaylist support multiple comma seperated (monkofthefunk)
 	- added reloadable image of type="position" from 1-27 position/1.png to display position in the games list (monkofthefunk)
 	- fixed start and end position (monkofthefunk)
+	- added postMessage on start and quit to alert other programs about its current state (inigomontoya)
+	- added property <item selected="true" restart="true"> to restart video upon scroll (monkofthefunk)
