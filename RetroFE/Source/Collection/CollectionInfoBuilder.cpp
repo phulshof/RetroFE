@@ -264,7 +264,7 @@ bool CollectionInfoBuilder::ImportBasicList(CollectionInfo *info, std::string fi
                 i->name = line;
                 i->title = line;
                 i->collectionInfo = info;
-                
+
                 list.push_back(i);
             }
 

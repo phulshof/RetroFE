@@ -36,6 +36,7 @@ public:
 
 private:
     void ReloadTexture();
+    std::string getTimeSince(std::string sinceTimestamp);
 
     Configuration &config_;
     bool systemMode_;

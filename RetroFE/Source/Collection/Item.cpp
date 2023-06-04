@@ -60,6 +60,7 @@ bool Item::sortDirectionDesc(std::string attribute)
 
     bool valid = false;
     if (attribute == "lastplayed") valid = true;
+    if (attribute == "playcount") valid = true;
 
     return valid;
 }
@@ -80,6 +81,7 @@ bool Item::validSortType(std::string attribute)
     else if (attribute == "rating") valid = true;
     else if (attribute == "score") valid = true;
     else if (attribute == "lastplayed") valid = true;
+    else if (attribute == "playcount") valid = true;
 
     return valid;
 }
@@ -99,8 +101,8 @@ std::string Item::getMetaAttribute(std::string attribute)
     else if (attribute == "joyways") value = joyWays;
     else if (attribute == "rating") value = rating;
     else if (attribute == "score") value = score;
-    else if (attribute == "lastplayed")
-        value = lastPlayed;
+    else if (attribute == "lastplayed") value = lastPlayed;
+    else if (attribute == "playcount") value = playCount;
 
     std::transform(value.begin(), value.end(), value.begin(), ::tolower);
 

@@ -60,3 +60,4 @@ v0.10.34.1
 	- fixed reloadable media on playlist change (monkofthefunk)
 	- added postMessage on start and quit to alert other programs about its current state (inigomontoya)
 	- added property <item selected="true" restart="true"> to restart video upon scroll (monkofthefunk)
+	- added playCount sort; lastPlayed text shows "1 year(s) 1 month(s) 1 day(s) ago" (monkofthefunk)
