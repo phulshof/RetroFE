@@ -23,7 +23,6 @@
 #include <vector>
 #include <iostream>
 #include <time.h>
-#include <chrono>
 #include <ctime>
 #include <algorithm>
 #include "../../Utility/Utils.h"
@@ -365,10 +364,18 @@ void ReloadableText::draw()
 std::string ReloadableText::getTimeSince(std::string sinceTimestamp)
 {
     const char* timestamp = sinceTimestamp.c_str();
-
-    // Convert the time points to time_t (seconds since epoch)
-    std::time_t t1 = time(0);
     std::time_t t2 = (time_t)strtol(timestamp, NULL, 10);
+
+    // error checking, make sure timestamp is valid
+    if (t2 == 0 && errno == EINVAL) {
+        return "";
+    }
+
+    // error checking, make sure the timestamp is not in the future
+    std::time_t t1 = std::time(nullptr);
+    if (t2 > t1) {
+        return "";
+    }
 
     // Convert time_t to struct tm
     std::tm tm1 = *std::localtime(&t1);
@@ -436,18 +443,23 @@ std::string ReloadableText::getTimeSince(std::string sinceTimestamp)
         totalDays = daysInMonth[(tm1.tm_mon + 11) % 12] - (daysDiff - totalDays - 1);
     }
 
-    std::string result= "";
-
-    if (daysDiff) {
-        result = std::to_string(daysDiff) + " day(s) ago";
+    // construct the result string
+    std::string result = "";
+    if (yearsDiff > 0) {
+        result += std::to_string(yearsDiff) + (yearsDiff == 1 ? " year " : " years ");
+    }
+    if (monthsDiff > 0) {
+        result += std::to_string(monthsDiff) + (monthsDiff == 1 ? " month " : " months ");
+    }
+    if (daysDiff > 0) {
+        result += std::to_string(daysDiff) + (daysDiff == 1 ? " day " : " days ");
     }
 
-    if (monthsDiff) {
-        result = std::to_string(monthsDiff) + " month(s) " + result;
+    if (result == "") {
+        result = "today";
     }
-
-    if (yearsDiff) {
-        result = std::to_string(yearsDiff) + " year(s) " + result;
+    else {
+        result += "ago";
     }
 
     return result;

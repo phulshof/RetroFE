@@ -54,7 +54,7 @@ std::string Item::lowercaseFullTitle()
     return lcstr;
 }
 
-bool Item::sortDirectionDesc(std::string attribute)
+bool Item::isSortDesc(std::string attribute)
 {
     std::transform(attribute.begin(), attribute.end(), attribute.begin(), ::tolower);
 
@@ -102,7 +102,7 @@ std::string Item::getMetaAttribute(std::string attribute)
     else if (attribute == "rating") value = rating;
     else if (attribute == "score") value = score;
     else if (attribute == "lastplayed") value = lastPlayed;
-    else if (attribute == "playcount") value = playCount;
+    else if (attribute == "playcount") value = std::to_string(playCount);
 
     std::transform(value.begin(), value.end(), value.begin(), ::tolower);
 

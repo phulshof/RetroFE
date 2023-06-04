@@ -61,3 +61,4 @@ v0.10.34.1
 	- added postMessage on start and quit to alert other programs about its current state (inigomontoya)
 	- added property <item selected="true" restart="true"> to restart video upon scroll (monkofthefunk)
 	- added playCount sort; lastPlayed text shows "1 year(s) 1 month(s) 1 day(s) ago" (monkofthefunk)
+	- fixed crashing due to sort; fixed restart video happens when becomming selected and not from; fixed last played text for current day (monkofthefunk)

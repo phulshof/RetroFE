@@ -197,10 +197,14 @@ bool CollectionInfo::itemIsLess(Item *lhs, Item *rhs)
 
     // sort by another attribute
     std::string sortType = lhs->collectionInfo->sortType != "" ? lhs->collectionInfo->sortType : rhs->collectionInfo->sortType;
-    std::string lhsValue = lhs->getMetaAttribute(sortType);
-    std::string rhsValue = rhs->getMetaAttribute(sortType);
-    if (sortType != "" && lhsValue != rhsValue) {
-        return lhs->collectionInfo->sortDesc ? lhsValue > rhsValue : lhsValue < rhsValue;
+    if (sortType != "") {
+        std::string lhsValue = lhs->getMetaAttribute(sortType);
+        std::string rhsValue = rhs->getMetaAttribute(sortType);
+        bool desc = Item::isSortDesc(sortType);
+
+        if (lhsValue != "" && rhsValue != "" && lhsValue != rhsValue) {
+            return desc ? lhsValue > rhsValue : lhsValue < rhsValue;
+        }
     }
     // default sort by name
     return lhs->lowercaseFullTitle() < rhs->lowercaseFullTitle();
@@ -224,7 +228,6 @@ void CollectionInfo::sortPlaylists()
         {
             // temporarily set collection info's sortType so search has access to it
             sortType = Item::validSortType(itP->first) ? itP->first : "";
-            sortDesc = Item::sortDirectionDesc(itP->first);
             std::sort(itP->second->begin(), itP->second->end(), itemIsLess);
         }
     }

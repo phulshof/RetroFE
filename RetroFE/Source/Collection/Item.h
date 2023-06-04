@@ -58,5 +58,5 @@ public:
     bool getInfo( std::string key, std::string &value );
     void loadInfo( std::string path );
     bool static validSortType(std::string attribute);
-    bool static sortDirectionDesc(std::string attribute);
+    bool static isSortDesc(std::string attribute);
 };
