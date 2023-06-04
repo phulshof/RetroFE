@@ -1233,8 +1233,7 @@ bool RetroFE::run( )
                 config_.getProperty( "lastPlayedSkipCollection", lastPlayedSkipCollection );
                 config_.getProperty( "lastplayedSize", size );
 
-                if (!isInAttractModeSkipPlaylist(currentPage_->getPlaylistName()) &&
-                    nextPageItem_->collectionInfo->name != lastPlayedSkipCollection)
+                if (nextPageItem_->collectionInfo->name != lastPlayedSkipCollection)
                 {
                     cib.updateLastPlayedPlaylist(currentPage_->getCollection(), nextPageItem_, size); // Update last played playlist if not currently in the skip playlist (e.g. settings)
                     // with new sort by last played return to first
