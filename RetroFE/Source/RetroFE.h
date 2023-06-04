@@ -53,7 +53,8 @@ public:
     void     launchEnter( );
     void     launchExit( );
 #ifdef WIN32	
-    void postMessage(WPARAM wParam, LPARAM lParam);
+    static int initializeHwndThreadFunction(void* data);
+	void postMessage(WPARAM wParam, LPARAM lParam);
 #endif	
 
 private:

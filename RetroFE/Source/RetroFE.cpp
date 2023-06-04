@@ -53,6 +53,12 @@
 #include <Windows.h>
 #include <SDL2/SDL_syswm.h>
 #include <SDL2/SDL_thread.h>
+
+int RetroFE::initializeHwndThreadFunction(void* data) {
+    RetroFE* self = reinterpret_cast<RetroFE*>(data);
+    self->initializeHwnd();
+    return 0;
+}
 #endif
 
 
@@ -77,7 +83,7 @@ RetroFE::RetroFE( Configuration &c )
     attractModePlaylistCollectionNumber_ = 0;
     firstPlaylist_                       = "all"; // todo
 #ifdef WIN32
-    initializeHwnd();
+    initializeThread = SDL_CreateThread(initializeHwndThreadFunction, "InitializeHWNDThread", this);
 #endif
 }
 
