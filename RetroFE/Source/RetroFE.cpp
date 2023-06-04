@@ -606,10 +606,9 @@ bool RetroFE::run( )
                 }
                 bool rememberMenu = false;
                 config_.getProperty("rememberMenu", rememberMenu);
-                if (rememberMenu) {
+                if (rememberMenu && currentPage_->getPlaylistName() != "lastplayed") {
                     currentPage_->returnToRememberSelectedItem();
                 }
-                currentPage_->onNewItemSelected();
                 state = RETROFE_PLAYLIST_LOAD_ART;
             }
             break;
@@ -618,6 +617,7 @@ bool RetroFE::run( )
         case RETROFE_PLAYLIST_LOAD_ART:
             if (currentPage_->isIdle( ))
             {
+                currentPage_->onNewItemSelected();
                 currentPage_->reallocateMenuSpritePoints(); // update playlist menu
                 currentPage_->playlistEnter();
                 state = RETROFE_PLAYLIST_ENTER;
@@ -1222,6 +1222,12 @@ bool RetroFE::run( )
                     nextPageItem_->collectionInfo->name != lastPlayedSkipCollection)
                 {
                     cib.updateLastPlayedPlaylist(currentPage_->getCollection(), nextPageItem_, size); // Update last played playlist if not currently in the skip playlist (e.g. settings)
+                    // with new sort by last played return to first
+                    if (currentPage_->getPlaylistName() == "lastplayed")
+                    {
+                        currentPage_->setScrollOffsetIndex(0);
+                        currentPage_->onNewItemSelected();
+                    }
                 }
 
                 l.LEDBlinky( 3, nextPageItem_->collectionInfo->name, nextPageItem_ );
@@ -1236,6 +1242,7 @@ bool RetroFE::run( )
                     launchExit( );
                     l.LEDBlinky( 4 );
                     currentPage_->exitGame( );
+                    
                     state = RETROFE_LAUNCH_EXIT;
                 }
             }

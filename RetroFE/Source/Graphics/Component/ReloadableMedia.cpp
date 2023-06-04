@@ -328,6 +328,11 @@ void ReloadableMedia::reloadTexture()
             basename = selectedItem->score;
             defined  = true;
         }
+        else if (typeLC == "playCount")
+        {
+            basename = selectedItem->playCount;
+            defined = true;
+        }
         else if(typeLC.rfind( "playlist", 0 ) == 0)
         {
             basename = page.getPlaylistName();

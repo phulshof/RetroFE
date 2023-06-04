@@ -27,6 +27,8 @@ Item::Item()
 {
     file = "";
     isFavorite = false;
+    playCount = 0;
+    lastPlayed = "0";
 }
 
 Item::~Item()
@@ -52,6 +54,16 @@ std::string Item::lowercaseFullTitle()
     return lcstr;
 }
 
+bool Item::sortDirectionDesc(std::string attribute)
+{
+    std::transform(attribute.begin(), attribute.end(), attribute.begin(), ::tolower);
+
+    bool valid = false;
+    if (attribute == "lastplayed") valid = true;
+
+    return valid;
+}
+
 bool Item::validSortType(std::string attribute)
 {
     std::transform(attribute.begin(), attribute.end(), attribute.begin(), ::tolower);
@@ -67,6 +79,7 @@ bool Item::validSortType(std::string attribute)
     else if (attribute == "joyways") valid = true;
     else if (attribute == "rating") valid = true;
     else if (attribute == "score") valid = true;
+    else if (attribute == "lastplayed") valid = true;
 
     return valid;
 }
@@ -86,6 +99,8 @@ std::string Item::getMetaAttribute(std::string attribute)
     else if (attribute == "joyways") value = joyWays;
     else if (attribute == "rating") value = rating;
     else if (attribute == "score") value = score;
+    else if (attribute == "lastplayed")
+        value = lastPlayed;
 
     std::transform(value.begin(), value.end(), value.begin(), ::tolower);
 

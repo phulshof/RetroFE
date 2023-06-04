@@ -48,6 +48,7 @@ public:
     bool menusort;
     bool subsSplit;
     bool hasSubs;
+    bool sortDesc;
     static bool itemIsLess(Item* lhs, Item* rhs);
 private:
     Configuration& conf_;

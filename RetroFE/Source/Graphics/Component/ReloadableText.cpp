@@ -24,6 +24,7 @@
 #include <iostream>
 #include <time.h>
 #include <algorithm>
+#include "../../Utility/Utils.h"
 
 ReloadableText::ReloadableText(std::string type, Page &page, Configuration &config, bool systemMode, Font *font, std::string layoutKey, std::string timeFormat, std::string textFormat, std::string singlePrefix, std::string singlePostfix, std::string pluralPrefix, std::string pluralPostfix)
     : Component(page)
@@ -172,6 +173,19 @@ void ReloadableText::ReloadTexture()
         else if (type_ == "genre")
         {
             text = selectedItem->genre;
+        }
+        else if (type_ == "playCount")
+        {
+            text = std::to_string(selectedItem->playCount);
+        }
+        else if (type_ == "lastPlayed")
+        {
+            if (selectedItem->lastPlayed != "0") {
+                const char* timestamp = selectedItem->lastPlayed.c_str();
+                time_t timenum = (time_t)strtol(timestamp, NULL, 10);
+                time_t last = time(&timenum);
+                text = std::asctime(std::localtime(&last));
+            }
         }
         else if (type_.rfind( "playlist", 0 ) == 0)
         {

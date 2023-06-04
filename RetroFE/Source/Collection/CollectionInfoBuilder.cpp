@@ -214,6 +214,7 @@ bool CollectionInfoBuilder::ImportBasicList(CollectionInfo *info, std::string fi
             Item *i = new Item();
 
             line.erase( std::remove(line.begin(), line.end(), '\r'), line.end() );
+            line = importPlayData(i, line);
 
             i->fullTitle = line;
             i->name = line;
@@ -237,7 +238,6 @@ bool CollectionInfoBuilder::ImportBasicList(CollectionInfo *info, std::string fi
     }
 
     std::string line; 
-
     while(std::getline(includeStream, line))
     {
         line = Utils::filterComments(line);
@@ -259,12 +259,12 @@ bool CollectionInfoBuilder::ImportBasicList(CollectionInfo *info, std::string fi
                 Item *i = new Item();
 
                 line.erase( std::remove(line.begin(), line.end(), '\r'), line.end() );
-
+                line = importPlayData(i, line);
                 i->fullTitle = line;
                 i->name = line;
                 i->title = line;
                 i->collectionInfo = info;
-
+                
                 list.push_back(i);
             }
 
@@ -550,10 +550,10 @@ void CollectionInfoBuilder::loadPlaylistItems(CollectionInfo* info, std::map<std
                 std::string sortType = Item::validSortType(basename) ? basename : "";
 
                 // add the playlist list 
-                for (std::map<std::string, Item*>::iterator it = playlistFilter.begin(); it != playlistFilter.end(); it++)
+                for (std::map<std::string, Item*>::iterator itpf = playlistFilter.begin(); itpf != playlistFilter.end(); itpf++)
                 {
                     std::string collectionName = info->name;
-                    std::string itemName = it->first;
+                    std::string itemName = itpf->first;
                     if (itemName.at(0) == '_') // name consists of _<collectionName>:<itemName>
                     {
                         itemName.erase(0, 1); // Remove _
@@ -570,6 +570,10 @@ void CollectionInfoBuilder::loadPlaylistItems(CollectionInfo* info, std::map<std
                     {
                         if (((*it)->name == itemName || itemName == "*") && (*it)->collectionInfo->name == collectionName)
                         {
+                            if (itpf->second->playCount) {
+                                (*it)->playCount = itpf->second->playCount;
+                                (*it)->lastPlayed = itpf->second->lastPlayed;
+                            }
                             info->playlists[basename]->push_back((*it));
                             if (basename == "favorites")
                                 (*it)->isFavorite = true;
@@ -590,6 +594,29 @@ void CollectionInfoBuilder::loadPlaylistItems(CollectionInfo* info, std::map<std
     closedir(dp);
 }
 
+std::string CollectionInfoBuilder::importPlayData(Item* item, std::string line)
+{
+    // parse play count and last played time
+    std::string extra;
+    size_t extraPosition;
+    size_t timePosition;
+    item->lastPlayed = "0";
+    item->playCount = 0;
+    extraPosition = line.find(";");
+    if (extraPosition != std::string::npos)
+    {
+        extra = line.substr(extraPosition + 1);
+        timePosition = extra.find(";");
+        if (timePosition != std::string::npos)
+        {
+            item->lastPlayed = extra.substr(timePosition+1);
+            item->playCount = Utils::convertInt(extra.substr(0, timePosition));
+        }
+        line = line.substr(0, extraPosition);
+    }
+
+    return line;
+}
 
 void CollectionInfoBuilder::updateLastPlayedPlaylist(CollectionInfo *info, Item *item, int size)
 {
@@ -613,6 +640,9 @@ void CollectionInfoBuilder::updateLastPlayedPlaylist(CollectionInfo *info, Item 
 
     if (size == 0)
         return;
+    // update the curren't items play count and last played time to be used for meta info/sorting and writing back to list
+    item->playCount++;
+    item->lastPlayed = std::to_string(std::time(0));
 
     // Put the new item at the front of the list.
     info->playlists["lastplayed"]->push_back(item);
@@ -684,17 +714,19 @@ void CollectionInfoBuilder::updateLastPlayedPlaylist(CollectionInfo *info, Item 
             return;
         }
 
+        // write playlist file
         filestream.open(file.c_str());
         std::vector<Item *> *saveitems = info->playlists["lastplayed"];
         for(std::vector<Item *>::iterator it = saveitems->begin(); it != saveitems->end(); it++)
-        {
+        { 
+            // append play count and last played time
             if ((*it)->collectionInfo->name == playlistCollectionName)
             {
-                filestream << (*it)->name << std::endl;
+                filestream << (*it)->name << ";" << (*it)->playCount << ";" << (*it)->lastPlayed << std::endl;
             }
             else
             {
-                filestream << "_" << (*it)->collectionInfo->name << ":" << (*it)->name << std::endl;
+                filestream << "_" << (*it)->collectionInfo->name << ":" << (*it)->name << ";" << (*it)->playCount << ";" << (*it)->lastPlayed << std::endl;
             }
         }
 
@@ -705,11 +737,13 @@ void CollectionInfoBuilder::updateLastPlayedPlaylist(CollectionInfo *info, Item 
         Logger::write(Logger::ZONE_ERROR, "Collection", "Save failed: " + file);
     }
 
-    // Sort the playlist(s)
-    info->sortPlaylists( );
+
+    // sort last played by play time with empty values last
+    info->sortType = "lastplayed";
+    info->sortDesc = true;
+    std::sort(info->playlists["lastplayed"]->begin(), info->playlists["lastplayed"]->end(), info->itemIsLess);
 
     return;
-
 }
 
 

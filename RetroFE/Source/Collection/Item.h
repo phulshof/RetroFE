@@ -45,6 +45,9 @@ public:
     std::string rating;
     std::string score;
     std::string playlist;
+    std::string lastPlayed;
+    int playCount;
+    
     bool        isFavorite;
     CollectionInfo *collectionInfo;
     bool leaf;
@@ -56,4 +59,5 @@ public:
     bool getInfo( std::string key, std::string &value );
     void loadInfo( std::string path );
     bool static validSortType(std::string attribute);
+    bool static sortDirectionDesc(std::string attribute);
 };
