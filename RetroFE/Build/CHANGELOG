@@ -62,3 +62,6 @@ v0.10.34.1
 	- added property <item selected="true" restart="true"> to restart video upon scroll (monkofthefunk)
 	- added playCount sort; lastPlayed text shows "1 year(s) 1 month(s) 1 day(s) ago" (monkofthefunk)
 	- fixed crashing due to sort; fixed restart video happens when becomming selected and not from; fixed last played text for current day (monkofthefunk)
+	- improved meta data import checks to increase startup speed (monkofthefunk)
+	- improved media player waiting intialization to use threads to increase startup speed (inigomontoya)
+	- added highPriority setting to set process to above normal (monkofthefunk)

@@ -23,10 +23,10 @@ Sound::Sound(std::string file, std::string altfile)
     , chunk_(NULL)
     , channel_(-1)
 {
-    if(!allocate())
+    if(file_ != "" && !allocate())
     {
         file_ = altfile;
-        if (!allocate())
+        if (file_ != "" && !allocate())
         {
             Logger::write(Logger::ZONE_WARNING, "Sound", "Cannot load " + file_);
         }

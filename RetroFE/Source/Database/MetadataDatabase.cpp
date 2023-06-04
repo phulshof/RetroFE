@@ -74,41 +74,41 @@ bool MetadataDatabase::resetDatabase()
 
 bool MetadataDatabase::initialize()
 {
-    int rc;
-    char *error = NULL;
-    sqlite3 *handle = db_.handle;
-
-    std::string sql;
-    sql.append("CREATE TABLE IF NOT EXISTS Meta(");
-    sql.append("collectionName TEXT KEY,");
-    sql.append("name TEXT NOT NULL DEFAULT '',");
-    sql.append("title TEXT NOT NULL DEFAULT '',");
-    sql.append("year TEXT NOT NULL DEFAULT '',");
-    sql.append("manufacturer TEXT NOT NULL DEFAULT '',");
-    sql.append("developer TEXT NOT NULL DEFAULT '',");
-    sql.append("genre TEXT NOT NULL DEFAULT '',");
-    sql.append("cloneOf TEXT NOT NULL DEFAULT '',");
-    sql.append("players TEXT NOT NULL DEFAULT '',");
-    sql.append("ctrltype TEXT NOT NULL DEFAULT '',");
-    sql.append("buttons TEXT NOT NULL DEFAULT '',");
-    sql.append("joyways TEXT NOT NULL DEFAULT '',");
-    sql.append("rating TEXT NOT NULL DEFAULT '',");
-    sql.append("score TEXT NOT NULL DEFAULT '');");
-    sql.append("CREATE UNIQUE INDEX IF NOT EXISTS MetaUniqueId ON Meta(collectionName, name);");
-
-    rc = sqlite3_exec(handle, sql.c_str(), NULL, 0, &error);
-
-    if(rc != SQLITE_OK)
-    {
-        std::stringstream ss;
-        ss << "Unable to create Metadata table. Error: " << error;
-        Logger::write(Logger::ZONE_ERROR, "Metadata", ss.str());
-
-        return false;
-    }
-
     if(needsRefresh())
     {
+        int rc;
+        char* error = NULL;
+        sqlite3* handle = db_.handle;
+
+        std::string sql;
+        sql.append("CREATE TABLE IF NOT EXISTS Meta(");
+        sql.append("collectionName TEXT KEY,");
+        sql.append("name TEXT NOT NULL DEFAULT '',");
+        sql.append("title TEXT NOT NULL DEFAULT '',");
+        sql.append("year TEXT NOT NULL DEFAULT '',");
+        sql.append("manufacturer TEXT NOT NULL DEFAULT '',");
+        sql.append("developer TEXT NOT NULL DEFAULT '',");
+        sql.append("genre TEXT NOT NULL DEFAULT '',");
+        sql.append("cloneOf TEXT NOT NULL DEFAULT '',");
+        sql.append("players TEXT NOT NULL DEFAULT '',");
+        sql.append("ctrltype TEXT NOT NULL DEFAULT '',");
+        sql.append("buttons TEXT NOT NULL DEFAULT '',");
+        sql.append("joyways TEXT NOT NULL DEFAULT '',");
+        sql.append("rating TEXT NOT NULL DEFAULT '',");
+        sql.append("score TEXT NOT NULL DEFAULT '');");
+        sql.append("CREATE UNIQUE INDEX IF NOT EXISTS MetaUniqueId ON Meta(collectionName, name);");
+
+        rc = sqlite3_exec(handle, sql.c_str(), NULL, 0, &error);
+
+        if (rc != SQLITE_OK)
+        {
+            std::stringstream ss;
+            ss << "Unable to create Metadata table. Error: " << error;
+            Logger::write(Logger::ZONE_ERROR, "Metadata", ss.str());
+
+            return false;
+        }
+
         importDirectory();
     }
 
@@ -127,7 +127,7 @@ bool MetadataDatabase::importDirectory()
 
     if(dp == NULL)
     {
-        Logger::write(Logger::ZONE_INFO, "MetadataDatabase", "Could not read directory \"" + hyperListPath + "\"");
+        Logger::write(Logger::ZONE_WARNING, "MetadataDatabase", "Could not read directory \"" + hyperListPath + "\"");
     }
     else
     {
@@ -318,7 +318,7 @@ bool MetadataDatabase::needsRefresh()
 #endif
         time_t metadirTime = timeDir(Utils::combinePath(Configuration::absolutePath, "meta"));
 
-        result = (count == 0 || metadbErr || metadb.st_mtime < metadirTime || exeErr || metadb.st_mtime < exe.st_mtime) ? true : false;
+        result = (count == 0 || metadbErr || metadb.st_mtime < metadirTime || exeErr ) ? true : false;
     }
     else
     {
