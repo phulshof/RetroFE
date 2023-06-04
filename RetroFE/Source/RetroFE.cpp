@@ -53,12 +53,6 @@
 #include <Windows.h>
 #include <SDL2/SDL_syswm.h>
 #include <SDL2/SDL_thread.h>
-
-int RetroFE::initializeHwndThreadFunction(void* data) {
-    RetroFE* self = reinterpret_cast<RetroFE*>(data);
-    self->initializeHwnd();
-    return 0;
-}
 #endif
 
 
@@ -82,30 +76,13 @@ RetroFE::RetroFE( Configuration &c )
     attractMode_                         = false;
     attractModePlaylistCollectionNumber_ = 0;
     firstPlaylist_                       = "all"; // todo
-#ifdef WIN32
-    initializeThread = SDL_CreateThread(initializeHwndThreadFunction, "InitializeHWNDThread", this);
-#endif
 }
 
 #ifdef WIN32
-void RetroFE::initializeHwnd( ) {
-    const int maxAttempts = 10;
-    const int sleepDuration = 500; // In milliseconds
-    int attempt = 0;
-    while (attempt < maxAttempts) {
-        hwnd = FindWindow(NULL, "MediaPlayerHiddenWindow");
-        if (hwnd != NULL) {
-            break;
-        }
-        attempt++;
-
-        SDL_Delay(sleepDuration);
-    }
-}
-
-void RetroFE::postMessage( WPARAM wParam, LPARAM lParam ) {
-    if (hwnd != NULL) {
-        PostMessage(hwnd, 0x8001, wParam, lParam);
+void RetroFE::postMessage(LPCTSTR windowTitle, UINT Msg, WPARAM wParam, LPARAM lParam ) {
+    HWND hwnd = FindWindow(NULL, windowTitle);
+	if (hwnd != NULL) {
+        PostMessage(hwnd, Msg, wParam, lParam);
     }
 }
 #endif
@@ -516,7 +493,7 @@ bool RetroFE::run( )
         case RETROFE_LOAD_ART:
             currentPage_->start( );
 #ifdef WIN32            
-			postMessage(50,0);		
+			postMessage("MediaplayerHiddenWindow",0x8001, 50, 0);		
 #endif			
             state = RETROFE_ENTER;
             break;
@@ -1977,7 +1954,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         {
             attract_.reset( );
 #ifdef WIN32
-            postMessage(51,0);
+        postMessage("MediaplayerHiddenWindow", 0x8001, 51,0);		
 #endif              			
             state = RETROFE_QUIT_REQUEST;
         }

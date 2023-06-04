@@ -53,14 +53,12 @@ public:
     void     launchEnter( );
     void     launchExit( );
 #ifdef WIN32	
-    static int initializeHwndThreadFunction(void* data);
-	void postMessage(WPARAM wParam, LPARAM lParam);
+	void RetroFE::postMessage(LPCTSTR windowTitle, UINT Msg, WPARAM wParam, LPARAM lParam );
 #endif	
 
 private:
 #ifdef WIN32	
     HWND hwnd;
-	void RetroFE::initializeHwnd( );
 #endif
     volatile bool initialized;
     volatile bool initializeError;
