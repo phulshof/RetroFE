@@ -739,9 +739,31 @@ void CollectionInfoBuilder::updateLastPlayedPlaylist(CollectionInfo *info, Item 
 
 
     // sort last played by play time with empty values last
-    info->sortType = "lastplayed";
-    info->sortDesc = true;
-    std::sort(info->playlists["lastplayed"]->begin(), info->playlists["lastplayed"]->end(), info->itemIsLess);
+    std::string sortType = "lastplayed";
+    std::sort(info->playlists["lastplayed"]->begin(), info->playlists["lastplayed"]->end(), [sortType](Item* lhs, Item* rhs) {
+
+        if (lhs->leaf && !rhs->leaf) return true;
+        if (!lhs->leaf && rhs->leaf) return false;
+
+        // sort by collections first
+        if (lhs->collectionInfo->subsSplit && lhs->collectionInfo != rhs->collectionInfo)
+            return lhs->collectionInfo->lowercaseName() < rhs->collectionInfo->lowercaseName();
+        if (!lhs->collectionInfo->menusort && !lhs->leaf && !rhs->leaf)
+            return false;
+
+        // sort by another attribute
+        if (sortType != "") {
+            std::string lhsValue = lhs->getMetaAttribute(sortType);
+            std::string rhsValue = rhs->getMetaAttribute(sortType);
+            bool desc = Item::isSortDesc(sortType);
+
+            if (lhsValue != rhsValue) {
+                return desc ? lhsValue > rhsValue : lhsValue < rhsValue;
+            }
+        }
+        // default sort by name
+        return lhs->lowercaseFullTitle() < rhs->lowercaseFullTitle();
+        });
 
     return;
 }

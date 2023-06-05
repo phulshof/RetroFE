@@ -32,6 +32,7 @@ public:
     void sortItems();
     void sortPlaylists();
     void addSubcollection(CollectionInfo *info);
+    static auto itemIsLess(std::string sortType);
     void extensionList(std::vector<std::string> &extensions);
     std::string name;
     std::string lowercaseName();
@@ -49,7 +50,6 @@ public:
     bool subsSplit;
     bool hasSubs;
     bool sortDesc;
-    static bool itemIsLess(Item* lhs, Item* rhs);
 private:
     Configuration& conf_;
     std::string metadataPath_;

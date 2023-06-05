@@ -184,36 +184,38 @@ void CollectionInfo::addSubcollection(CollectionInfo *newinfo)
     items.insert(items.begin(), newinfo->items.begin(), newinfo->items.end());
 }
 
-bool CollectionInfo::itemIsLess(Item *lhs, Item *rhs)
+auto CollectionInfo::itemIsLess(std::string sortType)
 {
-    if(lhs->leaf && !rhs->leaf) return true;
-    if(!lhs->leaf && rhs->leaf) return false;
+    return [sortType](Item* lhs, Item* rhs) {
 
-    // sort by collections first
-    if(lhs->collectionInfo->subsSplit && lhs->collectionInfo != rhs->collectionInfo)
-        return lhs->collectionInfo->lowercaseName() < rhs->collectionInfo->lowercaseName();
-    if(!lhs->collectionInfo->menusort && !lhs->leaf && !rhs->leaf)
-        return false;
+        if (lhs->leaf && !rhs->leaf) return true;
+        if (!lhs->leaf && rhs->leaf) return false;
 
-    // sort by another attribute
-    std::string sortType = lhs->collectionInfo->sortType != "" ? lhs->collectionInfo->sortType : rhs->collectionInfo->sortType;
-    if (sortType != "") {
-        std::string lhsValue = lhs->getMetaAttribute(sortType);
-        std::string rhsValue = rhs->getMetaAttribute(sortType);
-        bool desc = Item::isSortDesc(sortType);
+        // sort by collections first
+        if (lhs->collectionInfo->subsSplit && lhs->collectionInfo != rhs->collectionInfo)
+            return lhs->collectionInfo->lowercaseName() < rhs->collectionInfo->lowercaseName();
+        if (!lhs->collectionInfo->menusort && !lhs->leaf && !rhs->leaf)
+            return false;
 
-        if (lhsValue != "" && rhsValue != "" && lhsValue != rhsValue) {
-            return desc ? lhsValue > rhsValue : lhsValue < rhsValue;
+        // sort by another attribute
+        if (sortType != "") {
+            std::string lhsValue = lhs->getMetaAttribute(sortType);
+            std::string rhsValue = rhs->getMetaAttribute(sortType);
+            bool desc = Item::isSortDesc(sortType);
+
+            if (lhsValue != rhsValue) {
+                return desc ? lhsValue > rhsValue : lhsValue < rhsValue;
+            }
         }
-    }
-    // default sort by name
-    return lhs->lowercaseFullTitle() < rhs->lowercaseFullTitle();
+        // default sort by name
+        return lhs->lowercaseFullTitle() < rhs->lowercaseFullTitle();
+    };
 }
 
 
 void CollectionInfo::sortItems()
 {
-    std::sort( items.begin(), items.end(), itemIsLess );
+    std::sort( items.begin(), items.end(), itemIsLess(""));
 }
 
 
@@ -228,7 +230,7 @@ void CollectionInfo::sortPlaylists()
         {
             // temporarily set collection info's sortType so search has access to it
             sortType = Item::validSortType(itP->first) ? itP->first : "";
-            std::sort(itP->second->begin(), itP->second->end(), itemIsLess);
+            std::sort(itP->second->begin(), itP->second->end(), itemIsLess(sortType));
         }
     }
     sortType = "";

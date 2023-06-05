@@ -65,3 +65,6 @@ v0.10.34.1
 	- improved meta data import checks to increase startup speed (monkofthefunk)
 	- improved media player waiting intialization to use threads to increase startup speed (inigomontoya)
 	- added highPriority setting to set process to above normal (monkofthefunk)
+	- fixed sort to be more supportive of sort types (monkofthefunk)
+	- fixed playcount as an reloadableimage (monkofthfunk)
+	- improve restart video fast scroll flicker (monkofthefunk)

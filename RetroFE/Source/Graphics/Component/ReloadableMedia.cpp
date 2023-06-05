@@ -328,9 +328,9 @@ void ReloadableMedia::reloadTexture()
             basename = selectedItem->score;
             defined  = true;
         }
-        else if (typeLC == "playCount")
+        else if (typeLC == "playcount")
         {
-            basename = selectedItem->playCount;
+            basename = std::to_string(selectedItem->playCount);
             defined = true;
         }
         else if(typeLC.rfind( "playlist", 0 ) == 0)

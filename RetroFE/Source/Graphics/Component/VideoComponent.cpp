@@ -52,6 +52,10 @@ void VideoComponent::update(float dt)
     }
     if(isPlaying_)
     {
+        if (baseViewInfo.Restart) {
+            restart();
+            baseViewInfo.Restart = false;
+        }
         videoInst_->setVolume(baseViewInfo.Volume);
         videoInst_->update(dt);
 
@@ -60,11 +64,6 @@ void VideoComponent::update(float dt)
         {
             baseViewInfo.ImageHeight = static_cast<float>(videoInst_->getHeight());
             baseViewInfo.ImageWidth = static_cast<float>(videoInst_->getWidth());
-        }
-
-        if (baseViewInfo.Restart) {
-            baseViewInfo.Restart = false;
-            restart();
         }
     }
 
