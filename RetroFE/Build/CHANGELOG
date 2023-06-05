@@ -70,3 +70,4 @@ v0.10.34.1
 	- improve restart video fast scroll flicker (monkofthefunk)
 	- fixed reload playcount after launch (monkofthefunk)
 	- move lastplayed and playcount info into it's own playCount file (monkofthefunk)
+	- fixed don't trigger video restart if scrolling fast (monkofthefunk)
