@@ -182,7 +182,7 @@ void ReloadableText::ReloadTexture()
         else if (type_ == "lastPlayed")
         {
             if (selectedItem->lastPlayed != "0") {
-                text = getTimeSince(selectedItem->lastPlayed);
+                text = selectedItem->lastPlayed;// getTimeSince(selectedItem->lastPlayed);
             }
         }
         else if (type_.rfind( "playlist", 0 ) == 0)

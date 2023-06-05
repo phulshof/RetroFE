@@ -1190,6 +1190,15 @@ void Page::update(float dt)
     }
 }
 
+void Page::updateReloadables(float dt)
+{
+    for (std::vector<Component*>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    {
+        if (*it) {
+            (*it)->update(dt);
+        }
+    }
+}
 
 void Page::cleanup()
 {

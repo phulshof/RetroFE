@@ -68,3 +68,4 @@ v0.10.34.1
 	- fixed sort to be more supportive of sort types (monkofthefunk)
 	- fixed playcount as an reloadableimage (monkofthfunk)
 	- improve restart video fast scroll flicker (monkofthefunk)
+	- fixed reload playcount after launch (monkofthefunk)
