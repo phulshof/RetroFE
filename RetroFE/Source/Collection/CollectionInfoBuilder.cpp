@@ -202,19 +202,27 @@ bool CollectionInfoBuilder::ImportBasicList(CollectionInfo *info, std::string fi
     {
         return false;
     }
-
+    std::string playCountFile = Utils::combinePath(Configuration::absolutePath, "collections", "playCount.txt");
+    std::map<std::string, Item*> curretPlayCountList = ImportPlayCount(playCountFile);
     std::string line; 
-
+    Item* i;
     while(std::getline(includeStream, line))
     {
         line = Utils::filterComments(line);
         
         if (!line.empty() && list.find(line) == list.end())
         {
-            Item *i = new Item();
+            if (curretPlayCountList[line]) {
+                i = curretPlayCountList[line];
+            }
+            else if (curretPlayCountList["_"+info->name+":"+line]) {
+                i = curretPlayCountList["_" + info->name + ":" + line];
+            }
+            else {
+                i = new Item();
+            }
 
             line.erase( std::remove(line.begin(), line.end(), '\r'), line.end() );
-            line = importPlayData(i, line);
 
             i->fullTitle = line;
             i->name = line;
@@ -236,8 +244,10 @@ bool CollectionInfoBuilder::ImportBasicList(CollectionInfo *info, std::string fi
     {
         return false;
     }
-
+    std::string playCountFile = Utils::combinePath(Configuration::absolutePath, "collections", "playCount.txt");
+    std::map<std::string, Item*> curretPlayCountList = ImportPlayCount(playCountFile);
     std::string line; 
+    Item* i;
     while(std::getline(includeStream, line))
     {
         line = Utils::filterComments(line);
@@ -256,10 +266,17 @@ bool CollectionInfoBuilder::ImportBasicList(CollectionInfo *info, std::string fi
 
             if (!found)
             {
-                Item *i = new Item();
+                if (curretPlayCountList[line]) {
+                    i = curretPlayCountList[line];
+                }
+                else if (curretPlayCountList["_" + info->name + ":" + line]) {
+                    i = curretPlayCountList["_" + info->name + ":" + line];
+                }
+                else {
+                    i = new Item();
+                }
 
                 line.erase( std::remove(line.begin(), line.end(), '\r'), line.end() );
-                line = importPlayData(i, line);
                 i->fullTitle = line;
                 i->name = line;
                 i->title = line;
@@ -594,30 +611,6 @@ void CollectionInfoBuilder::loadPlaylistItems(CollectionInfo* info, std::map<std
     closedir(dp);
 }
 
-std::string CollectionInfoBuilder::importPlayData(Item* item, std::string line)
-{
-    // parse play count and last played time
-    std::string extra;
-    size_t extraPosition;
-    size_t timePosition;
-    item->lastPlayed = "0";
-    item->playCount = 0;
-    extraPosition = line.find(";");
-    if (extraPosition != std::string::npos)
-    {
-        extra = line.substr(extraPosition + 1);
-        timePosition = extra.find(";");
-        if (timePosition != std::string::npos)
-        {
-            item->lastPlayed = extra.substr(timePosition+1);
-            item->playCount = Utils::convertInt(extra.substr(0, timePosition));
-        }
-        line = line.substr(0, extraPosition);
-    }
-
-    return line;
-}
-
 void CollectionInfoBuilder::updateLastPlayedPlaylist(CollectionInfo *info, Item *item, int size)
 {
     std::string playlistCollectionName = info->name;
@@ -722,11 +715,11 @@ void CollectionInfoBuilder::updateLastPlayedPlaylist(CollectionInfo *info, Item 
             // append play count and last played time
             if ((*it)->collectionInfo->name == playlistCollectionName)
             {
-                filestream << (*it)->name << ";" << (*it)->playCount << ";" << (*it)->lastPlayed << std::endl;
+                filestream << (*it)->name << std::endl;
             }
             else
             {
-                filestream << "_" << (*it)->collectionInfo->name << ":" << (*it)->name << ";" << (*it)->playCount << ";" << (*it)->lastPlayed << std::endl;
+                filestream << "_" << (*it)->collectionInfo->name << ":" << (*it)->name << std::endl;
             }
         }
 
@@ -736,7 +729,6 @@ void CollectionInfoBuilder::updateLastPlayedPlaylist(CollectionInfo *info, Item 
     {
         Logger::write(Logger::ZONE_ERROR, "Collection", "Save failed: " + file);
     }
-
 
     // sort last played by play time with empty values last
     std::string sortType = "lastplayed";
@@ -765,9 +757,119 @@ void CollectionInfoBuilder::updateLastPlayedPlaylist(CollectionInfo *info, Item 
         return lhs->lowercaseFullTitle() < rhs->lowercaseFullTitle();
         });
 
+    AddToPlayCount(item);
+
     return;
 }
 
+std::string CollectionInfoBuilder::getKey(Item* item)
+{
+    return "_" + item->collectionInfo->name + ":" + item->name;
+}
+
+void CollectionInfoBuilder::AddToPlayCount(Item* item)
+{
+    // Write new playcount file
+    std::string dir = Utils::combinePath(Configuration::absolutePath, "collections");
+    std::string file = Utils::combinePath(Configuration::absolutePath, "collections", "playCount.txt");
+
+    // todo read to playcount
+    std::map<std::string, Item*> curretPlayCountList = ImportPlayCount(file);    
+    curretPlayCountList[getKey(item)] = item;
+    Logger::write(Logger::ZONE_INFO, "PlayCount", "Saving " + item->name + " " + std::to_string(item->playCount));
+
+    Logger::write(Logger::ZONE_INFO, "PlayCount", "Saving " + file);
+
+    std::ofstream filestream;
+    try
+    {
+        // Create playlists directory if it does not exist yet.
+        struct stat infostat;
+        if (stat(dir.c_str(), &infostat) != 0)
+        {
+#if defined(_WIN32) && !defined(__GNUC__)
+            if (!CreateDirectory(dir.c_str(), NULL))
+            {
+                if (ERROR_ALREADY_EXISTS != GetLastError())
+                {
+                    Logger::write(Logger::ZONE_WARNING, "PlayCount", "Could not create directory " + dir);
+                    return;
+                }
+            }
+#else 
+#if defined(__MINGW32__)
+            if (mkdir(dir.c_str()) == -1)
+#else
+            if (mkdir(dir.c_str(), 0755) == -1)
+#endif        
+            {
+                Logger::write(Logger::ZONE_WARNING, "PlayCount", "Could not create directory " + dir);
+                return;
+            }
+#endif
+        }
+        else if (!(infostat.st_mode & S_IFDIR))
+        {
+            Logger::write(Logger::ZONE_WARNING, "PlayCount", dir + " exists, but is not a directory.");
+            return;
+        }
+
+        // write file
+        filestream.open(file.c_str());
+        for (std::map<std::string, Item*>::iterator it = curretPlayCountList.begin(); it != curretPlayCountList.end(); it++)
+        {
+            // append play count and last played time
+            filestream << it->first << ";" << it->second->playCount << ";" << it->second->lastPlayed << std::endl;
+        }
+
+        filestream.close();
+    }
+    catch (std::exception&)
+    {
+        Logger::write(Logger::ZONE_ERROR, "PlayCount", "Save failed: " + file);
+    }
+}
+
+std::map<std::string, Item*> CollectionInfoBuilder::ImportPlayCount( std::string file)
+{
+    std::ifstream includeStream(file.c_str());
+    std::map<std::string, Item*> curretPlayCountList;
+    if (!includeStream.good())
+    {
+        return curretPlayCountList;
+    }
+
+    // parse play count and last played time
+    std::string extra;
+    size_t extraPosition;
+    size_t timePosition;
+   
+    std::string line;
+    while (std::getline(includeStream, line))
+    {
+        line = Utils::filterComments(line);
+        if (!line.empty())
+        {
+            line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+            extraPosition = line.find(";");
+            if (extraPosition != std::string::npos)
+            {
+                extra = line.substr(extraPosition + 1);
+                timePosition = extra.find(";");
+                line = line.substr(0, extraPosition);
+                if (timePosition != std::string::npos)
+                {
+                    Item* item = new Item();
+                    item->lastPlayed = extra.substr(timePosition + 1);
+                    item->playCount = Utils::convertInt(extra.substr(0, timePosition));
+                    curretPlayCountList.insert({ line, item });
+                }
+            }
+        }
+    }
+
+    return curretPlayCountList;
+}
 
 void CollectionInfoBuilder::ImportRomDirectory(std::string path, CollectionInfo *info, std::map<std::string, Item *> includeFilter, std::map<std::string, Item *> excludeFilter, bool romHierarchy, bool emuarc)
 {

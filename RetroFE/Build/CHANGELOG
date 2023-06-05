@@ -69,3 +69,4 @@ v0.10.34.1
 	- fixed playcount as an reloadableimage (monkofthfunk)
 	- improve restart video fast scroll flicker (monkofthefunk)
 	- fixed reload playcount after launch (monkofthefunk)
+	- move lastplayed and playcount info into it's own playCount file (monkofthefunk)
