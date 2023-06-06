@@ -1213,6 +1213,7 @@ bool RetroFE::run( )
                 if (nextPageItem_->collectionInfo->name != lastPlayedSkipCollection)
                 {
                     cib.updateLastPlayedPlaylist(currentPage_->getCollection(), nextPageItem_, size); // Update last played playlist if not currently in the skip playlist (e.g. settings)
+                    currentPage_->updateReloadables(0);
                     // with new sort by last played return to first
                     if (currentPage_->getPlaylistName() == "lastplayed")
                     {

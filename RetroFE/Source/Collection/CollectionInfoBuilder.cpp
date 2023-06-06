@@ -635,7 +635,11 @@ void CollectionInfoBuilder::updateLastPlayedPlaylist(CollectionInfo *info, Item 
         return;
     // update the curren't items play count and last played time to be used for meta info/sorting and writing back to list
     item->playCount++;
+#ifdef _WIN32
     item->lastPlayed = std::to_string(std::time(0));
+#else
+    item->lastPlayed = std::to_string(time(0));
+#endif
 
     // Put the new item at the front of the list.
     info->playlists["lastplayed"]->push_back(item);

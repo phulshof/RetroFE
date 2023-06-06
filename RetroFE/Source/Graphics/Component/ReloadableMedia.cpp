@@ -67,7 +67,9 @@ void ReloadableMedia::update(float dt)
 {
     if (newItemSelected ||
        (newScrollItemSelected && getMenuScrollReload()) ||
-        type_ == "isPaused")
+        type_ == "isPaused" || 
+        type_ == "playCount" || 
+        type_ == "playcount")
     {
 
         reloadTexture();
