@@ -1935,6 +1935,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
                         nextPageItem_->collectionInfo->name != lastPlayedSkipCollection) 
                     {
                         cib.updateLastPlayedPlaylist(currentPage_->getCollection(), nextPageItem_, size); // Update last played playlist if not currently in the skip playlist (e.g. settings)
+                        currentPage_->updateReloadables(0);
                     }
                     state = RETROFE_NEXT_PAGE_REQUEST;
                 }

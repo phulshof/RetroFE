@@ -95,6 +95,7 @@ public:
     bool isMenuIdle();
     void setStatusTextComponent(Text *t);
     void update(float dt);
+    void updateReloadables(float dt);
     void cleanup();
     void draw();
     void freeGraphicsMemory();

@@ -726,7 +726,8 @@ void ScrollingList::resetTweens( Component *c, AnimationEvents *sets, ViewInfo *
     c->baseViewInfo = *currentViewInfo;
 
     TweenSet *set = new TweenSet( );
-    if (currentViewInfo->Restart)
+    // don't trigger video restart if scrolling fast 
+    if (currentViewInfo->Restart && scrollPeriod_ > minScrollTime_)
         set->push(new Tween(TWEEN_PROPERTY_RESTART, LINEAR, currentViewInfo->Restart, nextViewInfo->Restart, 0));
 
     set->push(new Tween(TWEEN_PROPERTY_HEIGHT, LINEAR, currentViewInfo->Height, nextViewInfo->Height, scrollTime ) );
