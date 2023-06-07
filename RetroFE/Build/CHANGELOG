@@ -73,3 +73,4 @@ v0.10.34.1
 	- fixed don't trigger video restart if scrolling fast (monkofthefunk)
 	- fixed reload playcount after launch for images (monkofthefunk)
 	- fixed playCount import (monkofthefunk)
+	- fix playlist menu flash after playing a lastplayed game (monkofthefunk)

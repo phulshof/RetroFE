@@ -1218,7 +1218,7 @@ bool RetroFE::run( )
                     if (currentPage_->getPlaylistName() == "lastplayed")
                     {
                         currentPage_->setScrollOffsetIndex(0);
-                        currentPage_->onNewItemSelected();
+                        currentPage_->highlightLoadArt();
                     }
                 }
 

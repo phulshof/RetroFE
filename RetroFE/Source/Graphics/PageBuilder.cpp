@@ -265,7 +265,7 @@ Page *PageBuilder::buildPage( std::string collectionName )
             std::string what = e.what();
             long line = static_cast<long>(std::count(&buffer.front(), e.where<char>(), char('\n')) + 1);
             std::stringstream ss;
-            ss << "Could not parse layout file. [Line: " << line << "] Reason: " << e.what();
+            ss << "Could not parse layout file. [Line: " << line << "] in " << layoutFile << " Reason: " << e.what();
 
             Logger::write(Logger::ZONE_ERROR, "Layout", ss.str());
         }
