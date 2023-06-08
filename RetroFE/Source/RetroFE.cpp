@@ -1704,36 +1704,40 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         else if (input_.keystate(UserInput::KeyCodeLetterUp))
         {
             attract_.reset( );
-            // if playlist same name as meta sort value then support meta jump
-            if (Item::validSortType(page->getPlaylistName())) {
-                page->metaScroll(Page::ScrollDirectionBack, page->getPlaylistName());
-            }
-            else {
-                bool cfwLetterSub;
+            if (currentPage_->getPlaylistName() != "lastplayed") {
+                // if playlist same name as meta sort value then support meta jump
+                if (Item::validSortType(page->getPlaylistName())) {
+                    page->metaScroll(Page::ScrollDirectionBack, page->getPlaylistName());
+                }
+                else {
+                    bool cfwLetterSub;
                     config_.getProperty("cfwLetterSub", cfwLetterSub);
                     if (cfwLetterSub && page->hasSubs())
                         page->cfwLetterSubScroll(Page::ScrollDirectionBack);
                     else
                         page->letterScroll(Page::ScrollDirectionBack);
+                }
+                state = RETROFE_MENUJUMP_REQUEST;
             }
-            state = RETROFE_MENUJUMP_REQUEST;
         }
 
         else if (input_.keystate(UserInput::KeyCodeLetterDown))
         {
             attract_.reset( );
-            if (Item::validSortType(page->getPlaylistName())) {
-                page->metaScroll(Page::ScrollDirectionForward, page->getPlaylistName());
+            if (currentPage_->getPlaylistName() != "lastplayed") {
+                if (Item::validSortType(page->getPlaylistName())) {
+                    page->metaScroll(Page::ScrollDirectionForward, page->getPlaylistName());
+                }
+                else {
+                    bool cfwLetterSub;
+                    config_.getProperty("cfwLetterSub", cfwLetterSub);
+                    if (cfwLetterSub && page->hasSubs())
+                        page->cfwLetterSubScroll(Page::ScrollDirectionForward);
+                    else
+                        page->letterScroll(Page::ScrollDirectionForward);
+                }
+                state = RETROFE_MENUJUMP_REQUEST;
             }
-            else {
-                bool cfwLetterSub;
-                config_.getProperty("cfwLetterSub", cfwLetterSub);
-                if (cfwLetterSub && page->hasSubs())
-                    page->cfwLetterSubScroll(Page::ScrollDirectionForward);
-                else
-                    page->letterScroll(Page::ScrollDirectionForward);
-            }
-            state = RETROFE_MENUJUMP_REQUEST;
         }
 
         else if ( input_.keystate(UserInput::KeyCodeFavPlaylist) )
