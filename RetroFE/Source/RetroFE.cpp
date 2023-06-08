@@ -729,7 +729,7 @@ bool RetroFE::run( )
                     // Load new layout if available
                     std::string layoutName;
                     config_.getProperty( "layout", layoutName );
-                    PageBuilder pb( layoutName, "layout", config_, &fontcache_ );
+                    PageBuilder pb( layoutName, getLayoutFileName(), config_, &fontcache_ );
                     Page *page = pb.buildPage( nextPageItem_->name );
                     if ( page )
                     {
@@ -1348,7 +1348,7 @@ bool RetroFE::run( )
                 lastMenuPlaylists_[collectionName] = currentPage_->getPlaylistName( );
                 std::string layoutName;
                 config_.getProperty( "layout", layoutName );
-                PageBuilder pb( layoutName, "layout", config_, &fontcache_, true );
+                PageBuilder pb( layoutName, getLayoutFileName(), config_, &fontcache_, true );
                 Page *page = pb.buildPage( );
                 if ( page )
                 {
@@ -2029,7 +2029,7 @@ Page *RetroFE::loadPage( )
 
     config_.getProperty( "layout", layoutName );
 
-    PageBuilder pb( layoutName, "layout", config_, &fontcache_ );
+    PageBuilder pb( layoutName, getLayoutFileName(), config_, &fontcache_ );
     Page *page = pb.buildPage( );
 
     if ( !page )
@@ -2229,4 +2229,24 @@ void RetroFE::saveRetroFEState( )
     {
         Logger::write(Logger::ZONE_ERROR, "RetroFE", "Save failed: " + file);
     }
+}
+
+std::string RetroFE::getLayoutFileName()
+{
+    std::string layoutName = "layout";
+    std::string randomLayoutNames;
+    config_.getProperty("randomLayout", randomLayoutNames);
+    if (randomLayoutNames != "") {
+        Logger::write(Logger::ZONE_INFO, "RetroFE", "Choosing random layout from: " + randomLayoutNames);
+        std::vector<std::string> randomLayoutVector;
+        Utils::listToVector(randomLayoutNames, randomLayoutVector, ',');
+        if (randomLayoutVector.size() > 1) {
+            layoutName = randomLayoutVector[rand() % randomLayoutVector.size()];
+        }
+        else {
+            layoutName = randomLayoutVector[0];
+        }
+    }
+
+    return layoutName;
 }

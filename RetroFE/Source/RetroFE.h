@@ -130,6 +130,8 @@ private:
     CollectionInfo *getCollection( std::string collectionName );
     CollectionInfo *getMenuCollection( std::string collectionName );
 	void            saveRetroFEState( );
+    std::string getLayoutFileName();
+
 
     Configuration     &config_;
     DB                *db_;
