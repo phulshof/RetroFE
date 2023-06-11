@@ -45,6 +45,8 @@ Page::Page(Configuration &config, int layoutWidth, int layoutHeight)
     , anActiveMenu_(NULL)
     , fromPreviousPlaylist (false)
     , fromPlaylistNav(false)
+    , controlsType_("")
+    , locked_(false)
 {
     for (int i = 0; i < SDL::getNumScreens(); i++)
     {
@@ -510,6 +512,15 @@ float Page::getMinShowTime()
     return minShowTime_;
 }
 
+std::string Page::controlsType()
+{
+    return controlsType_;
+}
+
+void Page::setControlsType(std::string type)
+{
+    controlsType_ = type;
+}
 
 void Page::playlistChange()
 {
@@ -1669,6 +1680,16 @@ bool Page::isPaused( )
         ret |= (*it)->isPaused( );
     }
     return ret;
+}
+
+void Page::setLocked(bool locked)
+{
+    locked_ = locked;
+}
+
+bool Page::isLocked()
+{
+    return locked_;
 }
 
 ScrollingList* Page::getPlaylistMenu()
