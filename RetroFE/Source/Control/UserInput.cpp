@@ -84,6 +84,7 @@ bool UserInput::initialize()
     MapKey("jbFastRewind5p", KeyCodeSkipBackwardp, false);
     MapKey("jbPause", KeyCodePause, false);
     MapKey("jbRestart", KeyCodeRestart, false);
+    MapKey("kiosk", KeyCodeKisok, false);
 
     bool retVal = true;
 
@@ -378,8 +379,10 @@ void UserInput::clearJoysticks( )
 }
 
 
-void UserInput::reconfigure( )
+void UserInput::reconfigure()
 {
+    Logger::write(Logger::ZONE_INFO, "Input", "Reconfigure Inputs");
+
     for (unsigned int i = 0; i < keyHandlers_.size(); ++i)
     {
         if (keyHandlers_[i].first)

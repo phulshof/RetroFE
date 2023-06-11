@@ -451,7 +451,6 @@ bool Component::isPlaying()
 
 
 
-
 bool Component::isJukeboxPlaying()
 {
     return false;

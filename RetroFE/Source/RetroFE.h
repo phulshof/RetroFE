@@ -128,6 +128,7 @@ private:
     RETROFE_STATE   processUserInput( Page *page );
     void            update( float dt, bool scrollActive );
     CollectionInfo *getCollection( std::string collectionName );
+    void updatePageControls(std::string type);
     CollectionInfo *getMenuCollection( std::string collectionName );
 	void            saveRetroFEState( );
     std::string getLayoutFileName();
@@ -151,6 +152,7 @@ private:
     bool               attractMode_;
 	int                attractModePlaylistCollectionNumber_;
 	bool               reboot_;
+    bool               kioskLock_;
 	std::string        firstPlaylist_;
     std::map<std::string, bool> lkupAttractModeSkipPlaylist_;
     std::map<std::string, unsigned int> lastMenuOffsets_;

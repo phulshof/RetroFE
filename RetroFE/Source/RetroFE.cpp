@@ -71,6 +71,7 @@ RetroFE::RetroFE( Configuration &c )
     , keyLastTime_(0)
     , keyDelayTime_(.3f)
     , reboot_(false)
+    , kioskLock_(false)
 {
     menuMode_                            = false;
     attractMode_                         = false;
@@ -329,9 +330,9 @@ bool RetroFE::run( )
 
     // Define control configuration
     std::string controlsConfPath = Utils::combinePath( Configuration::absolutePath, "controls" );
-    for (int i = 9; i > 0; i--)
-        config_.import("controls", controlsConfPath + std::to_string(i) + ".conf", false);
     config_.import("controls", controlsConfPath + ".conf");
+    for (int i = 1; i < 10; i++)
+        config_.import("controls", controlsConfPath + std::to_string(i) + ".conf", false);
 
     if (config_.propertiesEmpty())
     {
@@ -410,6 +411,7 @@ bool RetroFE::run( )
     Menu     m( config_, input_ );
     preloadTime = static_cast<float>( SDL_GetTicks( ) ) / 1000;
     l.LEDBlinky( 1 );
+    config_.getProperty("kiosk", kioskLock_);
 
     while ( running )
     {
@@ -733,6 +735,10 @@ bool RetroFE::run( )
                     Page *page = pb.buildPage( nextPageItem_->name );
                     if ( page )
                     {
+                        if (page->controlsType() != "") {
+                            updatePageControls(page->controlsType());
+                            page->setControlsType("");
+                        }
                         currentPage_->freeGraphicsMemory( );
                         pages_.push( currentPage_ );
                         currentPage_ = page;
@@ -1352,6 +1358,10 @@ bool RetroFE::run( )
                 Page *page = pb.buildPage( );
                 if ( page )
                 {
+                    if (page->controlsType() != "") {
+                        updatePageControls(page->controlsType());
+                        page->setControlsType("");
+                    }
                     currentPage_->freeGraphicsMemory( );
                     pages_.push( currentPage_ );
                     currentPage_ = page;
@@ -1437,7 +1447,7 @@ bool RetroFE::run( )
                 if (!splashMode)
                 {
                     int attractReturn = attract_.update( deltaTime, *currentPage_ );
-                    if (attractReturn == 1) // Change playlist
+                    if (!kioskLock_ && attractReturn == 1) // Change playlist
                     {
                         attract_.reset( attract_.isSet( ) );
                         std::string settingPrefix = "collections." + currentPage_->getCollectionName() + ".";
@@ -1480,7 +1490,7 @@ bool RetroFE::run( )
                         }
                         state = RETROFE_PLAYLIST_REQUEST;
                     }
-                    if (attractReturn == 2) // Change collection
+                    if (!kioskLock_ && attractReturn == 2) // Change collection
                     {
                         attract_.reset( attract_.isSet( ) );
                         state = RETROFE_COLLECTION_DOWN_REQUEST;
@@ -1654,6 +1664,12 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         }
     }
 
+    // lock or unlock playlist/collection/menu nav and fav toggle
+    if (input_.keystate(UserInput::KeyCodeKisok)) {
+        kioskLock_ = !kioskLock_;
+        page->setLocked(kioskLock_);
+    }
+
     // Ignore other keys while the menu is scrolling
     if ( page->isIdle( ) && currentTime_ - keyLastTime_ > keyDelayTime_ )
     {
@@ -1663,8 +1679,8 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         }
 
         // Handle Collection Up/Down keys
-        else if ((input_.keystate(UserInput::KeyCodeCollectionUp)   && ( page->isHorizontalScroll( ) || !input_.keystate(UserInput::KeyCodeUp))) ||
-                 (input_.keystate(UserInput::KeyCodeCollectionLeft) && (!page->isHorizontalScroll( ) || !input_.keystate(UserInput::KeyCodeLeft))))
+        else if (!kioskLock_ && ((input_.keystate(UserInput::KeyCodeCollectionUp)   && ( page->isHorizontalScroll( ) || !input_.keystate(UserInput::KeyCodeUp))) ||
+                 (input_.keystate(UserInput::KeyCodeCollectionLeft) && (!page->isHorizontalScroll( ) || !input_.keystate(UserInput::KeyCodeLeft)))))
         {
             attract_.reset( );
             bool backOnCollection = false;
@@ -1675,8 +1691,8 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
                 state = RETROFE_BACK_REQUEST;
         }
 
-        else if ((input_.keystate(UserInput::KeyCodeCollectionDown)  && ( page->isHorizontalScroll( ) || !input_.keystate(UserInput::KeyCodeDown))) ||
-                 (input_.keystate(UserInput::KeyCodeCollectionRight) && (!page->isHorizontalScroll( ) || !input_.keystate(UserInput::KeyCodeRight))))
+        else if (!kioskLock_ && ((input_.keystate(UserInput::KeyCodeCollectionDown)  && ( page->isHorizontalScroll( ) || !input_.keystate(UserInput::KeyCodeDown))) ||
+                 (input_.keystate(UserInput::KeyCodeCollectionRight) && (!page->isHorizontalScroll( ) || !input_.keystate(UserInput::KeyCodeRight)))))
         {
             attract_.reset( );
             bool backOnCollection = false;
@@ -1687,14 +1703,14 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
                 state = RETROFE_BACK_REQUEST;
         }
 
-        else if (input_.keystate(UserInput::KeyCodePageUp))
+        else if (!kioskLock_ && input_.keystate(UserInput::KeyCodePageUp))
         {
             attract_.reset( );
             page->pageScroll(Page::ScrollDirectionBack);
             state = RETROFE_MENUJUMP_REQUEST;
         }
 
-        else if (input_.keystate(UserInput::KeyCodePageDown))
+        else if (!kioskLock_ && input_.keystate(UserInput::KeyCodePageDown))
         {
             attract_.reset( );
             page->pageScroll(Page::ScrollDirectionForward);
@@ -1740,25 +1756,25 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             }
         }
 
-        else if ( input_.keystate(UserInput::KeyCodeFavPlaylist) )
+        else if (!kioskLock_ && input_.keystate(UserInput::KeyCodeFavPlaylist) )
         {
             attract_.reset( );
             page->favPlaylist( );
             state = RETROFE_PLAYLIST_REQUEST;
         }
 
-        else if ( input_.keystate(UserInput::KeyCodeNextPlaylist) ||
+        else if (!kioskLock_ && (input_.keystate(UserInput::KeyCodeNextPlaylist) ||
                  (input_.keystate(UserInput::KeyCodePlaylistDown)  &&  page->isHorizontalScroll( )) ||
-                 (input_.keystate(UserInput::KeyCodePlaylistRight) && !page->isHorizontalScroll( )))
+                 (input_.keystate(UserInput::KeyCodePlaylistRight) && !page->isHorizontalScroll( ))))
         {
             attract_.reset( );
             page->nextPlaylist( );
             state = RETROFE_PLAYLIST_REQUEST;
         }
 
-        else if ( input_.keystate(UserInput::KeyCodePrevPlaylist) ||
+        else if (!kioskLock_ && (input_.keystate(UserInput::KeyCodePrevPlaylist) ||
                  (input_.keystate(UserInput::KeyCodePlaylistUp)   &&  page->isHorizontalScroll( )) ||
-                 (input_.keystate(UserInput::KeyCodePlaylistLeft) && !page->isHorizontalScroll( )))
+                 (input_.keystate(UserInput::KeyCodePlaylistLeft) && !page->isHorizontalScroll( ))))
         {
             attract_.reset( );
             page->playlistPrevEnter();
@@ -1766,8 +1782,8 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             state = RETROFE_PLAYLIST_REQUEST;
         }
 
-        else if ( input_.keystate(UserInput::KeyCodeCyclePlaylist) ||
-                  input_.keystate(UserInput::KeyCodeNextCyclePlaylist) )
+        else if (!kioskLock_ && (input_.keystate(UserInput::KeyCodeCyclePlaylist) ||
+                  input_.keystate(UserInput::KeyCodeNextCyclePlaylist)))
         {
             if (!isStandalonePlaylist(currentPage_->getPlaylistName()))
             {
@@ -1790,7 +1806,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             }
         }
 
-        else if ( input_.keystate(UserInput::KeyCodePrevCyclePlaylist) )
+        else if (!kioskLock_ && input_.keystate(UserInput::KeyCodePrevCyclePlaylist))
         {
             if (!isStandalonePlaylist(currentPage_->getPlaylistName()))
             {
@@ -1812,7 +1828,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             }
         }
 
-        else if ( input_.keystate(UserInput::KeyCodeRemovePlaylist) )
+        else if (!kioskLock_ && input_.keystate(UserInput::KeyCodeRemovePlaylist))
         {
             attract_.reset( );
             page->rememberSelectedItem();
@@ -1823,7 +1839,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             state = RETROFE_PLAYLIST_ENTER;
         }
 
-        else if ( input_.keystate(UserInput::KeyCodeAddPlaylist) )
+        else if (!kioskLock_ && input_.keystate(UserInput::KeyCodeAddPlaylist) )
         {
             if (!isStandalonePlaylist(currentPage_->getPlaylistName()))
             {
@@ -1837,7 +1853,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             }
         }
 
-        else if ( input_.keystate(UserInput::KeyCodeTogglePlaylist) )
+        else if (!kioskLock_ && input_.keystate(UserInput::KeyCodeTogglePlaylist) )
         {
             if (currentPage_->getPlaylistName() != "favorites" && 
                 !isStandalonePlaylist(currentPage_->getPlaylistName()))
@@ -1947,7 +1963,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             }
         }
 
-        else if (input_.keystate(UserInput::KeyCodeBack))
+        else if (!kioskLock_ && input_.keystate(UserInput::KeyCodeBack))
         {
             attract_.reset( );
             if ( back( exit ) || exit )
@@ -1956,7 +1972,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             }
         }
 
-        else if (input_.keystate(UserInput::KeyCodeQuit))
+        else if (input_.keystate(UserInput::KeyCodeQuit)) // !kioskLock_ && 
         {
             attract_.reset( );
 #ifdef WIN32
@@ -1965,14 +1981,14 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             state = RETROFE_QUIT_REQUEST;
         }
 
-        else if (input_.keystate(UserInput::KeyCodeReboot))
+        else if (input_.keystate(UserInput::KeyCodeReboot)) // !kioskLock_ && 
         {
             attract_.reset( );
             reboot_ = true;
             state   = RETROFE_QUIT_REQUEST;
         }
 
-        else if (input_.keystate(UserInput::KeyCodeSaveFirstPlaylist))
+        else if (!kioskLock_ && input_.keystate(UserInput::KeyCodeSaveFirstPlaylist))
         {
             attract_.reset( );
             if ( page->getMenuDepth( ) == 1 )
@@ -2023,18 +2039,24 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
 
 
 // Load a page
-Page *RetroFE::loadPage( )
+Page* RetroFE::loadPage()
 {
     std::string layoutName;
 
-    config_.getProperty( "layout", layoutName );
+    config_.getProperty("layout", layoutName);
 
-    PageBuilder pb( layoutName, getLayoutFileName(), config_, &fontcache_ );
-    Page *page = pb.buildPage( );
+    PageBuilder pb(layoutName, getLayoutFileName(), config_, &fontcache_);
+    Page* page = pb.buildPage();
 
-    if ( !page )
+    if (!page)
     {
-        Logger::write( Logger::ZONE_ERROR, "RetroFE", "Could not create page" );
+        Logger::write(Logger::ZONE_ERROR, "RetroFE", "Could not create page");
+    }
+    else {
+        if (page->controlsType() != "") {
+            updatePageControls(page->controlsType());
+            page->setControlsType("");
+        }
     }
 
     return page;
@@ -2184,6 +2206,14 @@ CollectionInfo *RetroFE::getCollection(std::string collectionName)
     return collection;
 }
 
+void RetroFE::updatePageControls(std::string type)
+{
+    Logger::write(Logger::ZONE_INFO, "Layout", "Layout changed controls type " + type);
+    std::string controlsConfPath = Utils::combinePath(Configuration::absolutePath, "controls");
+    if (config_.import("controls", controlsConfPath + " - " + type + ".conf")) {
+        input_.reconfigure();
+    }
+}
 
 // Load a menu
 CollectionInfo *RetroFE::getMenuCollection( std::string collectionName )
