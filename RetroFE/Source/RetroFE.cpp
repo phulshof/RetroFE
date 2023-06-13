@@ -527,9 +527,12 @@ bool RetroFE::run( )
                 delete currentPage_;
 
                 currentPage_ = loadPage( );
+                currentPage_->setLocked(kioskLock_);
                 splashMode = false;
                 if ( currentPage_ )
                 {
+                    currentPage_->setLocked(kioskLock_);
+
                     std::string firstCollection = "Main";
 
                     config_.getProperty( "firstCollection", firstCollection );
@@ -742,6 +745,7 @@ bool RetroFE::run( )
                         currentPage_->freeGraphicsMemory( );
                         pages_.push( currentPage_ );
                         currentPage_ = page;
+                        currentPage_->setLocked(kioskLock_);
                     }
                 }
 
@@ -885,6 +889,7 @@ bool RetroFE::run( )
                     currentPage_ = pages_.top( );
                     pages_.pop( );
                     currentPage_->allocateGraphicsMemory( );
+                    currentPage_->setLocked(kioskLock_);
                 }
                 else // Inside a collection with the same layout
                 {
@@ -1088,6 +1093,7 @@ bool RetroFE::run( )
                     currentPage_ = pages_.top( );
                     pages_.pop( );
                     currentPage_->allocateGraphicsMemory( );
+                    currentPage_->setLocked(kioskLock_);
                 }
                 else // Inside a collection with the same layout
                 {
@@ -1283,6 +1289,7 @@ bool RetroFE::run( )
                     currentPage_ = pages_.top( );
                     pages_.pop( );
                     currentPage_->allocateGraphicsMemory( );
+                    currentPage_->setLocked(kioskLock_);
                 }
                 else
                 {
@@ -1365,6 +1372,7 @@ bool RetroFE::run( )
                     currentPage_->freeGraphicsMemory( );
                     pages_.push( currentPage_ );
                     currentPage_ = page;
+                    currentPage_->setLocked(kioskLock_);
                     menuMode_ = true;
                     m.setPage( page );
                 }
@@ -1664,16 +1672,18 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         }
     }
 
-    // lock or unlock playlist/collection/menu nav and fav toggle
-    if (input_.keystate(UserInput::KeyCodeKisok)) {
-        kioskLock_ = !kioskLock_;
-        page->setLocked(kioskLock_);
-    }
-
     // Ignore other keys while the menu is scrolling
     if ( page->isIdle( ) && currentTime_ - keyLastTime_ > keyDelayTime_ )
     {
-        if ( input_.keystate(UserInput::KeyCodeMenu) && !menuMode_)
+
+        // lock or unlock playlist/collection/menu nav and fav toggle
+        if (input_.keystate(UserInput::KeyCodeKisok)) {
+            attract_.reset();
+            kioskLock_ = !kioskLock_;
+            page->setLocked(kioskLock_);
+            page->onNewItemSelected();
+            keyLastTime_ = currentTime_;
+        }else if ( input_.keystate(UserInput::KeyCodeMenu) && !menuMode_)
         {
             state = RETROFE_MENUMODE_START_REQUEST;
         }
