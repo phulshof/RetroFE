@@ -72,6 +72,7 @@ RetroFE::RetroFE( Configuration &c )
     , keyDelayTime_(.3f)
     , reboot_(false)
     , kioskLock_(false)
+    , paused_(false)
 {
     menuMode_                            = false;
     attractMode_                         = false;
@@ -165,9 +166,6 @@ void RetroFE::launchEnter( )
     // Disable window focus
     SDL_SetWindowGrab(SDL::getWindow( 0 ), SDL_FALSE);
 
-    // Free the textures, and optionally take down SDL
-    freeGraphicsMemory( );
-
     bool hideMouse = false;
     int  mouseX    = 5000;
     int  mouseY    = 5000;
@@ -182,9 +180,6 @@ void RetroFE::launchEnter( )
 // Return from the launch of a game/program
 void RetroFE::launchExit( )
 {
-
-    // Optionally set up SDL, and load the textures
-    allocateGraphicsMemory( );
 
     // Restore the SDL settings
     SDL_RestoreWindow( SDL::getWindow( 0 ) );
@@ -1235,7 +1230,7 @@ bool RetroFE::run( )
                 }
 
                 l.LEDBlinky( 3, nextPageItem_->collectionInfo->name, nextPageItem_ );
-                if (l.run(nextPageItem_->collectionInfo->name, nextPageItem_)) // Run and check if we need to reboot
+                if (l.run(nextPageItem_->collectionInfo->name, nextPageItem_, currentPage_)) // Run and check if we need to reboot
                 {
                     attract_.reset( );
                     reboot_ = true;
@@ -1243,6 +1238,7 @@ bool RetroFE::run( )
                 }
                 else
                 {
+                    attract_.reset();
                     launchExit( );
                     l.LEDBlinky( 4 );
                     currentPage_->exitGame( );
@@ -1452,7 +1448,7 @@ bool RetroFE::run( )
 		
             if ( currentPage_ )
             {
-                if (!splashMode)
+                if (!splashMode && !paused_)
                 {
                     int attractReturn = attract_.update( deltaTime, *currentPage_ );
                     if (!kioskLock_ && attractReturn == 1) // Change playlist
@@ -1511,7 +1507,7 @@ bool RetroFE::run( )
                 currentPage_->update( deltaTime );
                 SDL_PumpEvents( );
                 input_.updateKeystate( );
-                if (!splashMode)
+                if (!splashMode && !paused_)
                 {
                     if ( currentPage_->isAttractIdle( ) )
                     {
@@ -1912,10 +1908,14 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
 
         else if ( input_.keystate(UserInput::KeyCodePause) )
         {
-            attract_.reset( );
             page->pause( );
             page->jukeboxJump( );
             keyLastTime_ = currentTime_;
+            paused_ = !paused_;
+            if (!paused_) {
+                // trigger attract on unpause
+                attract_.activate();
+            }
         }
 
         else if ( input_.keystate(UserInput::KeyCodeRestart) )

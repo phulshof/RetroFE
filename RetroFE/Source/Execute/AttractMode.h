@@ -31,6 +31,7 @@ public:
 	int   maxTime;
     bool isFast;
     bool  isActive();
+    void activate();
     bool  isSet();
 
 private:

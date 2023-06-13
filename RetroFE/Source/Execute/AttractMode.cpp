@@ -127,6 +127,11 @@ bool AttractMode::isActive()
     return isActive_;
 }
 
+void AttractMode::activate()
+{
+    isActive_ = true;
+}
+
 
 bool AttractMode::isSet()
 {

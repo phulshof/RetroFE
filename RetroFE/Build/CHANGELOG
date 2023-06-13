@@ -80,3 +80,5 @@ v0.10.34.1
 	- added controls.conf kiosk=F3 mode that locks navigation, playlist toggle, fav toggle; settings.conf kiosk=true to start on first playlist locked, above toggle to is optional to set (monkofthefunk)
     - added "controls - <text>.conf" to be applied based on theme <layout controls="<text>", useful for horizontal and vertical (monkofthefunk)
 	- fixed kiosk image toggle (monkofthefunk)
+	- added jbPause to pause attract mode (monkofthefunk)
+	- added animated marquee during game (monkofthefunk)
