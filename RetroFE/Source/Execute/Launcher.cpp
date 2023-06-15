@@ -252,11 +252,12 @@ bool Launcher::execute(std::string executable, std::string args, std::string cur
     else
     {
 #ifdef WIN32
-
         std::atomic<bool> stop_thread=false;
         std::thread proc_thread = std::thread([this, &stop_thread, &currentPage]() {
             this->keepRendering(std::ref(stop_thread), *currentPage);
             });
+        SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
+
 		if ( wait )
 		{
 			while(WAIT_OBJECT_0 != MsgWaitForMultipleObjects(1, &processInfo.hProcess, FALSE, INFINITE, QS_ALLINPUT))
@@ -271,6 +272,13 @@ bool Launcher::execute(std::string executable, std::string args, std::string cur
         }
         stop_thread = true;
         proc_thread.join();
+
+        //resume priority
+        bool highPriority = false;
+        config_.getProperty("highPriority", highPriority);
+        if (highPriority) {
+            SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);
+        }
 
         // result = GetExitCodeProcess(processInfo.hProcess, &exitCode);
         CloseHandle(processInfo.hProcess);

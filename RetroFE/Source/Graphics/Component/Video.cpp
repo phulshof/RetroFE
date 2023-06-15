@@ -72,10 +72,12 @@ void Video::update(float dt)
 
 void Video::freeGraphicsMemory( )
 {
-    Component::freeGraphicsMemory( );
-    if(video_)
-    {
-        video_->freeGraphicsMemory( );
+    if (baseViewInfo.Monitor == 0) {
+        Component::freeGraphicsMemory();
+        if (video_)
+        {
+            video_->freeGraphicsMemory();
+        }
     }
 }
 

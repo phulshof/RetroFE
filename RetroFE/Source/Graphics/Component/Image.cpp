@@ -36,15 +36,17 @@ Image::~Image()
 
 void Image::freeGraphicsMemory()
 {
-    Component::freeGraphicsMemory();
+    if (baseViewInfo.Monitor == 0) {
+        Component::freeGraphicsMemory();
 
-    SDL_LockMutex(SDL::getMutex());
-    if (texture_ != NULL)
-    {
-        SDL_DestroyTexture(texture_);
-        texture_ = NULL;
+        SDL_LockMutex(SDL::getMutex());
+        if (texture_ != NULL)
+        {
+            SDL_DestroyTexture(texture_);
+            texture_ = NULL;
+        }
+        SDL_UnlockMutex(SDL::getMutex());
     }
-    SDL_UnlockMutex(SDL::getMutex());
 }
 
 void Image::allocateGraphicsMemory()

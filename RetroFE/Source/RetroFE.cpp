@@ -165,6 +165,8 @@ void RetroFE::launchEnter( )
 
     // Disable window focus
     SDL_SetWindowGrab(SDL::getWindow( 0 ), SDL_FALSE);
+    // Free the textures, and optionally take down SDL
+    freeGraphicsMemory();
 
     bool hideMouse = false;
     int  mouseX    = 5000;
@@ -180,6 +182,8 @@ void RetroFE::launchEnter( )
 // Return from the launch of a game/program
 void RetroFE::launchExit( )
 {
+    // Optionally set up SDL, and load the textures
+    allocateGraphicsMemory();
 
     // Restore the SDL settings
     SDL_RestoreWindow( SDL::getWindow( 0 ) );

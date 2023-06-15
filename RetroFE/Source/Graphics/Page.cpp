@@ -1481,7 +1481,9 @@ bool Page::isPlaying()
 
     for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
     {
-        retVal |= (*it)->isPlaying();
+        if ((*it)->baseViewInfo.Monitor == 0) {
+            retVal |= (*it)->isPlaying();
+        }
     }
 
     return retVal;
