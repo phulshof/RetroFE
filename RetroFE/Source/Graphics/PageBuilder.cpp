@@ -97,9 +97,9 @@ Page *PageBuilder::buildPage( std::string collectionName )
     }
 
     std::vector<std::string> monitors;
-    monitors.push_back("");
+    monitors.push_back(layoutPage);
     for ( int i = 0; i < SDL::getNumScreens(); i++ )
-        monitors.push_back( " - " + std::to_string( i ) );
+        monitors.push_back("layout - " + std::to_string( i ) );
    
 
     for ( size_t monitor = 0; monitor < monitors.size(); monitor++ )
@@ -108,8 +108,8 @@ Page *PageBuilder::buildPage( std::string collectionName )
             monitor_ = monitor - 1;
 		else
             monitor_ = monitor;
-        layoutFile       = Utils::combinePath(layoutPath, layoutPage + monitors[monitor] + ".xml");
-        layoutFileAspect = Utils::combinePath(layoutPath, layoutPage + " " + std::to_string( screenWidth_/Utils::gcd( screenWidth_, screenHeight_ ) ) + "x" + std::to_string( screenHeight_/Utils::gcd( screenWidth_, screenHeight_ ) ) + monitors[monitor] + ".xml" );
+        layoutFile       = Utils::combinePath(layoutPath, monitors[monitor] + ".xml");
+        layoutFileAspect = Utils::combinePath(layoutPath, "layout " + std::to_string( screenWidth_/Utils::gcd( screenWidth_, screenHeight_ ) ) + "x" + std::to_string( screenHeight_/Utils::gcd( screenWidth_, screenHeight_ ) ) + monitors[monitor] + ".xml" );
 
         Logger::write(Logger::ZONE_INFO, "Layout", "Initializing " + layoutFileAspect);
 
