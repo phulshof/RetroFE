@@ -100,7 +100,7 @@ void RetroFE::render( )
 {
 
     SDL_LockMutex( SDL::getMutex( ) );
-    for ( int i = 0; i < SDL::getNumDisplays( ); ++i )
+    for ( int i = 0; i < SDL::getScreenCount( ); ++i )
     {
         SDL_SetRenderDrawColor( SDL::getRenderer( i ), 0x0, 0x0, 0x00, 0xFF );
         SDL_RenderClear( SDL::getRenderer( i ) );
@@ -111,7 +111,7 @@ void RetroFE::render( )
         currentPage_->draw( );
     }
 
-    for ( int i = 0; i < SDL::getNumDisplays( ); ++i )
+    for ( int i = 0; i < SDL::getScreenCount( ); ++i )
     {
         SDL_RenderPresent( SDL::getRenderer( i ) );
     }
