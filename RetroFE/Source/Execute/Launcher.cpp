@@ -289,7 +289,7 @@ void Launcher::keepRendering(std::atomic<bool> &stop_thread, Page &currentPage)
         currentPage.update(float(0));
         SDL_LockMutex(SDL::getMutex());
         // start on secondary monitor
-        for (int i = 1; i < SDL::getNumDisplays(); ++i)
+        for (int i = 1; i < SDL::getScreenCount(); ++i)
         {
             SDL_SetRenderDrawColor(SDL::getRenderer(i), 0x0, 0x0, 0x00, 0xFF);
             SDL_RenderClear(SDL::getRenderer(i));
@@ -297,7 +297,7 @@ void Launcher::keepRendering(std::atomic<bool> &stop_thread, Page &currentPage)
 
         currentPage.draw();
 
-        for (int i = 1; i < SDL::getNumDisplays(); ++i)
+        for (int i = 1; i < SDL::getScreenCount(); ++i)
         {
             SDL_RenderPresent(SDL::getRenderer(i));
         }

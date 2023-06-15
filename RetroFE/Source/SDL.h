@@ -34,7 +34,11 @@ public:
     static SDL_mutex *getMutex( );
     static SDL_Window *getWindow( int index );
     static bool renderCopy( SDL_Texture *texture, float alpha, SDL_Rect *src, SDL_Rect *dest, ViewInfo &viewInfo, int layoutWidth, int layoutHeight );
-    static int getWindowWidth( int index )
+    static int getScreenCount( ) 
+	{
+        return screenCount_;
+    }
+	static int getWindowWidth( int index )
     {
         return (index < screenCount_ ? windowWidth_[index] : windowWidth_[0]);
     }
