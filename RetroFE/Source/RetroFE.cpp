@@ -1687,6 +1687,17 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
         {
             state = RETROFE_MENUMODE_START_REQUEST;
         }
+        else if (input_.keystate(UserInput::KeyCodeQuitCombo1) && input_.keystate(UserInput::KeyCodeQuitCombo2)) {
+            attract_.reset();
+            bool controllerComboExit = false;
+            config_.getProperty("controllerComboExit", controllerComboExit);
+            if (controllerComboExit) {
+#ifdef WIN32
+                postMessage("MediaplayerHiddenWindow", 0x8001, 51, 0);
+#endif              			
+                return RETROFE_QUIT_REQUEST;
+            }
+        }
 
         // Handle Collection Up/Down keys
         else if (!kioskLock_ && ((input_.keystate(UserInput::KeyCodeCollectionUp)   && ( page->isHorizontalScroll( ) || !input_.keystate(UserInput::KeyCodeUp))) ||

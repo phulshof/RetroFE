@@ -85,6 +85,8 @@ bool UserInput::initialize()
     MapKey("jbPause", KeyCodePause, false);
     MapKey("jbRestart", KeyCodeRestart, false);
     MapKey("kiosk", KeyCodeKisok, false);
+    MapKey("quitCombo1", KeyCodeQuitCombo1, false);
+    MapKey("quitCombo2", KeyCodeQuitCombo2, false);
 
     bool retVal = true;
 
@@ -110,6 +112,18 @@ bool UserInput::initialize()
     retVal = MapKey("select", KeyCodeSelect) && retVal;
     retVal = MapKey("back",   KeyCodeBack) && retVal;
     retVal = MapKey("quit",   KeyCodeQuit) && retVal;
+
+    // set quit combo
+    unsigned int button;
+    int joyNum = -1;
+
+    std::map<KeyCode_E, std::string> quitCombo;
+    quitCombo.insert(std::pair<KeyCode_E, std::string>(KeyCodeQuitCombo1, "joyButton6"));
+    quitCombo.insert(std::pair<KeyCode_E, std::string>(KeyCodeQuitCombo2, "joyButton7"));
+    for (std::map<KeyCode_E, std::string>::iterator qcI = quitCombo.begin(); qcI != quitCombo.end(); qcI++) {
+        button = Utils::convertInt(Utils::replace(Utils::toLower(qcI->second), "joybutton", ""));
+        keyHandlers_.push_back(std::pair<InputHandler*, KeyCode_E>(new JoyButtonHandler(joyNum, button), qcI->first));
+    }
 
     return retVal;
 }

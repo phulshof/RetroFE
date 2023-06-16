@@ -72,6 +72,8 @@ public:
         KeyCodePause,
         KeyCodeRestart,
         KeyCodeKisok,
+        KeyCodeQuitCombo1,
+        KeyCodeQuitCombo2,
         KeyCodeMax,
     };
 

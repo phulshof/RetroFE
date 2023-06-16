@@ -84,3 +84,4 @@ v0.10.34.1
 	- added animated marquee during game (monkofthefunk)
 	- fixed random layout to load layout-1... (monkofthefunk)
 	- fixed sound playing in background during game from animated marquee changes, and retrofe waiting on marquee video to end before starting (monkofthefunk)
+	- added controllerComboExit uses "start" and "back" (monkofthefunk)
