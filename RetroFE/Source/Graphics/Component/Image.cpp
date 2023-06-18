@@ -19,13 +19,15 @@
 #include "../../Utility/Log.h"
 #include <SDL2/SDL_image.h>
 
-Image::Image(std::string file, std::string altFile, Page &p, int monitor)
+Image::Image(std::string file, std::string altFile, Page &p, int monitor, bool additive)
     : Component(p)
     , texture_(NULL)
     , file_(file)
     , altFile_(altFile)
 {
     baseViewInfo.Monitor = monitor;
+    baseViewInfo.Additive = additive;
+
     allocateGraphicsMemory();
 }
 
@@ -65,13 +67,19 @@ void Image::allocateGraphicsMemory()
 
         if (texture_ != NULL)
         {
-            SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
+            if (baseViewInfo.Additive)
+            {
+                SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_ADD);
+            }
+            else
+            {
+                SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
+            }
             SDL_QueryTexture(texture_, NULL, NULL, &width, &height);
             baseViewInfo.ImageWidth  = (float)width;
             baseViewInfo.ImageHeight = (float)height;
         }
         SDL_UnlockMutex(SDL::getMutex());
-
     }
 
     Component::allocateGraphicsMemory();

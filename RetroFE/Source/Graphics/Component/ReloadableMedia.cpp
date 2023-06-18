@@ -531,7 +531,7 @@ Component *ReloadableMedia::findComponent(std::string collection, std::string ty
     }
     else
     {
-        component = imageBuild.CreateImage(imagePath, page, basename, baseViewInfo.Monitor);
+        component = imageBuild.CreateImage(imagePath, page, basename, baseViewInfo.Monitor, baseViewInfo.Additive);
     }
 
     return component;
