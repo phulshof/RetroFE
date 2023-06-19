@@ -224,7 +224,8 @@ bool SDL::initialize( Configuration &config )
             std::stringstream ss;
             ss << "Creating "<< windowWidth_[i] << "x" << windowHeight_[i] << " window (fullscreen: " << fullscreenStr << ")" << " on display " << screenNum;
             Logger::write( Logger::ZONE_INFO, "SDL", ss.str( ));
-            window_[i] = SDL_CreateWindow( "RetroFE", SDL_WINDOWPOS_CENTERED_DISPLAY(screenNum), SDL_WINDOWPOS_CENTERED_DISPLAY(screenNum), windowWidth_[i], windowHeight_[i], windowFlags );
+            std::string retrofeTitle = "RetroFE " + std::to_string(i);
+            window_[i] = SDL_CreateWindow( retrofeTitle.c_str(), SDL_WINDOWPOS_CENTERED_DISPLAY(screenNum), SDL_WINDOWPOS_CENTERED_DISPLAY(screenNum), windowWidth_[i], windowHeight_[i], windowFlags );
 			
 			
 #ifdef WIN32
