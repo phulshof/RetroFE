@@ -270,7 +270,7 @@ bool Component::animate()
             else
                 elapsedTime = static_cast<float>(tween->duration);
 
-            switch(tween->property)
+            switch (tween->property)
             {
             case TWEEN_PROPERTY_X:
                 if (tween->startDefined)
