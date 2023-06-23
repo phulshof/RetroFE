@@ -53,7 +53,7 @@ public:
     void     launchEnter( );
     void     launchExit( );
 #ifdef WIN32	
-	void RetroFE::postMessage(LPCTSTR windowTitle, UINT Msg, WPARAM wParam, LPARAM lParam );
+	void     postMessage(LPCTSTR windowTitle, UINT Msg, WPARAM wParam, LPARAM lParam );
 #endif	
 
 private:
