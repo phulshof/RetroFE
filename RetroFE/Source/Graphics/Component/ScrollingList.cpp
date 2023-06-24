@@ -718,6 +718,7 @@ void ScrollingList::resetTweens( Component *c, AnimationEvents *sets, ViewInfo *
     nextViewInfo->ImageHeight     = c->baseViewInfo.ImageHeight;
     nextViewInfo->ImageWidth      = c->baseViewInfo.ImageWidth;
     nextViewInfo->BackgroundAlpha = c->baseViewInfo.BackgroundAlpha;
+	
 
     c->setTweens(sets );
 
