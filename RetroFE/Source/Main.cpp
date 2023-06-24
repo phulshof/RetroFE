@@ -136,7 +136,7 @@ bool ImportConfiguration(Configuration* c)
         Logger::write(Logger::ZONE_ERROR, "RetroFE", "Could not import \"" + settingsConfPath + ".conf\"");
         return false;
     }
-    for (int i = 1; i < 10; i++)
+    for (int i = 1; i < 15; i++)
         c->import("", "", settingsConfPath + std::to_string(i) + ".conf", false);
     c->import("", "", settingsConfPath + "_saved.conf", false);
 
@@ -220,7 +220,7 @@ bool ImportConfiguration(Configuration* c)
             settingsImported = false;
             std::string settingsPath = Utils::combinePath(collectionsPath, collection, "settings");
             settingsImported |= c->import(collection, prefix, settingsPath + ".conf", false);
-            for (int i = 1; i < 10; i++)
+            for (int i = 1; i < 15; i++)
                 settingsImported |= c->import(collection, prefix, settingsPath + std::to_string(i) + ".conf", false);
 
             std::string infoFile = Utils::combinePath(collectionsPath, collection, "info.conf");

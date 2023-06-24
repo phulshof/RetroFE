@@ -54,6 +54,7 @@ GStreamerVideo::GStreamerVideo( int monitor )
     , currentVolume_(0.0)
     , monitor_(monitor)
 	, MuteVideo(Configuration::MuteVideo)
+    , hide_(false)
 {
     paused_ = false;
 }
@@ -191,6 +192,11 @@ bool GStreamerVideo::stop()
     frameReady_ = false;
 
     return true;
+}
+
+void GStreamerVideo::hide(bool hide)
+{
+    hide_ = hide;
 }
 
 bool GStreamerVideo::play(std::string file)
@@ -412,14 +418,14 @@ void GStreamerVideo::update(float /* dt */)
 
     SDL_LockMutex(SDL::getMutex());
     
-	if(!texture_ && width_ != 0 && height_ != 0)
+	if(!hide_ && !texture_ && width_ != 0 && height_ != 0)
     {
         texture_ = SDL_CreateTexture(SDL::getRenderer(monitor_), SDL_PIXELFORMAT_IYUV,
                                     SDL_TEXTUREACCESS_STREAMING, width_, height_);
         SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
     }
 
-    if(videoBuffer_)
+    if(!hide_ && videoBuffer_)
     {
         GstVideoMeta *meta;
         meta = gst_buffer_get_video_meta(videoBuffer_);
