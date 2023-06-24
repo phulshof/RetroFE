@@ -50,15 +50,23 @@ void VideoComponent::update(float dt)
     {
         isPlaying_ = ((GStreamerVideo *)(videoInst_))->isPlaying();
     }
+
     if(isPlaying_)
     {
         if (baseViewInfo.Restart) {
             restart();
             baseViewInfo.Restart = false;
         }
-        if (baseViewInfo.Alpha == 0 && !isPaused()) {
-            //videoInst_->hide(true);
-            pause();
+        if (videoInst_->getTexture()) {
+            if (baseViewInfo.Alpha == 0.0 && !isPaused()) {
+                videoInst_->hide(true);
+                pause();
+            }
+            if (baseViewInfo.Alpha != 0.0 && isPaused()) {
+                // unpause
+                videoInst_->hide(false);
+                pause();
+            }
         }
         videoInst_->setVolume(baseViewInfo.Volume);
         videoInst_->update(dt);
@@ -69,12 +77,6 @@ void VideoComponent::update(float dt)
             baseViewInfo.ImageHeight = static_cast<float>(videoInst_->getHeight());
             baseViewInfo.ImageWidth = static_cast<float>(videoInst_->getWidth());
         }
-    }
-    
-    if (baseViewInfo.Alpha != 0 && isPaused()) {
-        // unpause
-       // videoInst_->hide(false);
-        pause();
     }
 
     Component::update(dt);
