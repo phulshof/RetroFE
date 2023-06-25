@@ -120,7 +120,7 @@ bool Item::getInfo( std::string key, std::string & value )
 
    bool retVal = false;
 
-   if ( info_.find( key ) != info_.end( ) )
+   if (!info_.empty() && info_.find(key) != info_.end())
    {
        value  = info_[key];
        retVal = true;

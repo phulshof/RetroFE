@@ -81,7 +81,7 @@ CollectionInfo::~CollectionInfo()
 bool CollectionInfo::Save() 
 {
     bool retval = true;
-    if(saveRequest)
+    if(saveRequest && name != "")
     {
         std::string playlistCollectionName = name;
         bool globalFavLast = false;

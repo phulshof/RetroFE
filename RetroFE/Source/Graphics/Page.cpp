@@ -932,7 +932,6 @@ bool Page::popCollection()
     return true;
 }
 
-
 void Page::enterMenu()
 {
     triggerEventOnAllMenus("menuEnter");

@@ -30,6 +30,7 @@
 #include <stack>
 #include <map>
 #include <string>
+#include "Graphics/Page.h"
 #ifdef WIN32
     #include <windows.h>
 #endif
@@ -123,8 +124,12 @@ private:
     bool isInAttractModeSkipPlaylist(std::string playlist);
     void goToNextAttractModePlaylistByCycle(std::vector<std::string> cycleVector);
     void            quit( );
-    Page           *loadPage( );
+    Page           *loadPage(std::string collectionName);
     Page           *loadSplashPage( );
+
+    std::vector<std::string> collectionCycle_;
+    std::vector<std::string>::iterator collectionCycleIt_;
+
     RETROFE_STATE   processUserInput( Page *page );
     void            update( float dt, bool scrollActive );
     CollectionInfo *getCollection( std::string collectionName );

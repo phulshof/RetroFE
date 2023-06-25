@@ -87,6 +87,7 @@ bool UserInput::initialize()
     MapKey("kiosk", KeyCodeKisok, false);
     MapKey("quitCombo1", KeyCodeQuitCombo1, false);
     MapKey("quitCombo2", KeyCodeQuitCombo2, false);
+    MapKey("cycleCollection", KeyCodeCycleCollection, false);
 
     bool retVal = true;
 

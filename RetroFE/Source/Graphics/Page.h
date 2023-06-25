@@ -172,13 +172,13 @@ private:
 
     struct MenuInfo_S
     {
-        CollectionInfo *collection;
-        CollectionInfo::Playlists_T::iterator playlist; 
+        CollectionInfo* collection;
+        CollectionInfo::Playlists_T::iterator playlist;
         bool queueDelete;
     };
-
-    typedef std::vector< std::vector<ScrollingList *> > MenuVector_T;
     typedef std::list<MenuInfo_S> CollectionVector_T;
+    
+    typedef std::vector< std::vector<ScrollingList *> > MenuVector_T;
     void setActiveMenuItemsFromPlaylist(MenuInfo_S info, ScrollingList* menu);
 
     std::vector<ScrollingList *> activeMenu_;
