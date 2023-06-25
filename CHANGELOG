@@ -89,3 +89,4 @@ v0.10.34.1
 	- added unique window names "retorfe0" (inigomontoya)
 	- fixed adaptive feature affect on marquee menu videos (inigonmontoya, monkofthefunk)
 	- fixed pausing alpha=0 videos without black flicker during fast scroll (monkofthefunk)
+	- fixed fade in video due to stoping video update (monkofthefunk)
