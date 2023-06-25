@@ -91,3 +91,4 @@ v0.10.34.1
 	- fixed pausing alpha=0 videos without black flicker during fast scroll (monkofthefunk)
 	- fixed fade in video due to stoping video update (monkofthefunk)
 	- added cycleCollection = ThemeConsoles,ThemeArcades / cycleCollection = W that will cycle through collections with different layouts (monkofthefunk)
+	- fixed second screen menu update upon last played game launch and order reshuffle (monkofthefun)
