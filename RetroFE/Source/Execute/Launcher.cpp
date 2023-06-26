@@ -252,10 +252,16 @@ bool Launcher::execute(std::string executable, std::string args, std::string cur
     else
     {
 #ifdef WIN32
-        std::atomic<bool> stop_thread=false;
-        std::thread proc_thread = std::thread([this, &stop_thread, &currentPage]() {
-            this->keepRendering(std::ref(stop_thread), *currentPage);
-            });
+        std::atomic<bool> stop_thread;
+        std::thread proc_thread;
+        bool multiple_display = SDL::getScreenCount() > 1;
+        if (multiple_display) {
+            stop_thread = false;
+            proc_thread = std::thread([this, &stop_thread, &currentPage]() {
+                this->keepRendering(std::ref(stop_thread), *currentPage);
+                });
+        }
+        // lower priority
         SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
 
 		if ( wait )
@@ -270,9 +276,10 @@ bool Launcher::execute(std::string executable, std::string args, std::string cur
 				}
 			}
         }
-        stop_thread = true;
-        proc_thread.join();
-
+        if (multiple_display) {
+            stop_thread = true;
+            proc_thread.join();
+        }
         //resume priority
         bool highPriority = false;
         config_.getProperty("highPriority", highPriority);
@@ -293,10 +300,33 @@ bool Launcher::execute(std::string executable, std::string args, std::string cur
 
 void Launcher::keepRendering(std::atomic<bool> &stop_thread, Page &currentPage)
 {
+    float lastTime = 0;
+    float currentTime = 0;
+    float deltaTime = 0;
+    double sleepTime;
+    double fpsTime = 1000.0 / static_cast<double>(60);
+
     while (!stop_thread) {
+        lastTime = currentTime;
+        currentTime = static_cast<float>(SDL_GetTicks()) / 1000;
+
+        if (currentTime < lastTime)
+        {
+            currentTime = lastTime;
+        }
+
+        deltaTime = currentTime - lastTime;
+        sleepTime = fpsTime - deltaTime * 1000;
+            
+        if (sleepTime > 0 && sleepTime < 1000)
+        {
+            SDL_Delay(static_cast<unsigned int>(sleepTime));
+        }
         currentPage.update(float(0));
         SDL_LockMutex(SDL::getMutex());
+
         // start on secondary monitor
+        // todo support future main screen swap
         for (int i = 1; i < SDL::getScreenCount(); ++i)
         {
             SDL_SetRenderDrawColor(SDL::getRenderer(i), 0x0, 0x0, 0x00, 0xFF);
@@ -309,6 +339,7 @@ void Launcher::keepRendering(std::atomic<bool> &stop_thread, Page &currentPage)
         {
             SDL_RenderPresent(SDL::getRenderer(i));
         }
+
         SDL_UnlockMutex(SDL::getMutex());
     }
 }

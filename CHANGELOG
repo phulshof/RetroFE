@@ -92,3 +92,4 @@ v0.10.34.1
 	- fixed fade in video due to stoping video update (monkofthefunk)
 	- added cycleCollection = ThemeConsoles,ThemeArcades / cycleCollection = W that will cycle through collections with different layouts (monkofthefunk)
 	- fixed second screen menu update upon last played game launch and order reshuffle (monkofthefun)
+	- fixed high GPU due to marquee rendering thread on game launch (monkofthefunk)
