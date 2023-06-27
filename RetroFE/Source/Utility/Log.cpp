@@ -18,24 +18,27 @@
 #include <iostream>
 #include <sstream>
 #include <ctime>
+#include "../Database/Configuration.h"
 
 std::ofstream Logger::writeFileStream_;
-std::streambuf *Logger::cerrStream_ = NULL;
-std::streambuf *Logger::coutStream_ = NULL;
+std::streambuf* Logger::cerrStream_ = NULL;
+std::streambuf* Logger::coutStream_ = NULL;
+Configuration* Logger::config_ = NULL;
 
-bool Logger::initialize(std::string file)
+bool Logger::initialize(std::string file, Configuration* config)
 {
     writeFileStream_.open(file.c_str());
 
     cerrStream_ = std::cerr.rdbuf(writeFileStream_.rdbuf());
     coutStream_ = std::cout.rdbuf(writeFileStream_.rdbuf());
+    config_ = config;
 
     return writeFileStream_.is_open();
 }
 
 void Logger::deInitialize()
 {
-    if(writeFileStream_.is_open())
+    if (writeFileStream_.is_open())
     {
         writeFileStream_.close();
 
@@ -50,7 +53,7 @@ void Logger::write(Zone zone, std::string component, std::string message)
 {
     std::string zoneStr;
 
-    switch(zone)
+    switch (zone)
     {
     case ZONE_INFO:
         zoneStr = "INFO";
@@ -67,6 +70,15 @@ void Logger::write(Zone zone, std::string component, std::string message)
     case ZONE_ERROR:
         zoneStr = "ERROR";
         break;
+    }
+
+    // if levels defined and zone not in list then don't log
+    if (config_) {
+        std::string level = "0";// default to not show logs
+        config_->getProperty("log", level);
+        if (level != "" && level.find(zoneStr) == std::string::npos) {
+            return;
+        }
     }
     std::time_t rawtime = std::time(NULL);
     struct tm* timeinfo = std::localtime(&rawtime);

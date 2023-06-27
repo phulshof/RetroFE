@@ -34,17 +34,21 @@ public:
     static SDL_mutex *getMutex( );
     static SDL_Window *getWindow( int index );
     static bool renderCopy( SDL_Texture *texture, float alpha, SDL_Rect *src, SDL_Rect *dest, ViewInfo &viewInfo, int layoutWidth, int layoutHeight );
-    static int getWindowWidth( int index )
+    static int getScreenCount( ) 
+	{
+        return screenCount_;
+    }
+	static int getWindowWidth( int index )
     {
-        return (index < numDisplays_ ? windowWidth_[index] : windowWidth_[0]);
+        return (index < screenCount_ ? windowWidth_[index] : windowWidth_[0]);
     }
     static int getWindowHeight( int index )
     {
-        return (index < numDisplays_ ? windowHeight_[index] : windowHeight_[0]);
+        return (index < screenCount_ ? windowHeight_[index] : windowHeight_[0]);
     }
     static bool isFullscreen( int index )
     {
-        return (index < numDisplays_ ? fullscreen_[index] : fullscreen_[0]);
+        return (index < screenCount_ ? fullscreen_[index] : fullscreen_[0]);
     }
     static int getNumScreens( )
     {
@@ -68,4 +72,5 @@ private:
     static std::vector<bool>           mirror_;
     static int                         numScreens_;
     static int                         numDisplays_;
+	static int                         screenCount_;
 };

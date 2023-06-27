@@ -27,6 +27,7 @@ public:
     std::string filename();
     std::string lowercaseTitle() ;
     std::string lowercaseFullTitle();
+    std::string getMetaAttribute(std::string attribute);
     std::string name;
     std::string filepath;
     std::string file;
@@ -43,6 +44,9 @@ public:
     std::string joyWays;
     std::string rating;
     std::string score;
+    std::string playlist;
+    std::string lastPlayed;
+    int playCount;
     bool        isFavorite;
     CollectionInfo *collectionInfo;
     bool leaf;
@@ -53,4 +57,6 @@ public:
     void setInfo( std::string key, std::string value );
     bool getInfo( std::string key, std::string &value );
     void loadInfo( std::string path );
+    bool static validSortType(std::string attribute);
+    bool static isSortDesc(std::string attribute);
 };

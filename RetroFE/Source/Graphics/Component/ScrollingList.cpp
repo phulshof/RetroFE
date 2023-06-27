@@ -44,6 +44,8 @@ ScrollingList::ScrollingList( Configuration &c,
                               Page          &p,
                               bool           layoutMode,
                               bool           commonMode,
+                              bool          playlistType,
+                              bool          selectedImage,
                               Font          *font,
                               std::string    layoutKey,
                               std::string    imageType,
@@ -52,6 +54,8 @@ ScrollingList::ScrollingList( Configuration &c,
     , horizontalScroll( false )
     , layoutMode_( layoutMode )
     , commonMode_( commonMode )
+    , playlistType_( playlistType )
+    , selectedImage_( selectedImage)
     , spriteList_( NULL )
     , scrollPoints_( NULL )
     , tweenPoints_( NULL )
@@ -76,6 +80,8 @@ ScrollingList::ScrollingList( const ScrollingList &copy )
     , horizontalScroll( copy.horizontalScroll )
     , layoutMode_( copy.layoutMode_ )
     , commonMode_( copy.commonMode_ )
+    , playlistType_(copy.playlistType_)
+    , selectedImage_(copy.selectedImage_)
     , spriteList_( NULL )
     , itemIndex_( 0 )
     , selectedOffsetIndex_( copy.selectedOffsetIndex_ )
@@ -108,16 +114,43 @@ ScrollingList::~ScrollingList( )
     }
 }
 
+std::vector<Item*> ScrollingList::getItems()
+{
+    return *items_;
+}
 
 void ScrollingList::setItems( std::vector<Item *> *items )
 {
     items_ = items;
-    if ( items_ )
+    if (items_)
     {
-        itemIndex_ = loopDecrement( 0, selectedOffsetIndex_, items_->size( ) );
+        itemIndex_ = loopDecrement(0, selectedOffsetIndex_, items_->size());
     }
 }
 
+void ScrollingList::selectItemByName(std::string name)
+{
+    size_t size = items_->size();
+    unsigned int index = 0;
+
+    for (unsigned int i = 0; i < size; ++i)
+    {
+        index = loopDecrement(itemIndex_, i, size);
+
+        if (items_->at((index + selectedOffsetIndex_) % size)->name == name) {
+            itemIndex_ = index;
+            break;
+        }
+    }
+}
+
+std::string ScrollingList::getSelectedItemName()
+{
+    if (!items_->size())
+        return "";
+    
+    return items_->at((itemIndex_ + selectedOffsetIndex_) % items_->size())->name;
+}
 
 unsigned int ScrollingList::loopIncrement( unsigned int offset, unsigned int i, unsigned int size )
 {
@@ -267,24 +300,24 @@ Item *ScrollingList::getItemByOffset( int offset )
 }
 
 
-Item *ScrollingList::getSelectedItem( )
+Item* ScrollingList::getSelectedItem()
 {
-    if ( !items_ || items_->size( ) == 0 ) return NULL;
-    return items_->at( loopIncrement( itemIndex_, selectedOffsetIndex_, items_->size( ) ) );
+    if (!items_ || items_->size() == 0) return NULL;
+    return items_->at(loopIncrement(itemIndex_, selectedOffsetIndex_, items_->size()));
 }
 
 
-void ScrollingList::pageUp( )
+void ScrollingList::pageUp()
 {
-    if ( components_.size( ) == 0 ) return;
-    itemIndex_ = loopDecrement( itemIndex_, components_.size( ), items_->size( ) );
+    if (components_.size() == 0) return;
+    itemIndex_ = loopDecrement(itemIndex_, components_.size(), items_->size());
 }
 
 
-void ScrollingList::pageDown( )
+void ScrollingList::pageDown()
 {
-    if ( components_.size( ) == 0 ) return;
-    itemIndex_ = loopIncrement( itemIndex_, components_.size( ), items_->size( ) );
+    if (components_.size() == 0) return;
+    itemIndex_ = loopIncrement(itemIndex_, components_.size(), items_->size());
 }
 
 
@@ -307,7 +340,7 @@ void ScrollingList::letterDown( )
 }
 
 
-void ScrollingList::letterChange( bool increment )
+void ScrollingList::letterChange( bool increment)
 {
 
     if ( !items_ || items_->size( ) == 0 ) return;
@@ -369,15 +402,71 @@ void ScrollingList::letterChange( bool increment )
 }
 
 
-void ScrollingList::subUp( )
+void ScrollingList::metaUp(std::string attribute)
 {
-    subChange( true );
+    metaChange(true, attribute);
 }
 
 
-void ScrollingList::subDown( )
+void ScrollingList::metaDown(std::string attribute)
 {
-    subChange( false );
+    metaChange(false, attribute);
+}
+
+
+void ScrollingList::metaChange(bool increment, std::string attribute)
+{
+
+    if (!items_ || items_->size() == 0) return;
+
+    Item* startItem = items_->at((itemIndex_ + selectedOffsetIndex_) % items_->size());
+    std::string startValue = items_->at((itemIndex_ + selectedOffsetIndex_) % items_->size())->getMetaAttribute(attribute);
+
+    for (unsigned int i = 0; i < items_->size(); ++i)
+    {
+        unsigned int index = 0;
+        if (increment)
+        {
+            index = loopIncrement(itemIndex_, i, items_->size());
+        }
+        else
+        {
+            index = loopDecrement(itemIndex_, i, items_->size());
+        }
+
+        std::string endValue = items_->at((index + selectedOffsetIndex_) % items_->size())->getMetaAttribute(attribute);
+
+        if (startValue != endValue) {
+            itemIndex_ = index;
+            break;
+        }
+    }
+
+    if (!increment) // For decrement, find the first game of the new meta attribute
+    {
+        bool prevLetterSubToCurrent = false;
+        config_.getProperty("prevLetterSubToCurrent", prevLetterSubToCurrent);
+        if (!prevLetterSubToCurrent || items_->at((itemIndex_ + 1 + selectedOffsetIndex_) % items_->size()) == startItem)
+        {
+            startValue = items_->at((itemIndex_ + selectedOffsetIndex_) % items_->size())->getMetaAttribute(attribute);
+
+            for (unsigned int i = 0; i < items_->size(); ++i)
+            {
+                unsigned int index = loopDecrement(itemIndex_, i, items_->size());
+
+                std::string endValue = items_->at((index + selectedOffsetIndex_) % items_->size())->getMetaAttribute(attribute);
+
+                if (startValue != endValue) {
+                    itemIndex_ = loopIncrement(index, 1, items_->size());
+                    break;
+                }
+            }
+        }
+        else
+        {
+            itemIndex_ = loopIncrement(itemIndex_, 1, items_->size());
+        }
+    }
 }
 
 
@@ -490,145 +579,90 @@ void ScrollingList::freeGraphicsMemory( )
 
 void ScrollingList::triggerEnterEvent( )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "enter" );
-    }
+    triggerEventOnAll("enter", 0);
 }
 
 void ScrollingList::triggerExitEvent( )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at(i );
-        if ( c ) c->triggerEvent( "exit" );
-    }
+    triggerEventOnAll("exit", 0);
 }
 
 void ScrollingList::triggerMenuEnterEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "menuEnter", menuIndex );
-    }
+    triggerEventOnAll("menuEnter", menuIndex);
 }
 
 void ScrollingList::triggerMenuExitEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "menuExit", menuIndex );
-    }
+    triggerEventOnAll("menuExit", menuIndex);
 }
 
 void ScrollingList::triggerGameEnterEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "gameEnter", menuIndex );
-    }
+    triggerEventOnAll("gameEnter", menuIndex);
 }
 
 void ScrollingList::triggerGameExitEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "gameExit", menuIndex );
-    }
+    triggerEventOnAll("gameExit", menuIndex);
 }
 
 void ScrollingList::triggerHighlightEnterEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "highlightEnter", menuIndex );
-    }
+    triggerEventOnAll("highlightEnter", menuIndex);
 }
 
 void ScrollingList::triggerHighlightExitEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "highlightExit", menuIndex );
-    }
+    triggerEventOnAll("highlightExit", menuIndex);
 }
 
 void ScrollingList::triggerPlaylistEnterEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "playlistEnter", menuIndex );
-    }
+    triggerEventOnAll("playlistEnter", menuIndex);
 }
 
 void ScrollingList::triggerPlaylistExitEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "playlistExit", menuIndex );
-    }
+    triggerEventOnAll("playlistExit", menuIndex);
 }
 
 void ScrollingList::triggerMenuJumpEnterEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "menuJumpEnter", menuIndex );
-    }
+    triggerEventOnAll("menuJumpEnter", menuIndex);
 }
 
 void ScrollingList::triggerMenuJumpExitEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "menuJumpExit", menuIndex );
-    }
+    triggerEventOnAll("menuJumpExit", menuIndex);
 }
 
 void ScrollingList::triggerAttractEnterEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "attractEnter", menuIndex );
-    }
+    triggerEventOnAll("attractEnter", menuIndex);
 }
 
 void ScrollingList::triggerAttractEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "attract", menuIndex );
-    }
+    triggerEventOnAll("attract", menuIndex);
 }
 
 void ScrollingList::triggerAttractExitEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
-    {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "attractExit", menuIndex );
-    }
+    triggerEventOnAll("attractExit", menuIndex);
 }
 
 void ScrollingList::triggerJukeboxJumpEvent( int menuIndex )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
+    triggerEventOnAll("jukeboxJump", menuIndex);
+}
+
+void ScrollingList::triggerEventOnAll(std::string event, int menuIndex)
+{
+    for (unsigned int i = 0; i < components_.size(); ++i)
     {
-        Component *c = components_.at( i );
-        if ( c ) c->triggerEvent( "jukeboxJump", menuIndex );
+        Component* c = components_.at(i);
+        if (c) c->triggerEvent(event, menuIndex);
     }
 }
 
@@ -643,7 +677,10 @@ void ScrollingList::update( float dt )
     for ( unsigned int i = 0; i < scrollPoints_->size( ); i++ )
     {
         Component *c = components_.at( i );
-        if ( c ) c->update(dt );
+        if (c) {
+            c->playlistName = playlistName;
+            c->update(dt);
+        }
     }
 }
 
@@ -681,6 +718,7 @@ void ScrollingList::resetTweens( Component *c, AnimationEvents *sets, ViewInfo *
     nextViewInfo->ImageHeight     = c->baseViewInfo.ImageHeight;
     nextViewInfo->ImageWidth      = c->baseViewInfo.ImageWidth;
     nextViewInfo->BackgroundAlpha = c->baseViewInfo.BackgroundAlpha;
+	
 
     c->setTweens(sets );
 
@@ -689,6 +727,10 @@ void ScrollingList::resetTweens( Component *c, AnimationEvents *sets, ViewInfo *
     c->baseViewInfo = *currentViewInfo;
 
     TweenSet *set = new TweenSet( );
+    // don't trigger video restart if scrolling fast 
+    if (currentViewInfo->Restart && scrollPeriod_ > minScrollTime_)
+        set->push(new Tween(TWEEN_PROPERTY_RESTART, LINEAR, currentViewInfo->Restart, nextViewInfo->Restart, 0));
+
     set->push(new Tween(TWEEN_PROPERTY_HEIGHT, LINEAR, currentViewInfo->Height, nextViewInfo->Height, scrollTime ) );
     set->push(new Tween(TWEEN_PROPERTY_WIDTH, LINEAR, currentViewInfo->Width, nextViewInfo->Width, scrollTime ) );
     set->push(new Tween(TWEEN_PROPERTY_ANGLE, LINEAR, currentViewInfo->Angle, nextViewInfo->Angle, scrollTime ) );
@@ -706,6 +748,7 @@ void ScrollingList::resetTweens( Component *c, AnimationEvents *sets, ViewInfo *
     set->push(new Tween(TWEEN_PROPERTY_LAYER, LINEAR, currentViewInfo->Layer, nextViewInfo->Layer, scrollTime ) );
     set->push(new Tween(TWEEN_PROPERTY_VOLUME, LINEAR, currentViewInfo->Volume, nextViewInfo->Volume, scrollTime ) );
     set->push(new Tween(TWEEN_PROPERTY_MONITOR, LINEAR, currentViewInfo->Monitor, nextViewInfo->Monitor, scrollTime ) );
+
     scrollTween->Push( set );
 }
 
@@ -764,8 +807,12 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
         names.push_back( item->rating );
     if ( typeLC == "score" )
         names.push_back( item->score );
+    if (typeLC.rfind("playlist", 0) == 0)
+        names.push_back(item->name);
     names.push_back("default");
 
+    std::string name;
+    std::string selectedItemName = getSelectedItemName();
     for ( unsigned int n = 0; n < names.size() && !t; ++n )
     {
         // check collection path for art
@@ -800,7 +847,13 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
             }
             else
             {
-                t = imageBuild.CreateImage( imagePath, page, names[n], baseViewInfo.Monitor );
+                name = names[n];
+                if (selectedImage_ && item->name == selectedItemName) {
+                    t = imageBuild.CreateImage(imagePath, page, name + "-selected", baseViewInfo.Monitor, baseViewInfo.Additive);
+                }
+                if (!t) {
+                    t = imageBuild.CreateImage(imagePath, page, name, baseViewInfo.Monitor, baseViewInfo.Additive);
+                }
             }
         }
 
@@ -824,7 +877,13 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
             }
             else
             {
-                t = imageBuild.CreateImage( imagePath, page, names[n], baseViewInfo.Monitor );
+                name = names[n];
+                if (selectedImage_ && item->name == selectedItemName) {
+                    t = imageBuild.CreateImage(imagePath, page, name + "-selected", baseViewInfo.Monitor, baseViewInfo.Additive);
+                }
+                if (!t) {
+                    t = imageBuild.CreateImage(imagePath, page, name, baseViewInfo.Monitor, baseViewInfo.Additive);
+                }
             }
         }
     }
@@ -861,7 +920,13 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
         }
         else
         {
-            t = imageBuild.CreateImage( imagePath, page, imageType_, baseViewInfo.Monitor );
+            name = imageType_;
+            if (selectedImage_ && item->name == selectedItemName) {
+                t = imageBuild.CreateImage(imagePath, page, name + "-selected", baseViewInfo.Monitor, baseViewInfo.Additive);
+            }
+            if (!t) {
+                t = imageBuild.CreateImage(imagePath, page, name, baseViewInfo.Monitor, baseViewInfo.Additive);
+            }
         }
     }
 
@@ -874,7 +939,13 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
         }
         else
         {
-            t = imageBuild.CreateImage( item->filepath, page, imageType_, baseViewInfo.Monitor );
+            name = imageType_;
+            if (selectedImage_ && item->name == selectedItemName) {
+                t = imageBuild.CreateImage(item->filepath, page, name + "-selected", baseViewInfo.Monitor, baseViewInfo.Additive);
+            }
+            if (!t) {
+                t = imageBuild.CreateImage(item->filepath, page, name, baseViewInfo.Monitor, baseViewInfo.Additive);
+            }
         }
     }
 
@@ -905,7 +976,13 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
                 }
             }
 
-            t = imageBuild.CreateImage( imagePath, page, names[n], baseViewInfo.Monitor );
+            name = names[n];
+            if (selectedImage_ && item->name == selectedItemName) {
+                t = imageBuild.CreateImage(imagePath, page, name + "-selected", baseViewInfo.Monitor, baseViewInfo.Additive);
+            }
+            if (!t) {
+                t = imageBuild.CreateImage(imagePath, page, name, baseViewInfo.Monitor, baseViewInfo.Additive);
+            }
 
             // check sub-collection path for art
             if ( !t && !commonMode_ )
@@ -919,7 +996,13 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
                 {
                     config_.getMediaPropertyAbsolutePath( item->collectionInfo->name, imageType_, false, imagePath );
                 }
-                t = imageBuild.CreateImage( imagePath, page, names[n], baseViewInfo.Monitor );
+                name = names[n];
+                if (selectedImage_ && item->name == selectedItemName) {
+                    t = imageBuild.CreateImage(imagePath, page, name + "-selected", baseViewInfo.Monitor, baseViewInfo.Additive);
+                }
+                if (!t) {
+                    t = imageBuild.CreateImage(imagePath, page, name, baseViewInfo.Monitor, baseViewInfo.Additive);
+                }
             }
         }
 
@@ -948,13 +1031,25 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
             }
             if ( !t )
             {
-                t = imageBuild.CreateImage( imagePath, page, imageType_, baseViewInfo.Monitor );
+                name = imageType_;
+                if (selectedImage_ && item->name == selectedItemName) {
+                    t = imageBuild.CreateImage(imagePath, page, name + "-selected", baseViewInfo.Monitor, baseViewInfo.Additive);
+                }
+                if (!t) {
+                    t = imageBuild.CreateImage(imagePath, page, name, baseViewInfo.Monitor, baseViewInfo.Additive);
+                }
             }
         }
         // check rom directory path for art
         if ( !t )
         {
-            t = imageBuild.CreateImage( item->filepath, page, imageType_, baseViewInfo.Monitor );
+            name = imageType_;
+            if (selectedImage_ && item->name == selectedItemName) {
+                t = imageBuild.CreateImage(item->filepath, page, name + "-selected", baseViewInfo.Monitor, baseViewInfo.Additive);
+            }
+            if (!t) {
+                t = imageBuild.CreateImage(item->filepath, page, name, baseViewInfo.Monitor, baseViewInfo.Additive);
+            }
         }
 
     }
@@ -1050,6 +1145,9 @@ void ScrollingList::updateScrollPeriod(  )
 
 void ScrollingList::scroll( bool forward )
 {
+    // playlist menus don't scroll
+    if (playlistType_)
+        return;
 
     if ( !items_ || items_->size(  ) == 0 ) return;
     if ( !scrollPoints_ || scrollPoints_->size(  ) == 0 ) return;
@@ -1122,4 +1220,9 @@ void ScrollingList::scroll( bool forward )
     }
 
     return;
+}
+
+bool ScrollingList::isPlaylist()
+{
+    return playlistType_;
 }

@@ -28,41 +28,40 @@
 #include <time.h>
 #include <locale>
 
-static bool ImportConfiguration(Configuration *c);
-static bool StartLogging();
+static bool ImportConfiguration(Configuration* c);
+static bool StartLogging(Configuration* c);
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-
     // check to see if version or help was requested
-    if(argc > 1)
+    if (argc > 1)
     {
         std::string program = argv[0];
-        std::string param   = argv[1];
+        std::string param = argv[1];
 
-        if(argc == 3 && param == "-createcollection")
+        if (argc == 3 && param == "-createcollection")
         {
             // Do nothing; we handle that later
         }
-        else if(param == "-version"  ||
-                param == "--version" ||
-                param == "-v")
+        else if (param == "-version" ||
+            param == "--version" ||
+            param == "-v")
         {
-            std::cout << "RetroFE version " << Version::getString( ) << std::endl;
+            std::cout << "RetroFE version " << Version::getString() << std::endl;
             return 0;
         }
         else
         {
             std::cout << "Usage:" << std::endl;
-            std::cout << program  << "                                           Run RetroFE"                              << std::endl;
-            std::cout << program  << " --version                                 Print the version of RetroFE."            << std::endl;
-            std::cout << program  << " -createcollection <collection name>       Create a collection directory structure." << std::endl;
+            std::cout << program << "                                           Run RetroFE" << std::endl;
+            std::cout << program << " --version                                 Print the version of RetroFE." << std::endl;
+            std::cout << program << " -createcollection <collection name>       Create a collection directory structure." << std::endl;
             return 0;
         }
     }
 
     // Initialize locale language
-    setlocale( LC_ALL, "" );
+    setlocale(LC_ALL, "");
 
     // Initialize random seed
     srand(static_cast<unsigned int>(time(0)));
@@ -71,39 +70,45 @@ int main(int argc, char **argv)
 
     Configuration config;
 
-    if(!StartLogging())
+    if (!StartLogging(&config))
     {
         return -1;
     }
 
     // check to see if createcollection was requested
-    if(argc == 3)
+    if (argc == 3)
     {
         std::string param = argv[1];
         std::string value = argv[2];
 
-        if(param == "-createcollection")
+        if (param == "-createcollection")
         {
             CollectionInfoBuilder::createCollectionDirectory(value);
         }
 
         return 0;
     }
+    try {
 
-    while (true)
-    {
-        if(!ImportConfiguration(&config))
+        while (true)
         {
-            // Exit with a heads up...
-            std::string logFile = Utils::combinePath(Configuration::absolutePath, "log.txt");
-            fprintf(stderr, "RetroFE has failed to start due to configuration error.\nCheck log for details: %s\n", logFile.c_str());
-            return -1;
+            if (!ImportConfiguration(&config))
+            {
+                // Exit with a heads up...
+                std::string logFile = Utils::combinePath(Configuration::absolutePath, "log.txt");
+                fprintf(stderr, "RetroFE has failed to start due to configuration error.\nCheck log for details: %s\n", logFile.c_str());
+                return -1;
+            }
+            RetroFE p(config);
+            if (p.run()) // Check if we need to reboot after running
+                config.clearProperties();
+            else
+                break;
         }
-        RetroFE p(config);
-        if (p.run()) // Check if we need to reboot after running
-            config.clearProperties( );
-		else
-		    break;
+    }
+    catch (std::exception& e)
+    {
+        Logger::write(Logger::ZONE_ERROR, "EXCEPTION", e.what());
     }
 
     Logger::deInitialize();
@@ -111,45 +116,58 @@ int main(int argc, char **argv)
     return 0;
 }
 
-bool ImportConfiguration(Configuration *c)
+bool ImportConfiguration(Configuration* c)
 {
-    std::string configPath =  Configuration::absolutePath;
+    std::string configPath = Configuration::absolutePath;
 #ifdef WIN32
-    std::string launchersPath =  Utils::combinePath(Configuration::absolutePath, "launchers.windows");
+    std::string launchersPath = Utils::combinePath(Configuration::absolutePath, "launchers.windows");
 #elif __APPLE__
-    std::string launchersPath =  Utils::combinePath(Configuration::absolutePath, "launchers.apple");
+    std::string launchersPath = Utils::combinePath(Configuration::absolutePath, "launchers.apple");
 #else
-    std::string launchersPath =  Utils::combinePath(Configuration::absolutePath, "launchers.linux");
+    std::string launchersPath = Utils::combinePath(Configuration::absolutePath, "launchers.linux");
 #endif
-    std::string collectionsPath =  Utils::combinePath(Configuration::absolutePath, "collections");
-    DIR *dp;
-    struct dirent *dirp;
+    std::string collectionsPath = Utils::combinePath(Configuration::absolutePath, "collections");
+    DIR* dp;
+    struct dirent* dirp;
 
     std::string settingsConfPath = Utils::combinePath(configPath, "settings");
-    c->import("", "", settingsConfPath + "_saved.conf", false);
-    for ( int i = 9; i > 0; i--)
-        c->import("", "", settingsConfPath + std::to_string(i) + ".conf", false);
-    if(!c->import("", settingsConfPath + ".conf"))
+    if (!c->import("", settingsConfPath + ".conf"))
     {
         Logger::write(Logger::ZONE_ERROR, "RetroFE", "Could not import \"" + settingsConfPath + ".conf\"");
         return false;
     }
-    
+    for (int i = 1; i < 15; i++)
+        c->import("", "", settingsConfPath + std::to_string(i) + ".conf", false);
+    c->import("", "", settingsConfPath + "_saved.conf", false);
+
+    // log version
+    Logger::write(Logger::ZONE_INFO, "RetroFE", "Version " + Version::getString() + " starting");
+
+#ifdef WIN32
+    Logger::write(Logger::ZONE_INFO, "RetroFE", "OS: Windows");
+#elif __APPLE__
+    Logger::write(Logger::ZONE_INFO, "RetroFE", "OS: Mac");
+#else
+    Logger::write(Logger::ZONE_INFO, "RetroFE", "OS: Linux");
+#endif
+
+    Logger::write(Logger::ZONE_INFO, "RetroFE", "Absolute path: " + Configuration::absolutePath);
+
     dp = opendir(launchersPath.c_str());
 
-    if(dp == NULL)
+    if (dp == NULL)
     {
         Logger::write(Logger::ZONE_INFO, "RetroFE", "Could not read directory \"" + launchersPath + "\"");
-        launchersPath =  Utils::combinePath(Configuration::absolutePath, "launchers");
+        launchersPath = Utils::combinePath(Configuration::absolutePath, "launchers");
         dp = opendir(launchersPath.c_str());
-        if(dp == NULL)
+        if (dp == NULL)
         {
             Logger::write(Logger::ZONE_NOTICE, "RetroFE", "Could not read directory \"" + launchersPath + "\"");
             return false;
         }
     }
 
-    while((dirp = readdir(dp)) != NULL)
+    while ((dirp = readdir(dp)) != NULL)
     {
         if (dirp->d_type != DT_DIR && std::string(dirp->d_name) != "." && std::string(dirp->d_name) != "..")
         {
@@ -162,16 +180,16 @@ bool ImportConfiguration(Configuration *c)
                 continue;
             }
 
-            std::string extension = Utils::toLower(basename.substr(dot_position, basename.size()-1));
+            std::string extension = Utils::toLower(basename.substr(dot_position, basename.size() - 1));
             basename = basename.substr(0, dot_position);
 
-            if(extension == ".conf")
+            if (extension == ".conf")
             {
                 std::string prefix = "launchers." + Utils::toLower(basename);
 
                 std::string importFile = Utils::combinePath(launchersPath, std::string(dirp->d_name));
 
-                if(!c->import(prefix, importFile))
+                if (!c->import(prefix, importFile))
                 {
                     Logger::write(Logger::ZONE_ERROR, "RetroFE", "Could not import \"" + importFile + "\"");
                     if (dp) closedir(dp);
@@ -185,30 +203,33 @@ bool ImportConfiguration(Configuration *c)
 
     dp = opendir(collectionsPath.c_str());
 
-    if(dp == NULL)
+    if (dp == NULL)
     {
         Logger::write(Logger::ZONE_ERROR, "RetroFE", "Could not read directory \"" + collectionsPath + "\"");
         return false;
     }
 
-    while((dirp = readdir(dp)) != NULL)
+    bool settingsImported;
+    while ((dirp = readdir(dp)) != NULL)
     {
         std::string collection = (dirp->d_name);
         if (dirp->d_type == DT_DIR && collection != "." && collection != ".." && collection.length() > 0 && collection[0] != '_')
         {
             std::string prefix = "collections." + collection;
 
-            std::string infoFile = Utils::combinePath(collectionsPath, collection, "info.conf");
+            settingsImported = false;
+            std::string settingsPath = Utils::combinePath(collectionsPath, collection, "settings");
+            settingsImported |= c->import(collection, prefix, settingsPath + ".conf", false);
+            for (int i = 1; i < 15; i++)
+                settingsImported |= c->import(collection, prefix, settingsPath + std::to_string(i) + ".conf", false);
 
+            std::string infoFile = Utils::combinePath(collectionsPath, collection, "info.conf");
             c->import(collection, prefix, infoFile, false);
 
-            std::string settingsFile = Utils::combinePath(collectionsPath, collection, "settings.conf");
-
-            if(!c->import(collection, prefix, settingsFile, false))
+            if (!settingsImported)
             {
-                Logger::write(Logger::ZONE_INFO, "RetroFE", "Could not import \"" + settingsFile + "\"");
+                Logger::write(Logger::ZONE_ERROR, "RetroFE", "Could not import any collection settings for " + collection);
             }
-
         }
     }
 
@@ -219,29 +240,17 @@ bool ImportConfiguration(Configuration *c)
     return true;
 }
 
-bool StartLogging()
+bool StartLogging(Configuration* config)
 {
     std::string logFile = Utils::combinePath(Configuration::absolutePath, "log.txt");
 
-    if(!Logger::initialize(logFile))
+    if (!Logger::initialize(logFile, config))
     {
-	// Can't write to logs give a heads up...
-	fprintf(stderr, "Could not open log: %s for writing!\nRetroFE will now exit...\n", logFile.c_str());
+        // Can't write to logs give a heads up...
+        fprintf(stderr, "Could not open log: %s for writing!\nRetroFE will now exit...\n", logFile.c_str());
         //Logger::write(Logger::ZONE_ERROR, "RetroFE", "Could not open \"" + logFile + "\" for writing");
         return false;
     }
-
-    Logger::write(Logger::ZONE_INFO, "RetroFE", "Version " + Version::getString() + " starting");
-
-#ifdef WIN32
-    Logger::write(Logger::ZONE_INFO, "RetroFE", "OS: Windows");
-#elif __APPLE__
-    Logger::write(Logger::ZONE_INFO, "RetroFE", "OS: Mac");
-#else
-    Logger::write(Logger::ZONE_INFO, "RetroFE", "OS: Linux");
-#endif
-
-    Logger::write(Logger::ZONE_INFO, "RetroFE", "Absolute path: " + Configuration::absolutePath);
 
     return true;
 }

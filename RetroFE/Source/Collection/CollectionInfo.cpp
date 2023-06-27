@@ -34,12 +34,15 @@
 #include <cstring>
 #endif
 
-CollectionInfo::CollectionInfo(std::string name,
-                               std::string listPath,
-                               std::string extensions,
-                               std::string metadataType,
-                               std::string metadataPath)
-    : name(name)
+CollectionInfo::CollectionInfo(
+    Configuration& c,
+    std::string name,
+    std::string listPath,
+    std::string extensions,
+    std::string metadataType,
+    std::string metadataPath)
+    : conf_(c)
+    , name(name)
     , listpath(listPath)
     , saveRequest(false)
     , metadataType(metadataType)
@@ -47,7 +50,8 @@ CollectionInfo::CollectionInfo(std::string name,
     , subsSplit(false)
     , hasSubs(false)
     , metadataPath_(metadataPath)
-	, extensions_(extensions)
+    , extensions_(extensions)
+    , sortDesc(false)
 {
 }
 
@@ -77,10 +81,16 @@ CollectionInfo::~CollectionInfo()
 bool CollectionInfo::Save() 
 {
     bool retval = true;
-    if(saveRequest)
+    if(saveRequest && name != "")
     {
-        std::string dir  = Utils::combinePath(Configuration::absolutePath, "collections", name, "playlists");
-        std::string file = Utils::combinePath(Configuration::absolutePath, "collections", name, "playlists/favorites.txt");
+        std::string playlistCollectionName = name;
+        bool globalFavLast = false;
+        (void)conf_.getProperty("globalFavLast", globalFavLast);
+        if (globalFavLast) {
+            playlistCollectionName = "Favorites";
+        }
+        std::string dir  = Utils::combinePath(Configuration::absolutePath, "collections", playlistCollectionName, "playlists");
+        std::string file = Utils::combinePath(Configuration::absolutePath, "collections", playlistCollectionName, "playlists", "favorites.txt");
         Logger::write(Logger::ZONE_INFO, "Collection", "Saving " + file);
 
         std::ofstream filestream;
@@ -121,7 +131,7 @@ bool CollectionInfo::Save()
             std::vector<Item *> *saveitems = playlists["favorites"];
             for(std::vector<Item *>::iterator it = saveitems->begin(); it != saveitems->end(); it++)
             {
-                if ((*it)->collectionInfo->name == name)
+                if ((*it)->collectionInfo->name == (*it)->name)
                 {
                     filestream << (*it)->name << std::endl;
                 }
@@ -174,21 +184,38 @@ void CollectionInfo::addSubcollection(CollectionInfo *newinfo)
     items.insert(items.begin(), newinfo->items.begin(), newinfo->items.end());
 }
 
-bool CollectionInfo::itemIsLess(Item *lhs, Item *rhs)
+auto CollectionInfo::itemIsLess(std::string sortType)
 {
-    if(lhs->leaf && !rhs->leaf) return true;
-    if(!lhs->leaf && rhs->leaf) return false;
-    if(lhs->collectionInfo->subsSplit && lhs->collectionInfo != rhs->collectionInfo)
-        return lhs->collectionInfo->lowercaseName() < rhs->collectionInfo->lowercaseName();
-    if(!lhs->collectionInfo->menusort && !lhs->leaf && !rhs->leaf)
-        return false;
-    return lhs->lowercaseFullTitle() < rhs->lowercaseFullTitle();
+    return [sortType](Item* lhs, Item* rhs) {
+
+        if (lhs->leaf && !rhs->leaf) return true;
+        if (!lhs->leaf && rhs->leaf) return false;
+
+        // sort by collections first
+        if (lhs->collectionInfo->subsSplit && lhs->collectionInfo != rhs->collectionInfo)
+            return lhs->collectionInfo->lowercaseName() < rhs->collectionInfo->lowercaseName();
+        if (!lhs->collectionInfo->menusort && !lhs->leaf && !rhs->leaf)
+            return false;
+
+        // sort by another attribute
+        if (sortType != "") {
+            std::string lhsValue = lhs->getMetaAttribute(sortType);
+            std::string rhsValue = rhs->getMetaAttribute(sortType);
+            bool desc = Item::isSortDesc(sortType);
+
+            if (lhsValue != rhsValue) {
+                return desc ? lhsValue > rhsValue : lhsValue < rhsValue;
+            }
+        }
+        // default sort by name
+        return lhs->lowercaseFullTitle() < rhs->lowercaseFullTitle();
+    };
 }
 
 
 void CollectionInfo::sortItems()
 {
-    std::sort( items.begin(), items.end(), itemIsLess );
+    std::sort( items.begin(), items.end(), itemIsLess(""));
 }
 
 
@@ -201,22 +228,10 @@ void CollectionInfo::sortPlaylists()
     {
         if ( itP->second != allItems )
         {
-            toSortItems.clear();
-            for(std::vector <Item *>::iterator itSort = itP->second->begin(); itSort != itP->second->end(); itSort++)
-            {
-                toSortItems.push_back((*itSort));
-            }
-            itP->second->clear();
-            for(std::vector <Item *>::iterator itAll = allItems->begin(); itAll != allItems->end(); itAll++)
-            {
-                for(std::vector <Item *>::iterator itSort = toSortItems.begin(); itSort != toSortItems.end(); itSort++)
-                {
-                    if ((*itAll) == (*itSort))
-                    {
-                        itP->second->push_back((*itAll));
-                    }
-                }
-            }
+            // temporarily set collection info's sortType so search has access to it
+            sortType = Item::validSortType(itP->first) ? itP->first : "";
+            std::sort(itP->second->begin(), itP->second->end(), itemIsLess(sortType));
         }
     }
+    sortType = "";
 }

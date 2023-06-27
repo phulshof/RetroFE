@@ -23,7 +23,9 @@
 #include <vector>
 #include <iostream>
 #include <time.h>
+#include <ctime>
 #include <algorithm>
+#include "../../Utility/Utils.h"
 
 ReloadableText::ReloadableText(std::string type, Page &page, Configuration &config, bool systemMode, Font *font, std::string layoutKey, std::string timeFormat, std::string textFormat, std::string singlePrefix, std::string singlePostfix, std::string pluralPrefix, std::string pluralPostfix)
     : Component(page)
@@ -172,6 +174,16 @@ void ReloadableText::ReloadTexture()
         else if (type_ == "genre")
         {
             text = selectedItem->genre;
+        }
+        else if (type_ == "playCount")
+        {
+            text = std::to_string(selectedItem->playCount);
+        }
+        else if (type_ == "lastPlayed")
+        {
+            if (selectedItem->lastPlayed != "0") {
+                text = selectedItem->lastPlayed;// getTimeSince(selectedItem->lastPlayed);
+            }
         }
         else if (type_.rfind( "playlist", 0 ) == 0)
         {
@@ -346,4 +358,109 @@ void ReloadableText::draw()
         imageInst_->baseViewInfo = baseViewInfo;
         imageInst_->draw();
     }
+}
+
+// thank you chatgpt
+std::string ReloadableText::getTimeSince(std::string sinceTimestamp)
+{
+    const char* timestamp = sinceTimestamp.c_str();
+    std::time_t t2 = (time_t)strtol(timestamp, NULL, 10);
+
+    // error checking, make sure timestamp is valid
+    if (t2 == 0 && errno == EINVAL) {
+        return "";
+    }
+
+    // error checking, make sure the timestamp is not in the future
+    std::time_t t1 = std::time(nullptr);
+    if (t2 > t1) {
+        return "";
+    }
+
+    // Convert time_t to struct tm
+    std::tm tm1 = *std::localtime(&t1);
+    std::tm tm2 = *std::localtime(&t2);
+
+    // Calculate the difference in years, months, and days
+    int yearsDiff = tm1.tm_year - tm2.tm_year;
+    int monthsDiff = tm1.tm_mon - tm2.tm_mon;
+    int daysDiff = tm1.tm_mday - tm2.tm_mday;
+
+    // Adjust the difference in case of negative values
+    if (daysDiff < 0) {
+        monthsDiff--;
+        std::time_t tempT2 = t2;
+        std::tm tempTm2 = tm2;
+
+        while (tempTm2.tm_mon != tm1.tm_mon) {
+            tempT2 += 24 * 60 * 60;  // Add 1 day
+            tempTm2 = *std::localtime(&tempT2);
+            daysDiff += tempTm2.tm_mday;  // Add the number of days in the current month
+        }
+
+        if (daysDiff < 0) {
+            std::time_t tempT2 = t2;
+            std::tm tempTm2 = tm2;
+            int totalDaysDiff = 0;
+
+            while (tempTm2.tm_year != tm1.tm_year || tempTm2.tm_mon != tm1.tm_mon) {
+                tempT2 += 24 * 60 * 60;  // Add 1 day
+                tempTm2 = *std::localtime(&tempT2);
+                totalDaysDiff++;
+            }
+
+            monthsDiff--;
+            daysDiff = totalDaysDiff - daysDiff;
+        }
+    }
+
+    // Adjust the difference in case of negative months
+    if (monthsDiff < 0) {
+        yearsDiff--;
+        monthsDiff += 12;
+    }
+
+    // Calculate the number of days in each month
+    const int daysInMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+    int totalDays = 0;
+    for (int i = tm2.tm_mon; i < 12; ++i) {
+        totalDays += daysInMonth[i];
+    }
+    totalDays -= tm2.tm_mday - 1;
+
+    for (int i = 0; i < tm1.tm_mon; ++i) {
+        totalDays += daysInMonth[i];
+    }
+    totalDays += tm1.tm_mday;
+
+    // Adjust the difference by the total number of days
+    if (totalDays >= daysDiff) {
+        totalDays -= daysDiff;
+    }
+    else {
+        monthsDiff--;
+        totalDays = daysInMonth[(tm1.tm_mon + 11) % 12] - (daysDiff - totalDays - 1);
+    }
+
+    // construct the result string
+    std::string result = "";
+    if (yearsDiff > 0) {
+        result += std::to_string(yearsDiff) + (yearsDiff == 1 ? " year " : " years ");
+    }
+    if (monthsDiff > 0) {
+        result += std::to_string(monthsDiff) + (monthsDiff == 1 ? " month " : " months ");
+    }
+    if (daysDiff > 0) {
+        result += std::to_string(daysDiff) + (daysDiff == 1 ? " day " : " days ");
+    }
+
+    if (result == "") {
+        result = "today";
+    }
+    else {
+        result += "ago";
+    }
+
+    return result;
 }

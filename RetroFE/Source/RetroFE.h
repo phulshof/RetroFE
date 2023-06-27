@@ -30,6 +30,10 @@
 #include <stack>
 #include <map>
 #include <string>
+#include "Graphics/Page.h"
+#ifdef WIN32
+    #include <windows.h>
+#endif
 
 
 class CollectionInfo;
@@ -49,8 +53,14 @@ public:
     void     allocateGraphicsMemory( );
     void     launchEnter( );
     void     launchExit( );
+#ifdef WIN32	
+	void     postMessage(LPCTSTR windowTitle, UINT Msg, WPARAM wParam, LPARAM lParam );
+#endif	
 
 private:
+#ifdef WIN32	
+    HWND hwnd;
+#endif
     volatile bool initialized;
     volatile bool initializeError;
     SDL_Thread   *initializeThread;
@@ -108,16 +118,26 @@ private:
         RETROFE_QUIT,
     };
 
-    void            render( );
+    void            render();
     bool            back( bool &exit );
+    bool isStandalonePlaylist(std::string playlist);
+    bool isInAttractModeSkipPlaylist(std::string playlist);
+    void goToNextAttractModePlaylistByCycle(std::vector<std::string> cycleVector);
     void            quit( );
-    Page           *loadPage( );
+    Page           *loadPage(std::string collectionName);
     Page           *loadSplashPage( );
+
+    std::vector<std::string> collectionCycle_;
+    std::vector<std::string>::iterator collectionCycleIt_;
+
     RETROFE_STATE   processUserInput( Page *page );
     void            update( float dt, bool scrollActive );
     CollectionInfo *getCollection( std::string collectionName );
+    void updatePageControls(std::string type);
     CollectionInfo *getMenuCollection( std::string collectionName );
 	void            saveRetroFEState( );
+    std::string getLayoutFileName();
+
 
     Configuration     &config_;
     DB                *db_;
@@ -137,8 +157,10 @@ private:
     bool               attractMode_;
 	int                attractModePlaylistCollectionNumber_;
 	bool               reboot_;
+    bool               kioskLock_;
+    bool               paused_;
 	std::string        firstPlaylist_;
-
+    std::map<std::string, bool> lkupAttractModeSkipPlaylist_;
     std::map<std::string, unsigned int> lastMenuOffsets_;
     std::map<std::string, std::string>  lastMenuPlaylists_;
 };

@@ -25,6 +25,9 @@
 #include <locale>
 #include <sstream>
 #include <fstream>
+#include "../Graphics/Page.h"
+#include <thread>
+#include <atomic>
 #ifdef WIN32
 #include <windows.h>
 #include <cstring>
@@ -35,7 +38,7 @@ Launcher::Launcher(Configuration &c)
 {
 }
 
-bool Launcher::run(std::string collection, Item *collectionItem)
+bool Launcher::run(std::string collection, Item *collectionItem, Page *currentPage)
 {
     std::string launcherName = collectionItem->collectionInfo->launcher;
     std::string executablePath;
@@ -117,7 +120,7 @@ bool Launcher::run(std::string collection, Item *collectionItem)
                                         selectedItemsDirectory,
                                         collection);
 
-    if(!execute(executablePath, args, currentDirectory))
+    if(!execute(executablePath, args, currentDirectory, true, currentPage))
     {
         Logger::write(Logger::ZONE_ERROR, "Launcher", "Failed to launch.");
         return false;
@@ -179,7 +182,7 @@ void Launcher::LEDBlinky( int command, std::string collection, Item *collectionI
 	}
 	if ( LEDBlinkyDirectory != "" && !execute( exe, args, LEDBlinkyDirectory, wait ) )
 	{
-        Logger::write( Logger::ZONE_ERROR, "LEDBlinky", "Failed to launch." );
+        Logger::write( Logger::ZONE_WARNING, "LEDBlinky", "Failed to launch." );
 	}
 	return;
 }
@@ -199,7 +202,8 @@ std::string Launcher::replaceVariables(std::string str,
     str = Utils::replace(str, "%ITEM_COLLECTION_NAME%", itemCollectionName);
     str = Utils::replace(str, "%RETROFE_PATH%", Configuration::absolutePath);
 #ifdef WIN32
-    str = Utils::replace(str, "%RETROFE_EXEC_PATH%", Utils::combinePath(Configuration::absolutePath, "core", "RetroFE.exe"));
+    str = Utils::replace(str, "%RETROFE_EXEC_PATH%", Utils::combinePath(Configuration::absolutePath, "retrofe", "RetroFE.exe"));
+    str = Utils::replace(str, "%CMD%", std::getenv("COMSPEC"));
 #else
     str = Utils::replace(str, "%RETROFE_EXEC_PATH%", Utils::combinePath(Configuration::absolutePath, "RetroFE"));
 #endif
@@ -207,7 +211,7 @@ std::string Launcher::replaceVariables(std::string str,
     return str;
 }
 
-bool Launcher::execute(std::string executable, std::string args, std::string currentDirectory, bool wait)
+bool Launcher::execute(std::string executable, std::string args, std::string currentDirectory, bool wait, Page* currentPage)
 {
     bool retVal = false;
     std::string executionString = "\"" + executable + "\" " + args;
@@ -242,12 +246,24 @@ bool Launcher::execute(std::string executable, std::string args, std::string cur
     if(system(executionString.c_str()) != 0)
 #endif
     {
-        Logger::write(Logger::ZONE_ERROR, "Launcher", "Failed to run: " + executable);
+        Logger::write(Logger::ZONE_WARNING, "Launcher", "Failed to run: " + executable);
     }
 
     else
     {
 #ifdef WIN32
+        std::atomic<bool> stop_thread;
+        std::thread proc_thread;
+        bool multiple_display = SDL::getScreenCount() > 1;
+        if (multiple_display) {
+            stop_thread = false;
+            proc_thread = std::thread([this, &stop_thread, &currentPage]() {
+                this->keepRendering(std::ref(stop_thread), *currentPage);
+                });
+        }
+        // lower priority
+        SetPriorityClass(GetCurrentProcess(), NORMAL_PRIORITY_CLASS);
+
 		if ( wait )
 		{
 			while(WAIT_OBJECT_0 != MsgWaitForMultipleObjects(1, &processInfo.hProcess, FALSE, INFINITE, QS_ALLINPUT))
@@ -256,8 +272,19 @@ bool Launcher::execute(std::string executable, std::string args, std::string cur
 				while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 				{
 					DispatchMessage(&msg);
+                    
 				}
 			}
+        }
+        if (multiple_display) {
+            stop_thread = true;
+            proc_thread.join();
+        }
+        //resume priority
+        bool highPriority = false;
+        config_.getProperty("highPriority", highPriority);
+        if (highPriority) {
+            SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);
         }
 
         // result = GetExitCodeProcess(processInfo.hProcess, &exitCode);
@@ -269,6 +296,52 @@ bool Launcher::execute(std::string executable, std::string args, std::string cur
     Logger::write(Logger::ZONE_INFO, "Launcher", "Completed");
 
     return retVal;
+}
+
+void Launcher::keepRendering(std::atomic<bool> &stop_thread, Page &currentPage)
+{
+    float lastTime = 0;
+    float currentTime = 0;
+    float deltaTime = 0;
+    double sleepTime;
+    double fpsTime = 1000.0 / static_cast<double>(60);
+
+    while (!stop_thread) {
+        lastTime = currentTime;
+        currentTime = static_cast<float>(SDL_GetTicks()) / 1000;
+
+        if (currentTime < lastTime)
+        {
+            currentTime = lastTime;
+        }
+
+        deltaTime = currentTime - lastTime;
+        sleepTime = fpsTime - deltaTime * 1000;
+            
+        if (sleepTime > 0 && sleepTime < 1000)
+        {
+            SDL_Delay(static_cast<unsigned int>(sleepTime));
+        }
+        currentPage.update(float(0));
+        SDL_LockMutex(SDL::getMutex());
+
+        // start on secondary monitor
+        // todo support future main screen swap
+        for (int i = 1; i < SDL::getScreenCount(); ++i)
+        {
+            SDL_SetRenderDrawColor(SDL::getRenderer(i), 0x0, 0x0, 0x00, 0xFF);
+            SDL_RenderClear(SDL::getRenderer(i));
+        }
+
+        currentPage.draw();
+
+        for (int i = 1; i < SDL::getScreenCount(); ++i)
+        {
+            SDL_RenderPresent(SDL::getRenderer(i));
+        }
+
+        SDL_UnlockMutex(SDL::getMutex());
+    }
 }
 
 bool Launcher::launcherName(std::string &launcherName, std::string collection)

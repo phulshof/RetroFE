@@ -153,55 +153,50 @@ void Component::setTweens(AnimationEvents *set)
 void Component::update(float dt)
 {
     elapsedTweenTime_ += dt;
-
-    if ( animationRequested_ && animationRequestedType_ != "" )
+    if (animationRequested_ && animationRequestedType_ != "")
     {
-      Animation *newTweens;
-      // Check if this component is part of an active scrolling list
-      if ( menuIndex_ >= MENU_INDEX_HIGH )
-      {
-          // Check for animation at index i
-          newTweens = tweens_->getAnimation( animationRequestedType_, MENU_INDEX_HIGH );
-          if ( !(newTweens && newTweens->size() > 0) )
-          {
-              // Check for animation at the current menuIndex
-              newTweens = tweens_->getAnimation( animationRequestedType_, menuIndex_ - MENU_INDEX_HIGH);
-          }
-      }
-      else
-      {
-          // Check for animation at the current menuIndex
-          newTweens = tweens_->getAnimation( animationRequestedType_, menuIndex_ );
-      }
-      if (newTweens && newTweens->size() > 0)
-      {
-        animationType_        = animationRequestedType_;
-        currentTweens_        = newTweens;
-        currentTweenIndex_    = 0;
-        elapsedTweenTime_     = 0;
-        storeViewInfo_        = baseViewInfo;
-        currentTweenComplete_ = false;
-      }
-      animationRequested_   = false;
+        Animation* newTweens;
+        // Check if this component is part of an active scrolling list
+        if (menuIndex_ >= MENU_INDEX_HIGH)
+        {
+            // Check for animation at index i
+            newTweens = tweens_->getAnimation(animationRequestedType_, MENU_INDEX_HIGH);
+            if (!(newTweens && newTweens->size() > 0))
+            {
+                // Check for animation at the current menuIndex
+                newTweens = tweens_->getAnimation(animationRequestedType_, menuIndex_ - MENU_INDEX_HIGH);
+            }
+        }
+        else
+        {
+            // Check for animation at the current menuIndex
+            newTweens = tweens_->getAnimation(animationRequestedType_, menuIndex_);
+        }
+        if (newTweens && newTweens->size() > 0)
+        {
+            animationType_ = animationRequestedType_;
+            currentTweens_ = newTweens;
+            currentTweenIndex_ = 0;
+            elapsedTweenTime_ = 0;
+            storeViewInfo_ = baseViewInfo;
+            currentTweenComplete_ = false;
+        }
+        animationRequested_ = false;
     }
 
     if (tweens_ && currentTweenComplete_)
     {
-        animationType_        = "idle";
-        currentTweens_        = tweens_->getAnimation( "idle", menuIndex_ );
-        if ( currentTweens_ && currentTweens_->size( ) == 0 && !page.isMenuScrolling( ) )
+        animationType_ = "idle";
+        currentTweens_ = tweens_->getAnimation("idle", menuIndex_);
+        if (currentTweens_ && currentTweens_->size() == 0 && !page.isMenuScrolling())
         {
-            currentTweens_    = tweens_->getAnimation( "menuIdle", menuIndex_ );
-            if ( currentTweens_ && currentTweens_->size( ) > 0 )
-            {
-                currentTweens_ = currentTweens_;
-            }
+            currentTweens_ = tweens_->getAnimation("menuIdle", menuIndex_);
         }
-        currentTweenIndex_    = 0;
-        elapsedTweenTime_     = 0;
-        storeViewInfo_        = baseViewInfo;
+        currentTweenIndex_ = 0;
+        elapsedTweenTime_ = 0;
+        storeViewInfo_ = baseViewInfo;
         currentTweenComplete_ = false;
-        animationRequested_   = false;
+        animationRequested_ = false;
     }
 
     currentTweenComplete_ = animate();
@@ -244,10 +239,29 @@ bool Component::animate()
     {
         bool currentDone = true;
         TweenSet *tweens = currentTweens_->tweenSet(currentTweenIndex_);
-
+        std::string playlist;
+        bool foundFiltered;
         for(unsigned int i = 0; i < tweens->size(); i++)
         {
             Tween *tween = tweens->tweens()->at(i);
+            // only animate if filter matches current playlist or in playlist1,playlist2,playlist3
+            if (tween->playlistFilter != "" && playlistName != "") {
+                foundFiltered = false;
+                std::stringstream ss(tween->playlistFilter);
+                playlist = "";
+                while (ss.good())
+                {
+                    getline(ss, playlist, ',');
+                    if (playlistName == playlist) {
+                        foundFiltered = true;
+                        break;
+                    }
+                }
+                // didn't find match, skip
+                if (!foundFiltered) {
+                    continue;
+                }
+            }
             double elapsedTime = elapsedTweenTime_;
 
             //todo: too many levels of nesting
@@ -256,7 +270,7 @@ bool Component::animate()
             else
                 elapsedTime = static_cast<float>(tween->duration);
 
-            switch(tween->property)
+            switch (tween->property)
             {
             case TWEEN_PROPERTY_X:
                 if (tween->startDefined)
@@ -407,6 +421,9 @@ bool Component::animate()
 
             case TWEEN_PROPERTY_NOP:
                 break;
+            case TWEEN_PROPERTY_RESTART:
+                baseViewInfo.Restart = tween->duration && !elapsedTime;
+                break;
             }
         }
 
@@ -431,7 +448,6 @@ bool Component::isPlaying()
 {
     return false;
 }
-
 
 
 

@@ -45,6 +45,9 @@ public:
     void deInitialize();
     virtual void onNewItemSelected();
     virtual void onNewScrollItemSelected();
+    void returnToRememberSelectedItem();
+    void rememberSelectedItem();
+    std::map<std::string, unsigned int> getLastPlaylistOffsets();
     void highlightLoadArt();
     bool pushCollection(CollectionInfo *collection);
     bool popCollection();
@@ -60,15 +63,18 @@ public:
     void nextCyclePlaylist(std::vector<std::string> list);
     void prevCyclePlaylist(std::vector<std::string> list);
     void pushMenu(ScrollingList *s, int index = -1);
+    void updatePlaylistMenuPosition();
     bool isMenusFull();
     void setLoadSound(Sound *chunk);
     void setUnloadSound(Sound *chunk);
     void setHighlightSound(Sound *chunk);
     void setSelectSound(Sound *chunk);
+    Item *getSelectedMenuItem();
+    ScrollingList* getAnActiveMenu();
     bool addComponent(Component *c);
     void pageScroll(ScrollDirection direction);
     void letterScroll(ScrollDirection direction);
-    void subScroll(ScrollDirection direction);
+    void metaScroll(ScrollDirection direction, std::string attribute);
     void cfwLetterSubScroll(ScrollDirection direction);
     unsigned int getCollectionSize();
     unsigned int getSelectedIndex();
@@ -89,6 +95,7 @@ public:
     bool isMenuIdle();
     void setStatusTextComponent(Text *t);
     void update(float dt);
+    void updateReloadables(float dt);
     void cleanup();
     void draw();
     void freeGraphicsMemory();
@@ -101,11 +108,18 @@ public:
     CollectionInfo *getCollection();
     void  setMinShowTime(float value);
     float getMinShowTime();
+    std::string controlsType();
+    void setControlsType(std::string type);
     void  menuScroll();
     void  highlightEnter();
     void  highlightExit();
     void  playlistEnter();
     void  playlistExit();
+    void playlistNextEnter();
+    void playlistNextExit();
+    void playlistPrevEnter();
+    void playlistPrevExit();
+    void triggerEventOnAllMenus(std::string event);
     void  menuJumpEnter();
     void  menuJumpExit();
     void  attractEnter( );
@@ -117,8 +131,7 @@ public:
     void  addPlaylist();
     void  removePlaylist();
     void  togglePlaylist();
-    void  updateLastPlayedPlaylist( Item *item );
-    void  reallocateMenuSpritePoints();
+    void  reallocateMenuSpritePoints(bool updatePlaylistMenu = true);
     bool  isMenuScrolling();
     bool  isPlaying();
     void  resetScrollPeriod();
@@ -141,23 +154,36 @@ public:
     unsigned long long getCurrent( );
     unsigned long long getDuration( );
     bool  isPaused( );
+    void setLocked(bool locked);
+    bool isLocked();
+    ScrollingList* getPlaylistMenu();
+    void setPlaylistMenu(ScrollingList*);
+    bool playlistExists(std::string);
+    void setSelectedItem();
+    bool fromPreviousPlaylist = false;
+    bool fromPlaylistNav = false;
 
 private:
     void playlistChange();
     std::string collectionName_;
     Configuration &config_;
+    std::string controlsType_;
+    bool locked_;
 
     struct MenuInfo_S
     {
-        CollectionInfo *collection;
-        CollectionInfo::Playlists_T::iterator playlist; 
+        CollectionInfo* collection;
+        CollectionInfo::Playlists_T::iterator playlist;
         bool queueDelete;
     };
-
-    typedef std::vector< std::vector<ScrollingList *> > MenuVector_T;
     typedef std::list<MenuInfo_S> CollectionVector_T;
+    
+    typedef std::vector< std::vector<ScrollingList *> > MenuVector_T;
+    void setActiveMenuItemsFromPlaylist(MenuInfo_S info, ScrollingList* menu);
 
     std::vector<ScrollingList *> activeMenu_;
+    ScrollingList* anActiveMenu_;
+    ScrollingList* playlistMenu_;
     unsigned int menuDepth_;
     MenuVector_T menus_;
     CollectionVector_T collections_;
@@ -167,6 +193,7 @@ private:
     std::vector<Component *> LayerComponents;
     std::list<ScrollingList *> deleteMenuList_;
     std::list<CollectionInfo *> deleteCollectionList_;
+    std::map<std::string, unsigned int> lastPlaylistOffsets_;
 
     bool scrollActive_;
 

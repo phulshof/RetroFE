@@ -22,13 +22,14 @@
 std::map<std::string, TweenAlgorithm> Tween::tweenTypeMap_;
 std::map<std::string, TweenProperty> Tween::tweenPropertyMap_;
 
-Tween::Tween(TweenProperty property, TweenAlgorithm type, double start, double end, double duration)
+Tween::Tween(TweenProperty property, TweenAlgorithm type, double start, double end, double duration, std::string playlistFilter)
     : property(property)
     , duration(duration)
     , startDefined(true)
     , type(type)
     , start(start)
     , end(end)
+    , playlistFilter(playlistFilter)
 {
 }
 
@@ -60,6 +61,7 @@ bool Tween::getTweenProperty(std::string name, TweenProperty &property)
         tweenPropertyMap_["containerheight"] = TWEEN_PROPERTY_CONTAINER_HEIGHT;
         tweenPropertyMap_["volume"]          = TWEEN_PROPERTY_VOLUME;
         tweenPropertyMap_["nop"]             = TWEEN_PROPERTY_NOP;
+        tweenPropertyMap_["restart"] = TWEEN_PROPERTY_RESTART;
     }
 
     std::transform(name.begin(), name.end(), name.begin(), ::tolower);

@@ -33,6 +33,9 @@
 #endif
 
 std::string Configuration::absolutePath;
+bool Configuration::HardwareVideoAccel = false;
+int Configuration::AvdecMaxThreads = 2;
+bool Configuration::MuteVideo = false;
 
 Configuration::Configuration()
 {
@@ -103,9 +106,9 @@ void Configuration::clearProperties( )
 }
 
 
-bool Configuration::import(std::string keyPrefix, std::string file)
+bool Configuration::import(std::string keyPrefix, std::string file, bool mustExist)
 {
-    return import("", keyPrefix, file);
+    return import("", keyPrefix, file, mustExist);
 }
 
 bool Configuration::import(std::string collection, std::string keyPrefix, std::string file, bool mustExist)
@@ -126,7 +129,7 @@ bool Configuration::import(std::string collection, std::string keyPrefix, std::s
         }
         else
         {
-            Logger::write(Logger::ZONE_INFO, "Configuration", "Could not open " + file + "\"");
+            Logger::write(Logger::ZONE_WARNING, "Configuration", "Could not open " + file + "\"");
         }
 
         return false;
@@ -160,9 +163,9 @@ bool Configuration::parseLine(std::string collection, std::string keyPrefix, std
         retVal = true;
     }
     // all configuration fields must have an assignment operator
-    else if((position = line.find(delimiter)) != std::string::npos)
+    else if ((position = line.find(delimiter)) != std::string::npos)
     {
-        if(keyPrefix.size() != 0)
+        if (keyPrefix.size() != 0)
         {
             keyPrefix += ".";
         }
@@ -175,11 +178,12 @@ bool Configuration::parseLine(std::string collection, std::string keyPrefix, std
         value = line.substr(position + delimiter.length(), line.length());
         value = trimEnds(value);
 
-        if(collection != "")
+        if (collection != "")
         {
             value = Utils::replace(value, "%ITEM_COLLECTION_NAME%", collection);
         }
-        properties_.insert(PropertiesPair(key, value));
+
+        properties_[key] = value;
 
         std::stringstream ss;
         ss << "Dump: "  << "\"" << key << "\" = \"" << value << "\"";
@@ -268,7 +272,7 @@ bool Configuration::getProperty(std::string key, bool &value)
 
     if(retVal)
     {
-        if(!strValue.compare("yes") || !strValue.compare("true"))
+        if(!strValue.compare("yes") || !strValue.compare("true") || !strValue.compare("on"))
         {
             value = true;
         }
@@ -284,6 +288,11 @@ bool Configuration::getProperty(std::string key, bool &value)
 void Configuration::setProperty(std::string key, std::string value)
 {
     properties_[key] = value;
+}
+
+bool Configuration::propertiesEmpty()
+{
+    return properties_.empty();
 }
 
 bool Configuration::propertyExists(std::string key)

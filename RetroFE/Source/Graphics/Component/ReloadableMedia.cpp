@@ -28,7 +28,8 @@
 #include <vector>
 #include <iostream>
 
-ReloadableMedia::ReloadableMedia(Configuration &config, bool systemMode, bool layoutMode, bool commonMode, bool menuMode, std::string type, std::string imageType, Page &p, int displayOffset, bool isVideo, Font *font, bool jukebox, int jukeboxNumLoops)
+ReloadableMedia::ReloadableMedia(Configuration &config, bool systemMode, bool layoutMode, bool commonMode, bool menuMode, std::string type, std::string imageType, 
+    Page &p, int displayOffset, bool isVideo, Font *font, bool jukebox, int jukeboxNumLoops, int randomSelect)
     : Component(p)
     , config_(config)
     , systemMode_(systemMode)
@@ -45,6 +46,8 @@ ReloadableMedia::ReloadableMedia(Configuration &config, bool systemMode, bool la
     , imageType_(imageType)
     , jukebox_(jukebox)
     , jukeboxNumLoops_(jukeboxNumLoops)
+    , numberOfImages_(27)
+    , randomSelect_(randomSelect)
 {
     allocateGraphicsMemory();
 }
@@ -66,7 +69,9 @@ void ReloadableMedia::update(float dt)
 {
     if (newItemSelected ||
        (newScrollItemSelected && getMenuScrollReload()) ||
-        type_ == "isPaused")
+        type_ == "isPaused" || 
+        type_ == "playCount" || 
+        type_ == "playcount")
     {
 
         reloadTexture();
@@ -117,13 +122,19 @@ void ReloadableMedia::freeGraphicsMemory()
 
 void ReloadableMedia::reloadTexture()
 {
+    std::string typeLC = Utils::toLower(type_);
+    Item* selectedItem = page.getSelectedItem(displayOffset_);
+
     if(loadedComponent_)
     {
-        delete loadedComponent_;
-        loadedComponent_ = NULL;
+        // delete image/video/text if no selected Item, or if not a playlist type or playlists are different
+        if (!selectedItem || !(typeLC.rfind("playlist", 0) == 0 && (page.getPlaylistName() == loadedComponent_->playlistName)))
+        {
+            delete loadedComponent_;
+            loadedComponent_ = NULL;
+        }
     }
 
-    Item *selectedItem = page.getSelectedItem(displayOffset_);
     if(!selectedItem) return;
 
     config_.getProperty("currentCollection", currentCollection_);
@@ -138,7 +149,6 @@ void ReloadableMedia::reloadTexture()
         names.push_back(selectedItem->cloneof);
     }
 
-    std::string typeLC = Utils::toLower(type_);
     if (typeLC == "isfavorite")
     {
         if (selectedItem->isFavorite)
@@ -161,6 +171,17 @@ void ReloadableMedia::reloadTexture()
             names.push_back("no");
         }
     }
+    if (typeLC == "islocked")
+    {
+        if (page.isLocked())
+        {
+            names.push_back("yes");
+        }
+        else
+        {
+            names.push_back("no");
+        }
+    }
 
     names.push_back("default");
 
@@ -169,6 +190,13 @@ void ReloadableMedia::reloadTexture()
         for(unsigned int n = 0; n < names.size() && !loadedComponent_; ++n)
         {
             std::string basename = names[n];
+
+            // support reloadable video based on playlist# type
+            if (basename != "default" && typeLC.rfind("playlist", 0) == 0)
+            {
+                basename = page.getPlaylistName();
+            }
+
             if(systemMode_)
             {
 
@@ -229,6 +257,7 @@ void ReloadableMedia::reloadTexture()
 
             if(loadedComponent_)
             {
+                loadedComponent_->playlistName = page.getPlaylistName();
                 loadedComponent_->allocateGraphicsMemory();
                 baseViewInfo.ImageWidth = loadedComponent_->baseViewInfo.ImageWidth;
                 baseViewInfo.ImageHeight = loadedComponent_->baseViewInfo.ImageHeight;
@@ -314,6 +343,11 @@ void ReloadableMedia::reloadTexture()
             basename = selectedItem->score;
             defined  = true;
         }
+        else if (typeLC == "playcount")
+        {
+            basename = std::to_string(selectedItem->playCount);
+            defined = true;
+        }
         else if(typeLC.rfind( "playlist", 0 ) == 0)
         {
             basename = page.getPlaylistName();
@@ -323,6 +357,22 @@ void ReloadableMedia::reloadTexture()
         {
             basename = selectedItem->fullTitle.at(0);
             defined  = true;
+        }
+        else if (typeLC == "position")
+        {
+            if (!selectedItem->collectionInfo->items.empty()) {
+                int position = page.getSelectedIndex() + 1;
+                if (position == 1) {
+                    basename = '1';
+                }
+                else if (position == page.getCollectionSize()) {
+                    basename = std::to_string(numberOfImages_);
+                }
+                else {
+                    basename = std::to_string(int(ceil(float(position) / float(page.getCollectionSize()) * float(numberOfImages_))));
+                }
+                defined = true;
+            }
         }
 
         if (!selectedItem->leaf) // item is not a leaf
@@ -343,6 +393,14 @@ void ReloadableMedia::reloadTexture()
         }
 
         Utils::replaceSlashesWithUnderscores(basename);
+
+        // ability to randomly select image/video
+        if (randomSelect_) {
+            int randImage = (rand() % randomSelect_);
+            if (randImage != 0) {
+                basename = basename + " - " + std::to_string(randImage);
+            }
+        }
 
         if(systemMode_)
         {
@@ -404,6 +462,7 @@ void ReloadableMedia::reloadTexture()
 
         if (loadedComponent_ != NULL)
         {
+             loadedComponent_->playlistName = page.getPlaylistName();
              loadedComponent_->allocateGraphicsMemory();
              baseViewInfo.ImageWidth = loadedComponent_->baseViewInfo.ImageWidth;
              baseViewInfo.ImageHeight = loadedComponent_->baseViewInfo.ImageHeight;
@@ -472,7 +531,7 @@ Component *ReloadableMedia::findComponent(std::string collection, std::string ty
     }
     else
     {
-        component = imageBuild.CreateImage(imagePath, page, basename, baseViewInfo.Monitor);
+        component = imageBuild.CreateImage(imagePath, page, basename, baseViewInfo.Monitor, baseViewInfo.Additive);
     }
 
     return component;

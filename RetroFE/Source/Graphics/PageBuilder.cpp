@@ -97,9 +97,9 @@ Page *PageBuilder::buildPage( std::string collectionName )
     }
 
     std::vector<std::string> monitors;
-    monitors.push_back("");
+    monitors.push_back(layoutPage);
     for ( int i = 0; i < SDL::getNumScreens(); i++ )
-        monitors.push_back( " - " + std::to_string( i ) );
+        monitors.push_back("layout - " + std::to_string( i ) );
    
 
     for ( size_t monitor = 0; monitor < monitors.size(); monitor++ )
@@ -108,8 +108,8 @@ Page *PageBuilder::buildPage( std::string collectionName )
             monitor_ = monitor - 1;
 		else
             monitor_ = monitor;
-        layoutFile       = Utils::combinePath(layoutPath, layoutPage + monitors[monitor] + ".xml");
-        layoutFileAspect = Utils::combinePath(layoutPath, layoutPage + " " + std::to_string( screenWidth_/Utils::gcd( screenWidth_, screenHeight_ ) ) + "x" + std::to_string( screenHeight_/Utils::gcd( screenWidth_, screenHeight_ ) ) + monitors[monitor] + ".xml" );
+        layoutFile       = Utils::combinePath(layoutPath, monitors[monitor] + ".xml");
+        layoutFileAspect = Utils::combinePath(layoutPath, "layout " + std::to_string( screenWidth_/Utils::gcd( screenWidth_, screenHeight_ ) ) + "x" + std::to_string( screenHeight_/Utils::gcd( screenWidth_, screenHeight_ ) ) + monitors[monitor] + ".xml" );
 
         Logger::write(Logger::ZONE_INFO, "Layout", "Initializing " + layoutFileAspect);
 
@@ -152,6 +152,7 @@ Page *PageBuilder::buildPage( std::string collectionName )
                 xml_attribute<> *fontColorXml = root->first_attribute("fontColor");
                 xml_attribute<> *fontSizeXml = root->first_attribute("loadFontSize");
                 xml_attribute<> *minShowTimeXml = root->first_attribute("minShowTime");
+                xml_attribute<>* controls = root->first_attribute("controls");
 
                 if(!layoutWidthXml || !layoutHeightXml)
                 {
@@ -210,6 +211,13 @@ Page *PageBuilder::buildPage( std::string collectionName )
                     page->setMinShowTime(Utils::convertFloat(minShowTimeXml->value()));
                 }
 
+                // add additional controls to replace others based on theme/layout
+                if (controls && controls->value() != "") {
+                    std::string controlLayout = controls->value();
+                    Logger::write(Logger::ZONE_INFO, "Layout", "Layout set custom control type " + controlLayout);
+                    page->setControlsType(controlLayout);
+                }
+
                 // load sounds
                 for(xml_node<> *sound = root->first_node("sound"); sound; sound = sound->next_sibling("sound"))
                 {
@@ -265,7 +273,7 @@ Page *PageBuilder::buildPage( std::string collectionName )
             std::string what = e.what();
             long line = static_cast<long>(std::count(&buffer.front(), e.where<char>(), char('\n')) + 1);
             std::stringstream ss;
-            ss << "Could not parse layout file. [Line: " << line << "] Reason: " << e.what();
+            ss << "Could not parse layout file. [Line: " << line << "] in " << layoutFile << " Reason: " << e.what();
 
             Logger::write(Logger::ZONE_ERROR, "Layout", ss.str());
         }
@@ -366,6 +374,9 @@ bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
         ScrollingList *scrollingList = buildMenu(componentXml,*page);
         xml_attribute<> *indexXml = componentXml->first_attribute("menuIndex");
         int index = indexXml ? Utils::convertInt(indexXml->value()) : -1;
+        if (scrollingList->isPlaylist()) {
+            page->setPlaylistMenu(scrollingList);
+        }
         page->pushMenu(scrollingList, index);
     }
 
@@ -390,6 +401,7 @@ bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
         xml_attribute<> *src        = componentXml->first_attribute("src");
         xml_attribute<> *idXml      = componentXml->first_attribute("id");
         xml_attribute<> *monitorXml = componentXml->first_attribute("monitor");
+        xml_attribute<>* additiveXml = componentXml->first_attribute("additive");
 
         int id = -1;
         if (idXml)
@@ -411,7 +423,8 @@ bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
             altImagePath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, std::string(src->value()));
 
             int monitor = monitorXml ? Utils::convertInt(monitorXml->value()) : monitor_;
-            Image *c = new Image(imagePath, altImagePath, *page, monitor);
+            bool additive = additiveXml ? bool(additiveXml->value()) : false;
+            Image *c = new Image(imagePath, altImagePath, *page, monitor, additive);
             c->setId( id );
             xml_attribute<> *menuScrollReload = componentXml->first_attribute("menuScrollReload");
             if (menuScrollReload &&
@@ -559,6 +572,8 @@ void PageBuilder::loadReloadableImages(xml_node<> *layout, std::string tagName, 
         xml_attribute<> *endTimeXml        = componentXml->first_attribute("endTime");
         xml_attribute<> *alignmentXml      = componentXml->first_attribute("alignment");
         xml_attribute<> *idXml             = componentXml->first_attribute("id");
+        xml_attribute<>* randomSelectXml = componentXml->first_attribute("randomSelect");
+
         bool systemMode = false;
         bool layoutMode = false;
         bool commonMode = false;
@@ -759,14 +774,20 @@ void PageBuilder::loadReloadableImages(xml_node<> *layout, std::string tagName, 
                 jukeboxNumLoops = numLoopsXml ? Utils::convertInt(numLoopsXml->value()) : 1;
             }
             Font *font = addFont(componentXml, NULL);
+
             std::string typeString      = "video";
             std::string imageTypeString = "";
             if ( type )
                 typeString = type->value();
             if ( imageType )
                 imageTypeString = imageType->value();
-            c = new ReloadableMedia(config_, systemMode, layoutMode, commonMode, menuMode, typeString, imageTypeString, *page, selectedOffset, (tagName == "reloadableVideo") || (tagName == "reloadableAudio"), font, jukebox, jukeboxNumLoops);
+
+            int randomSelectInt = randomSelectXml ? Utils::convertInt(randomSelectXml->value()) : 0;
+
+            c = new ReloadableMedia(config_, systemMode, layoutMode, commonMode, menuMode, typeString, imageTypeString, *page, 
+                selectedOffset, (tagName == "reloadableVideo") || (tagName == "reloadableAudio"), font, jukebox, jukeboxNumLoops, randomSelectInt);
             c->setId( id );
+
             xml_attribute<> *menuScrollReload = componentXml->first_attribute("menuScrollReload");
             if (menuScrollReload &&
                 (Utils::toLower(menuScrollReload->value()) == "true" ||
@@ -882,6 +903,10 @@ AnimationEvents *PageBuilder::createTweenInstance(xml_node<> *componentXml)
     buildTweenSet(tweens, componentXml, "onGameExit",       "gameExit");
     buildTweenSet(tweens, componentXml, "onPlaylistEnter",  "playlistEnter");
     buildTweenSet(tweens, componentXml, "onPlaylistExit",   "playlistExit");
+    buildTweenSet(tweens, componentXml, "onPlaylistNextEnter", "playlistNextEnter");
+    buildTweenSet(tweens, componentXml, "onPlaylistNextExit", "playlistNextExit");
+    buildTweenSet(tweens, componentXml, "onPlaylistPrevEnter", "playlistPrevEnter");
+    buildTweenSet(tweens, componentXml, "onPlaylistPrevExit", "playlistPrevExit");
     buildTweenSet(tweens, componentXml, "onMenuJumpEnter",  "menuJumpEnter");
     buildTweenSet(tweens, componentXml, "onMenuJumpExit",   "menuJumpExit");
     buildTweenSet(tweens, componentXml, "onAttractEnter",   "attractEnter");
@@ -988,6 +1013,8 @@ ScrollingList * PageBuilder::buildMenu(xml_node<> *menuXml, Page &page)
     xml_attribute<> *scrollAccelerationXml = menuXml->first_attribute("scrollAcceleration");
     xml_attribute<> *minScrollTimeXml      = menuXml->first_attribute("minScrollTime");
     xml_attribute<> *scrollOrientationXml  = menuXml->first_attribute("orientation");
+    xml_attribute<>* selectedImage         = menuXml->first_attribute("selectedImage");
+
 
     if(menuTypeXml)
     {
@@ -1000,14 +1027,21 @@ ScrollingList * PageBuilder::buildMenu(xml_node<> *menuXml, Page &page)
         Logger::write(Logger::ZONE_WARNING, "Layout", "Menu tag is missing <itemDefaults> tag.");
     }
 
+    bool playlistType = false;
     if(imageTypeXml)
     {
         imageType = imageTypeXml->value();
+        if (imageType.rfind("playlist", 0) == 0) {
+            playlistType = true;
+        }
     }
 
     if(videoTypeXml)
     {
         videoType = videoTypeXml->value();
+        if (videoType.rfind("playlist", 0) == 0) {
+            playlistType = true;
+        }
     }
 
     bool layoutMode = false;
@@ -1033,7 +1067,7 @@ ScrollingList * PageBuilder::buildMenu(xml_node<> *menuXml, Page &page)
     // on default, text will be rendered to the menu. Preload it into cache.
     Font *font = addFont(itemDefaults, NULL);
 
-    menu = new ScrollingList(config_, page, layoutMode, commonMode, font, layoutKey, imageType, videoType);
+    menu = new ScrollingList(config_, page, layoutMode, commonMode, playlistType, selectedImage, font, layoutKey, imageType, videoType);
     buildViewInfo(menuXml, menu->baseViewInfo);
 
     if(scrollTimeXml)
@@ -1090,6 +1124,7 @@ void PageBuilder::buildCustomMenu(ScrollingList *menu, xml_node<> *menuXml, xml_
         ViewInfo *viewInfo = new ViewInfo();
         buildViewInfo(componentXml, *viewInfo, itemDefaults);
         viewInfo->Monitor = menu->baseViewInfo.Monitor;
+        viewInfo->Additive = menu->baseViewInfo.Additive;
 
         points->push_back(viewInfo);
         tweenPoints->push_back(createTweenInstance(componentXml));
@@ -1300,6 +1335,8 @@ void PageBuilder::buildViewInfo(xml_node<> *componentXml, ViewInfo &info, xml_no
     xml_attribute<> *containerHeight    = findAttribute(componentXml, "containerHeight", defaultXml);
     xml_attribute<> *monitor            = findAttribute(componentXml, "monitor", defaultXml);
     xml_attribute<> *volume             = findAttribute(componentXml, "volume", defaultXml);
+    xml_attribute<>* restart = findAttribute(componentXml, "restart", defaultXml);
+    xml_attribute<>* additive = findAttribute(componentXml, "additive", defaultXml);
 
     info.X = getHorizontalAlignment(x, 0);
     info.Y = getVerticalAlignment(y, 0);
@@ -1342,6 +1379,8 @@ void PageBuilder::buildViewInfo(xml_node<> *componentXml, ViewInfo &info, xml_no
     info.ContainerHeight    = containerHeight    ? Utils::convertFloat(containerHeight->value())   : -1.f;
     info.Monitor            = monitor            ? Utils::convertInt(monitor->value())             : 0;
     info.Volume             = volume             ? Utils::convertFloat(volume->value())            : 1.f;
+    info.Restart = restart ? Utils::toLower(restart->value()) == "true" : false;
+    info.Additive = additive ? Utils::toLower(additive->value()) == "true" : false;
 
     if(fontColor)
     {
@@ -1385,6 +1424,8 @@ void PageBuilder::getTweenSet(xml_node<> *node, Animation *animation)
 void PageBuilder::getAnimationEvents(xml_node<> *node, TweenSet &tweens)
 {
     xml_attribute<> *durationXml = node->first_attribute("duration");
+    std::string actionSetting;
+    config_.getProperty("action", actionSetting);
 
     if(!durationXml)
     {
@@ -1398,6 +1439,8 @@ void PageBuilder::getAnimationEvents(xml_node<> *node, TweenSet &tweens)
             xml_attribute<> *from = animate->first_attribute("from");
             xml_attribute<> *to = animate->first_attribute("to");
             xml_attribute<> *algorithmXml = animate->first_attribute("algorithm");
+            xml_attribute<>* setting = animate->first_attribute("setting");
+            xml_attribute<>* playlist = animate->first_attribute("playlist");
 
             std::string animateType;
             if (type)
@@ -1410,12 +1453,17 @@ void PageBuilder::getAnimationEvents(xml_node<> *node, TweenSet &tweens)
             {
                 Logger::write(Logger::ZONE_ERROR, "Layout", "Animate tag missing \"type\" attribute");
             }
-            else if(!to && animateType != "nop")
+            else if(!to && (animateType != "nop" && animateType != "restart"))
             {
                 Logger::write(Logger::ZONE_ERROR, "Layout", "Animate tag missing \"to\" attribute");
             }
             else
             {
+                // if in settings action="<something>" and the action has setting="<something>" then perform animation
+                if (setting && setting->value() != actionSetting) {
+                    continue;
+                }
+
                 float fromValue = 0.0f;
                 bool  fromDefined = true;
                 if (from)
@@ -1442,7 +1490,7 @@ void PageBuilder::getAnimationEvents(xml_node<> *node, TweenSet &tweens)
 
                 }
 
-                if(Tween::getTweenProperty(type->value(), property))
+                if(Tween::getTweenProperty(animateType, property))
                 {
                     switch(property)
                     {
@@ -1479,14 +1527,16 @@ void PageBuilder::getAnimationEvents(xml_node<> *node, TweenSet &tweens)
 
                     case TWEEN_PROPERTY_MAX_WIDTH:
                     case TWEEN_PROPERTY_MAX_HEIGHT:
-                      fromValue = getVerticalAlignment(from, FLT_MAX);
-                      toValue   = getVerticalAlignment(to,   FLT_MAX);
-
+                        fromValue = getVerticalAlignment(from, FLT_MAX);
+                        toValue   = getVerticalAlignment(to,   FLT_MAX);
+                        break;
                     default:
                         break;
                     }
 
-                    Tween *t = new Tween(property, algorithm, fromValue, toValue, durationValue);
+                    // if in layout action has playlist="<current playlist name>" then perform action
+                    std::string playlistFilter = playlist && playlist->value() ? playlist->value() : "";
+                    Tween *t = new Tween(property, algorithm, fromValue, toValue, durationValue, playlistFilter);
                     if (!fromDefined)
                       t->startDefined = false;
                     tweens.push(t);

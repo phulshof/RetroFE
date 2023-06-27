@@ -29,13 +29,14 @@ public:
     static std::string trimEnds(std::string str);
 	void clearProperties( );
     // gets the global configuration
-    bool import(std::string keyPrefix, std::string file);
+    bool import(std::string keyPrefix, std::string file, bool mustExist = true);
     bool import(std::string collection, std::string keyPrefix, std::string file, bool mustExist = true);
     bool getProperty(std::string key, std::string &value);
     bool getProperty(std::string key, int &value);
     bool getProperty(std::string key, bool &value);
     void childKeyCrumbs(std::string parent, std::vector<std::string> &children);
     void setProperty(std::string key, std::string value);
+    bool propertiesEmpty();
     bool propertyExists(std::string key);
     bool propertyPrefixExists(std::string key);
     bool getPropertyAbsolutePath(std::string key, std::string &value);
@@ -43,6 +44,9 @@ public:
     void getMediaPropertyAbsolutePath(std::string collectionName, std::string mediaType, bool system, std::string &value);
     void getCollectionAbsolutePath(std::string collectionName, std::string &value);
     static std::string absolutePath;
+	static int AvdecMaxThreads;
+	static bool HardwareVideoAccel; // Declare HardwareVideoAccel as a static member variable
+	static bool MuteVideo;
 
 private:
     bool getRawProperty(std::string key, std::string &value);

@@ -37,6 +37,8 @@ public:
                    Page          &p,
                    bool          layoutMode,
                    bool          commonMode,
+                   bool          playlistType,
+                   bool          selectedImage,
                    Font         *font,
                    std::string   layoutKey,
                    std::string   imageType,
@@ -44,6 +46,7 @@ public:
 
     ScrollingList( const ScrollingList &copy );
     virtual ~ScrollingList( );
+    std::vector<Item*> getItems();
     void triggerEnterEvent( );
     void triggerExitEvent( );
     void triggerMenuEnterEvent( int menuIndex = -1 );
@@ -60,10 +63,13 @@ public:
     void triggerAttractEvent( int menuIndex = -1 );
     void triggerAttractExitEvent( int menuIndex = -1 );
     void triggerJukeboxJumpEvent( int menuIndex = -1 );
+    void triggerEventOnAll(std::string event, int menuIndex);
 
     bool allocateTexture( unsigned int index, Item *i );
     void deallocateTexture( unsigned int index );
     void setItems( std::vector<Item *> *items );
+    void selectItemByName(std::string name);
+    std::string getSelectedItemName();
     void destroyItems( );
     void setPoints( std::vector<ViewInfo *> *scrollPoints, std::vector<AnimationEvents *> *tweenPoints );
     unsigned int getSelectedIndex( );
@@ -74,8 +80,9 @@ public:
     void letterUp( );
     void letterDown( );
     void letterChange( bool increment );
-    void subUp( );
-    void subDown( );
+    void metaUp(std::string attribute);
+    void metaDown(std::string attribute);
+    void metaChange(bool increment, std::string attribute);
     void subChange( bool increment );
     void cfwLetterSubUp( );
     void cfwLetterSubDown( );
@@ -87,6 +94,7 @@ public:
     void setSelectedIndex( int selectedIndex );
     Item *getItemByOffset( int offset );
     Item *getSelectedItem( );
+    unsigned int getSelectedItemPosition();
     void allocateGraphicsMemory( );
     void freeGraphicsMemory( );
     void update( float dt );
@@ -101,7 +109,7 @@ public:
     void resetScrollPeriod( );
     void updateScrollPeriod( );
     void scroll( bool forward );
-
+    bool isPlaylist();
 private:
 
     void resetTweens( Component *c, AnimationEvents *sets, ViewInfo *currentViewInfo, ViewInfo *nextViewInfo, double scrollTime );
@@ -110,6 +118,9 @@ private:
 
     bool layoutMode_;
     bool commonMode_;
+    bool playlistType_;
+    bool selectedImage_;
+
     std::vector<Component *> *spriteList_;
     std::vector<ViewInfo *> *scrollPoints_;
     std::vector<AnimationEvents *> *tweenPoints_;

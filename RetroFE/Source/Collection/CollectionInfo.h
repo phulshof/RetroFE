@@ -20,17 +20,19 @@
 #include <map>
 
 class Item;
+class Configuration;
 
 class CollectionInfo
 {
 public:
-    CollectionInfo(std::string name, std::string listPath, std::string extensions, std::string metadataType, std::string metadataPath);
+    CollectionInfo(Configuration& c, std::string name, std::string listPath, std::string extensions, std::string metadataType, std::string metadataPath);
     virtual ~CollectionInfo();
     std::string settingsPath() const;
     bool Save();
     void sortItems();
     void sortPlaylists();
     void addSubcollection(CollectionInfo *info);
+    static auto itemIsLess(std::string sortType);
     void extensionList(std::vector<std::string> &extensions);
     std::string name;
     std::string lowercaseName();
@@ -39,16 +41,17 @@ public:
     std::string metadataType;
     std::string launcher;
     std::vector<Item *> items;
+    std::vector<Item*> playlistItems;
 
     typedef std::map<std::string, std::vector <Item *> *> Playlists_T;
     Playlists_T playlists;
-
+    std::string sortType;
     bool menusort;
     bool subsSplit;
     bool hasSubs;
+    bool sortDesc;
 private:
+    Configuration& conf_;
     std::string metadataPath_;
     std::string extensions_;
-    static bool itemIsLess(Item *lhs, Item *rhs);
-
 };

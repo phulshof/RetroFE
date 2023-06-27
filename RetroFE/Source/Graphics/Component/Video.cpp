@@ -72,10 +72,10 @@ void Video::update(float dt)
 
 void Video::freeGraphicsMemory( )
 {
-    Component::freeGraphicsMemory( );
-    if(video_)
+    Component::freeGraphicsMemory();
+    if (video_)
     {
-        video_->freeGraphicsMemory( );
+        video_->freeGraphicsMemory();
     }
 }
 

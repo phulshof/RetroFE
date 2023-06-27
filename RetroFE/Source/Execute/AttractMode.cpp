@@ -23,10 +23,15 @@ AttractMode::AttractMode()
     , idleNextTime(0)
     , isActive_(false)
     , isSet_(false)
+    , isFast(false)
     , elapsedTime_(0)
     , elapsedPlaylistTime_(0)
     , elapsedCollectionTime_(0)
     , activeTime_(0)
+    , idlePlaylistTime(0)
+    , idleCollectionTime(0)
+    , minTime(0)
+    , maxTime(0)
 {
 }
 
@@ -100,7 +105,9 @@ int AttractMode::update(float dt, Page &page)
         if (page.isMenuIdle())
         {
             page.scroll(true);
-            page.updateScrollPeriod();
+            if (isFast) {
+                page.updateScrollPeriod(); // accelerate scrolling
+            }
         }
 
         if(elapsedTime_ > activeTime_)
@@ -118,6 +125,11 @@ int AttractMode::update(float dt, Page &page)
 bool AttractMode::isActive()
 {
     return isActive_;
+}
+
+void AttractMode::activate()
+{
+    isActive_ = true;
 }
 
 

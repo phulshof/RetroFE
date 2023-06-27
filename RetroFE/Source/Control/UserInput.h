@@ -71,7 +71,11 @@ public:
         KeyCodeSkipBackwardp,
         KeyCodePause,
         KeyCodeRestart,
-        KeyCodeMax
+        KeyCodeKisok,
+        KeyCodeQuitCombo1,
+        KeyCodeQuitCombo2,
+        KeyCodeCycleCollection,
+        KeyCodeMax,
     };
 
     UserInput(Configuration &c);
@@ -82,7 +86,7 @@ public:
     bool keystate(KeyCode_E);
     bool newKeyPressed(KeyCode_E code);
     void clearJoysticks( );
-    void reconfigure( );
+    void reconfigure();
 	void updateKeystate( );
 
 private:

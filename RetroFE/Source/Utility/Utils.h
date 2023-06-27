@@ -29,6 +29,7 @@ public:
     static void replaceSlashesWithUnderscores(std::string &content);
     static std::string getDirectory(std::string filePath);
     static std::string getParentDirectory(std::string filePath);
+    static std::string getEnvVar(std::string const& key);
     static std::string getFileName(std::string filePath);
     static bool findMatchingFile(std::string prefix, std::vector<std::string> &extensions, std::string &file);
     static std::string toLower(std::string str);
@@ -37,6 +38,7 @@ public:
     static std::string trimEnds(std::string str);
     static void listToVector( std::string str, std::vector<std::string> &vec, char delimiter );
     static int gcd( int a, int b );
+    static std::string trim(std::string& str);
 
     //todo: there has to be a better way to do this
     static std::string combinePath(std::list<std::string> &paths);
