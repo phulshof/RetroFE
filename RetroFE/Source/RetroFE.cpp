@@ -75,7 +75,7 @@ RetroFE::RetroFE( Configuration &c )
     menuMode_                            = false;
     attractMode_                         = false;
     attractModePlaylistCollectionNumber_ = 0;
-    firstPlaylist_                       = "all";
+    firstPlaylist_                       = "all"; // todo
 }
 
 
@@ -1353,7 +1353,7 @@ bool RetroFE::run( )
                         std::string cycleString;
                         config_.getProperty( "cyclePlaylist", cycleString );
                         std::vector<std::string> cycleVector;
-                        Utils::listToVector( cycleString, cycleVector, ',' );
+                        Utils::listToVector(cycleString, cycleVector, ',' );
 
                         if ( cyclePlaylist )
                             currentPage_->nextCyclePlaylist( cycleVector );
