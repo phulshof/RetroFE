@@ -856,6 +856,8 @@ bool Page::pushCollection(CollectionInfo *collection)
     }
     if (menus_.size()) {
         activeMenu_ = menus_[menuDepth_];
+        anActiveMenu_ = NULL;
+        selectedItem_ = NULL;
         for (std::vector<ScrollingList*>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
         {
             ScrollingList* menu = *it;
@@ -923,7 +925,8 @@ bool Page::popCollection()
 
     menuDepth_--;
     activeMenu_ = menus_[menuDepth_ - 1];
-
+    anActiveMenu_ = NULL;
+    selectedItem_ = NULL;
     for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
     {
         (*it)->collectionName = info->collection->name;

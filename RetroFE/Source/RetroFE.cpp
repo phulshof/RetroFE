@@ -2195,13 +2195,13 @@ CollectionInfo *RetroFE::getCollection(std::string collectionName)
         collection->sortItems();
     }
 
-    // adds items to "all" list except those found in "exclude_all.txt"
-    cib.addPlaylists(collection);
-    collection->sortPlaylists();
-
     // build collection menu if menu.txt exists
     MenuParser mp;
     mp.buildMenuItems(collection, menuSort);
+
+    // adds items to "all" list except those found in "exclude_all.txt"
+    cib.addPlaylists(collection);
+    collection->sortPlaylists();
 
     // Add extra info, if available
     for ( std::vector<Item *>::iterator it = collection->items.begin( ); it != collection->items.end( ); it++ )
