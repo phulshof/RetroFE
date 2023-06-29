@@ -1,5 +1,8 @@
 vx.x
 
+v0.10.34.2
+	- update version *.2 (monkofthefunk)
+
 v0.10.34.1
 	- added vsync; fix if vSync is yes skip SDL_Delay fps limiter (inigomonyota)
 	- added HardwareVideoAccel flag to settongs.conf (inigomonyota)
