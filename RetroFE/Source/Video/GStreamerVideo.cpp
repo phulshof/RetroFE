@@ -80,9 +80,7 @@ void GStreamerVideo::processNewBuffer(GstElement * /* fakesink */, GstBuffer *bu
     if (video && video->isPlaying_)
     {
         SDL_LockMutex(SDL::getMutex());
-        bool shouldUpdateVideoBuffer = !video->frameReady_;
-        SDL_UnlockMutex(SDL::getMutex());
-        if (shouldUpdateVideoBuffer)
+        if (!video->frameReady_)
         {
             if (!video->width_ || !video->height_)
             {
@@ -92,20 +90,13 @@ void GStreamerVideo::processNewBuffer(GstElement * /* fakesink */, GstBuffer *bu
                 gst_structure_get_int(s, "height", &video->height_);
                 gst_caps_unref(caps);  // Don't forget to unref the caps
             }
-            if (video->height_ && video->width_)
+            if (video->height_ && video->width_ && !video->videoBuffer_)
             {
-                SDL_LockMutex(SDL::getMutex());
-                bool shouldRefBuffer = !video->videoBuffer_;
-                SDL_UnlockMutex(SDL::getMutex());
-                if (shouldRefBuffer)
-                {
-                    video->videoBuffer_ = gst_buffer_ref(buf);
-                    SDL_LockMutex(SDL::getMutex());
-                    video->frameReady_ = true;
-                    SDL_UnlockMutex(SDL::getMutex());
-                }
+                video->videoBuffer_ = gst_buffer_ref(buf);
+                video->frameReady_ = true;
             }
         }
+        SDL_UnlockMutex(SDL::getMutex());
     }
 }
 
@@ -226,7 +217,7 @@ bool GStreamerVideo::play(std::string file)
             videoBin_ = gst_bin_new("SinkBin");
             videoSink_  = gst_element_factory_make("fakesink", "video_sink");
             videoConvert_  = gst_element_factory_make("capsfilter", "video_convert");
-            videoConvertCaps_ = gst_caps_from_string("video/x-raw,format=(string)I420,pixel-aspect-ratio=(fraction)1/1");
+            videoConvertCaps_ = gst_caps_from_string("video/x-raw,format=(string)NV12,pixel-aspect-ratio=(fraction)1/1");
             height_ = 0;
             width_ = 0;
             if(!playbin_)
@@ -416,86 +407,51 @@ void GStreamerVideo::update(float /* dt */)
 		}
 	}
 
-    SDL_LockMutex(SDL::getMutex());
+
     
-	if(!hide_ && !texture_ && width_ != 0 && height_ != 0)
-    {
-        texture_ = SDL_CreateTexture(SDL::getRenderer(monitor_), SDL_PIXELFORMAT_IYUV,
-                                    SDL_TEXTUREACCESS_STREAMING, width_, height_);
-        SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
-    }
-
-    if(!hide_ && videoBuffer_)
-    {
-        GstVideoMeta *meta;
-        meta = gst_buffer_get_video_meta(videoBuffer_);
-
-        // Presence of meta indicates non-contiguous data in the buffer
-        if (!meta)
+	if (!hide_)
+	{
+        SDL_LockMutex(SDL::getMutex());
+        if (!texture_ && width_ != 0 && height_ != 0)
         {
-            void *pixels;
-            int pitch;
-            unsigned int vbytes = width_ * height_;
-            vbytes += (vbytes / 2);
-            gsize bufSize = gst_buffer_get_size(videoBuffer_);
+            texture_ = SDL_CreateTexture(SDL::getRenderer(monitor_), SDL_PIXELFORMAT_NV12,
+                                        SDL_TEXTUREACCESS_STREAMING, width_, height_);
+            SDL_SetTextureBlendMode(texture_, SDL_BLENDMODE_BLEND);
+        }
+        if (videoBuffer_)
+        {
+            GstVideoMeta *meta = gst_buffer_get_video_meta(videoBuffer_);
 
-            if (bufSize == vbytes)
+            if (!meta || meta->buffer == NULL)
             {
+                void *pixels;
+                int pitch;
+
                 SDL_LockTexture(texture_, NULL, &pixels, &pitch);
-                gst_buffer_extract(videoBuffer_, 0, pixels, vbytes);
+                gst_buffer_extract(videoBuffer_, 0, pixels, width_ * height_ * 3 / 2);
                 SDL_UnlockTexture(texture_);
             }
             else
             {
                 GstMapInfo bufInfo;
-                unsigned int y_stride, u_stride, v_stride;
-                const Uint8 *y_plane, *u_plane, *v_plane;
-
-                y_stride = GST_ROUND_UP_4(width_);
-                u_stride = v_stride = GST_ROUND_UP_4(y_stride / 2);
+                const Uint8 *y_plane, *uv_plane;
 
                 gst_buffer_map(videoBuffer_, &bufInfo, GST_MAP_READ);
-                y_plane = bufInfo.data;
-                u_plane = y_plane + (height_ * y_stride);
-                v_plane = u_plane + ((height_ / 2) * u_stride);
-                SDL_UpdateYUVTexture(texture_, NULL,
-                                     (const Uint8*)y_plane, y_stride,
-                                     (const Uint8*)u_plane, u_stride,
-                                     (const Uint8*)v_plane, v_stride);
+
+                y_plane = bufInfo.data + meta->offset[0];
+                uv_plane = bufInfo.data + meta->offset[1]; // Assuming the UV plane immediately follows the Y plane in memory
+
+                SDL_UpdateNVTexture(texture_, NULL,
+                                (const Uint8 *)y_plane, meta->stride[0],
+                                (const Uint8 *)uv_plane, meta->stride[1]);
                 gst_buffer_unmap(videoBuffer_, &bufInfo);
             }
+            gst_buffer_unref(videoBuffer_);
+            videoBuffer_ = NULL;
         }
-        else
-		{
-			GstMapInfo bufInfo;
-			void *y_plane, *u_plane, *v_plane;
-			int y_stride, u_stride, v_stride;
-
-			// Map the buffer only once
-			gst_buffer_map(videoBuffer_, &bufInfo, GST_MAP_READ);
-
-			// Map Y, U, and V planes using offsets and strides from meta
-			y_stride = meta->stride[0];
-			u_stride = meta->stride[1];
-			v_stride = meta->stride[2];
-
-			y_plane = bufInfo.data + meta->offset[0];
-			u_plane = bufInfo.data + meta->offset[1];
-			v_plane = bufInfo.data + meta->offset[2];
-
-			SDL_UpdateYUVTexture(texture_, NULL,
-								(const Uint8*)y_plane, y_stride,
-								(const Uint8*)u_plane, u_stride,
-								(const Uint8*)v_plane, v_stride);
-
-			// Unmap the buffer only once
-			gst_buffer_unmap(videoBuffer_, &bufInfo);
-		}
-		gst_buffer_unref(videoBuffer_);
-		videoBuffer_ = NULL;
+        SDL_UnlockMutex(SDL::getMutex());
 	}
-	
-	SDL_UnlockMutex(SDL::getMutex());
+
     
 	if(videoBus_)
     {
@@ -523,7 +479,6 @@ void GStreamerVideo::update(float /* dt */)
             gst_message_unref(msg);
         }
     }
-    
 }
 
 
