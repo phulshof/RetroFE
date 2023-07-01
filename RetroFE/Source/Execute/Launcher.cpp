@@ -240,6 +240,16 @@ bool Launcher::execute(std::string executable, std::string args, std::string cur
     Logger::write(Logger::ZONE_INFO, "Launcher", "Attempting to launch: " + executionString);
     Logger::write(Logger::ZONE_INFO, "Launcher", "     from within folder: " + currentDirectory);
 
+    std::atomic<bool> stop_thread;
+    std::thread proc_thread;
+    bool multiple_display = SDL::getScreenCount() > 1;
+    if (multiple_display) {
+        stop_thread = false;
+        proc_thread = std::thread([this, &stop_thread, &currentPage]() {
+            this->keepRendering(std::ref(stop_thread), *currentPage);
+            });
+    }
+
 #ifdef WIN32
     STARTUPINFO startupInfo;
     PROCESS_INFORMATION processInfo;
@@ -255,16 +265,6 @@ bool Launcher::execute(std::string executable, std::string args, std::string cur
     startupInfo.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
     startupInfo.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
     startupInfo.wShowWindow = SW_SHOWDEFAULT;
-
-    std::atomic<bool> stop_thread;
-    std::thread proc_thread;
-    bool multiple_display = SDL::getScreenCount() > 1;
-    if (multiple_display) {
-        stop_thread = false;
-        proc_thread = std::thread([this, &stop_thread, &currentPage]() {
-            this->keepRendering(std::ref(stop_thread), *currentPage);
-            });
-    }
 
     if(!CreateProcess(NULL, applicationName, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, currDir, &startupInfo, &processInfo))
 #else
