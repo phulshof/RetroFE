@@ -225,8 +225,9 @@ bool SDL::initialize( Configuration &config )
             ss << "Creating "<< windowWidth_[i] << "x" << windowHeight_[i] << " window (fullscreen: " << fullscreenStr << ")" << " on display " << screenNum;
             Logger::write( Logger::ZONE_INFO, "SDL", ss.str( ));
             std::string retrofeTitle = "RetroFE " + std::to_string(i);
-            window_[i] = SDL_CreateWindow( retrofeTitle.c_str(), SDL_WINDOWPOS_CENTERED_DISPLAY(screenNum), SDL_WINDOWPOS_CENTERED_DISPLAY(screenNum), windowWidth_[i], windowHeight_[i], windowFlags );
-			
+            if (!window_[i]) {
+                window_[i] = SDL_CreateWindow(retrofeTitle.c_str(), SDL_WINDOWPOS_CENTERED_DISPLAY(screenNum), SDL_WINDOWPOS_CENTERED_DISPLAY(screenNum), windowWidth_[i], windowHeight_[i], windowFlags);
+            }
 			
 #ifdef WIN32
 			std::string SDLRenderDriver = "direct3d";
@@ -260,15 +261,17 @@ bool SDL::initialize( Configuration &config )
             {
                 bool vSync = false;
 				config.getProperty("vSync", vSync);
-				if (vSync == true) 
-				{
-					renderer_[i] = SDL_CreateRenderer(window_[i], -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-					Logger::write( Logger::ZONE_INFO, "SDL", "vSync Enabled" );
-				} 
-				else 
-				{
-					renderer_[i] = SDL_CreateRenderer(window_[i], -1, SDL_RENDERER_ACCELERATED);
-				}
+                if (!renderer_[i]) {
+                    if (vSync == true)
+                    {
+                        renderer_[i] = SDL_CreateRenderer(window_[i], -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+                        Logger::write(Logger::ZONE_INFO, "SDL", "vSync Enabled");
+                    }
+                    else
+                    {
+                        renderer_[i] = SDL_CreateRenderer(window_[i], -1, SDL_RENDERER_ACCELERATED);
+                    }
+                }
 				if (renderer_[i] == NULL) 
 				{
 					std::string error = SDL_GetError();

@@ -28,6 +28,8 @@ class Launcher
 public:
     Launcher(Configuration &c);
     bool run(std::string collection, Item *collectionItem, Page *currentPage = NULL);
+    void startScript();
+    void exitScript();
 	void LEDBlinky( int command, std::string collection = "", Item *collectionItem = NULL);
     void keepRendering(std::atomic<bool>& stop_thread, Page& currentPage);
 

@@ -410,6 +410,7 @@ bool RetroFE::run( )
     Menu     m( config_, input_ );
     preloadTime = static_cast<float>( SDL_GetTicks( ) ) / 1000;
     l.LEDBlinky( 1 );
+    l.startScript();
     config_.getProperty("kiosk", kioskLock_);
 
     while ( running )
@@ -1448,6 +1449,7 @@ bool RetroFE::run( )
             if ( currentPage_->isGraphicsIdle( ) )
             {
                 l.LEDBlinky( 2 );
+                l.exitScript();
                 running = false;
             }
             break;
