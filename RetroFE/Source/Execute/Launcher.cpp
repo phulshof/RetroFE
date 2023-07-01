@@ -268,6 +268,9 @@ bool Launcher::execute(std::string executable, std::string args, std::string cur
 
     if(!CreateProcess(NULL, applicationName, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, currDir, &startupInfo, &processInfo))
 #else
+    std::atomic<bool> stop_thread;
+    std::thread proc_thread;
+    bool multiple_display = SDL::getScreenCount() > 1;    
     const std::size_t last_slash_idx = executable.rfind(Utils::pathSeparator);
     if (last_slash_idx != std::string::npos)
     {
