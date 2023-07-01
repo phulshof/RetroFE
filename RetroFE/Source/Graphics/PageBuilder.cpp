@@ -81,50 +81,67 @@ Page *PageBuilder::buildPage( std::string collectionName )
     std::string layoutFile;
     std::string layoutFileAspect;
     std::string layoutName = layoutKey;
+    std::string layoutPathDefault = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName);
 
     if ( isMenu_ )
     {
         layoutPath = Utils::combinePath(Configuration::absolutePath, "menu");
     }
-    else if ( collectionName == "" )
-    {
-        layoutPath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName);
-    }
-    else
+    else if ( collectionName != "" )
     {
         layoutPath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, "collections", collectionName);
         layoutPath = Utils::combinePath(layoutPath, "layout");
     }
 
-    std::vector<std::string> monitors;
-    monitors.push_back(layoutPage);
+    std::vector<std::string> layouts;
+    layouts.push_back(layoutPage);
+    // todo replace numScreens with numLayers
     for ( int i = 0; i < SDL::getNumScreens(); i++ )
-        monitors.push_back("layout - " + std::to_string( i ) );
+        layouts.push_back("layout - " + std::to_string( i ) );
    
-
-    for ( size_t monitor = 0; monitor < monitors.size(); monitor++ )
+    for ( size_t layer = 0; layer < layouts.size(); layer++ )
     {
-		if ( monitor > 0 )
-            monitor_ = monitor - 1;
+		if (layer > 0 )
+            monitor_ = layer - 1;
 		else
-            monitor_ = monitor;
-        layoutFile       = Utils::combinePath(layoutPath, monitors[monitor] + ".xml");
-        layoutFileAspect = Utils::combinePath(layoutPath, "layout " + std::to_string( screenWidth_/Utils::gcd( screenWidth_, screenHeight_ ) ) + "x" + std::to_string( screenHeight_/Utils::gcd( screenWidth_, screenHeight_ ) ) + monitors[monitor] + ".xml" );
+            monitor_ = layer;
+
+        layoutFile       = Utils::combinePath(layoutPath, layouts[layer] + ".xml");
+        layoutFileAspect = Utils::combinePath(layoutPath, "layout " + std::to_string( screenWidth_/Utils::gcd( screenWidth_, screenHeight_ ) ) + "x" + 
+            std::to_string( screenHeight_/Utils::gcd( screenWidth_, screenHeight_ ) ) + layouts[layer] + ".xml" );
 
         Logger::write(Logger::ZONE_INFO, "Layout", "Initializing " + layoutFileAspect);
 
         rapidxml::xml_document<> doc;
         std::ifstream file(layoutFileAspect.c_str());
-
+        // aspect layout
         if ( !file.good( ) )
         {
             Logger::write( Logger::ZONE_INFO, "Layout", "could not find layout file: " + layoutFileAspect );
             Logger::write( Logger::ZONE_INFO, "Layout", "Initializing " + layoutFile );
+            
+            // collection or default layout
             file.open( layoutFile.c_str( ) );
             if ( !file.good( ) )
             {
                 Logger::write( Logger::ZONE_INFO, "Layout", "could not find layout file: " + layoutFile );
-                continue;
+
+                // try default layout
+                if (layoutPath != layoutPathDefault) {
+                    layoutFile = Utils::combinePath(layoutPathDefault, layouts[layer] + ".xml");
+                    Logger::write(Logger::ZONE_INFO, "Layout", "Initializing " + layoutFile);
+
+                    file.open(layoutFile.c_str());
+                    if (!file.good())
+                    {
+                        // try next layout
+                        continue;
+                    }
+                }
+                else {
+                    // try next layout
+                    continue;
+                }
             }
         }
 
@@ -202,8 +219,8 @@ Page *PageBuilder::buildPage( std::string collectionName )
                     page = new Page(config_, layoutWidth_, layoutHeight_ );
                 else
                 {
-                    page->setLayoutWidth( monitor,  layoutWidth_ );
-                    page->setLayoutHeight( monitor, layoutHeight_ ); 
+                    page->setLayoutWidth(layer,  layoutWidth_);
+                    page->setLayoutHeight(layer, layoutHeight_);
                 }
 
                 if(minShowTimeXml) 

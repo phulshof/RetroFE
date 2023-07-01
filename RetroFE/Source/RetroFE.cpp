@@ -741,8 +741,9 @@ bool RetroFE::run( )
                     std::string layoutName;
                     config_.getProperty( "layout", layoutName );
                     PageBuilder pb( layoutName, getLayoutFileName(), config_, &fontcache_ );
+                    // try collection name
                     Page *page = pb.buildPage( nextPageItem_->name );
-                    if ( page )
+                    if (page)
                     {
                         if (page->controlsType() != "") {
                             updatePageControls(page->controlsType());
@@ -752,6 +753,9 @@ bool RetroFE::run( )
                         pages_.push( currentPage_ );
                         currentPage_ = page;
                         currentPage_->setLocked(kioskLock_);
+                    }
+                    else {
+                        Logger::write(Logger::ZONE_ERROR, "RetroFE", "Could not create page");
                     }
                 }
 
@@ -1384,7 +1388,7 @@ bool RetroFE::run( )
                 config_.getProperty( "layout", layoutName );
                 PageBuilder pb( layoutName, getLayoutFileName(), config_, &fontcache_, true );
                 Page *page = pb.buildPage( );
-                if ( page )
+                if (page)
                 {
                     if (page->controlsType() != "") {
                         updatePageControls(page->controlsType());
@@ -1396,6 +1400,9 @@ bool RetroFE::run( )
                     currentPage_->setLocked(kioskLock_);
                     menuMode_ = true;
                     m.setPage( page );
+                }
+                else {
+                    Logger::write(Logger::ZONE_ERROR, "RetroFE", "Could not create page");
                 }
                 config_.setProperty( "currentCollection", "menu" );
                 CollectionInfo *info = getMenuCollection( "menu" );
@@ -2110,9 +2117,6 @@ Page* RetroFE::loadPage(std::string collectionName)
 
     PageBuilder pb(layoutName, getLayoutFileName(), config_, &fontcache_);
     Page* page = pb.buildPage(collectionName);
-    if (!page) {
-        page = pb.buildPage();
-    }
     if (!page)
     {
         Logger::write(Logger::ZONE_ERROR, "RetroFE", "Could not create page");
@@ -2136,8 +2140,12 @@ Page *RetroFE::loadSplashPage( )
 
     PageBuilder pb( layoutName, "splash", config_, &fontcache_ );
     Page * page = pb.buildPage( );
-    page->start( );
-
+    if (!page) {
+        Logger::write(Logger::ZONE_ERROR, "RetroFE", "Could not create splash page");
+    }
+    else {
+        page->start();
+    }
     return page;
 }
 
