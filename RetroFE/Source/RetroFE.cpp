@@ -769,6 +769,16 @@ bool RetroFE::run( )
                 config_.getProperty( "rememberMenu", rememberMenu );
 
                 std::string autoPlaylist = "all";
+
+                // check collection for setting
+                std::string settingPrefix = "collections." + currentPage_->getCollectionName() + ".";
+                if (config_.propertyExists(settingPrefix + "autoPlaylist")) {
+                    config_.getProperty(settingPrefix + "autoPlaylist", autoPlaylist);
+                }
+                else {
+                    config_.getProperty("autoPlaylist", autoPlaylist);
+                }
+
                 config_.getProperty( "autoPlaylist", autoPlaylist );
                 bool returnToRememberedPlaylist = rememberMenu && lastMenuPlaylists_.find(nextPageName) != lastMenuPlaylists_.end();
                 if (returnToRememberedPlaylist)

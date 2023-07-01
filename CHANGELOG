@@ -4,6 +4,7 @@ v0.10.34.2
 	- update version *.2 (monkofthefunk)
 	- changed pixel format from I420 to NV12 (inigomonyota)
 	- fixed bug with marquee and launching lastplayed would play video audio during game (monkofthefunk)
+	- fixed collection setting autoPlaylist to go to upon nav (monkofthefunk)
 
 v0.10.34.1
 	- added vsync; fix if vSync is yes skip SDL_Delay fps limiter (inigomonyota)
