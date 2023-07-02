@@ -1648,6 +1648,18 @@ void RetroFE::goToNextAttractModePlaylistByCycle(std::vector<std::string> cycleV
 // Process the user input
 RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
 {
+    bool screensaver = false;
+    config_.getProperty("screensaver", screensaver);
+    std::map<UINT32, bool> ssExitInputs = {
+        {SDL_MOUSEMOTION,true},
+        {SDL_KEYDOWN,true},
+        {SDL_MOUSEBUTTONDOWN,true},
+        {SDL_JOYBUTTONDOWN,true},
+        {SDL_JOYAXISMOTION,true},
+        {SDL_JOYHATMOTION,true},
+        {SDL_CONTROLLERBUTTONDOWN,true},
+        {SDL_CONTROLLERAXISMOTION,true},
+    };
     bool exit = false;
     RETROFE_STATE state = RETROFE_IDLE;
 
@@ -1655,11 +1667,20 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
     SDL_Event e;
     while ( SDL_PollEvent( &e ) )
     {
+        // some how !SDL_KEYUP prevents double action
         input_.update(e);
-        if ( e.type == SDL_KEYDOWN && !SDL_KEYUP )
-        {
+        if (e.type == SDL_KEYDOWN && !SDL_KEYUP || 
+            (screensaver && ssExitInputs[e.type])
+        ){
             break;
         }
+    }
+
+    if (screensaver && ssExitInputs[e.type]) {
+#ifdef WIN32
+        postMessage("MediaplayerHiddenWindow", 0x8001, 51, 0);
+#endif              			
+        return RETROFE_QUIT;
     }
 
     // Handle next/previous game inputs
@@ -1701,21 +1722,23 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             return state;
         }
     }
-
-    // Ignore other keys while the menu is scrolling
-    if ( page->isIdle( ) && currentTime_ - keyLastTime_ > keyDelayTime_ )
-    {
-
+    
+    // don't wait for idle
+    if (currentTime_ - keyLastTime_ > keyDelayTime_) {
         // lock or unlock playlist/collection/menu nav and fav toggle
-        if (input_.keystate(UserInput::KeyCodeKisok)) {
+        if (page->isIdle() && input_.keystate(UserInput::KeyCodeKisok)) {
             attract_.reset();
             kioskLock_ = !kioskLock_;
             page->setLocked(kioskLock_);
             page->onNewItemSelected();
+
             keyLastTime_ = currentTime_;
-        }else if ( input_.keystate(UserInput::KeyCodeMenu) && !menuMode_)
+            return RETROFE_IDLE;
+        }
+        else if (input_.keystate(UserInput::KeyCodeMenu) && !menuMode_)
         {
-            state = RETROFE_MENUMODE_START_REQUEST;
+            keyLastTime_ = currentTime_;
+            return RETROFE_MENUMODE_START_REQUEST;
         }
         else if (input_.keystate(UserInput::KeyCodeQuitCombo1) && input_.keystate(UserInput::KeyCodeQuitCombo2)) {
             attract_.reset();
@@ -1728,9 +1751,33 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
                 return RETROFE_QUIT_REQUEST;
             }
         }
+        // KeyCodeCycleCollection shared with KeyCodeQuitCombo1 and can missfire
+        else if (!kioskLock_ && input_.keystate(UserInput::KeyCodeCycleCollection) && currentTime_ - keyLastTime_ > keyDelayTime_+2.0)
+        {
+            attract_.reset();
+            if (collectionCycle_.size()) {
+                collectionCycleIt_++;
+                if (collectionCycleIt_ == collectionCycle_.end()) {
+                    collectionCycleIt_ = collectionCycle_.begin();
+                }
+                if (!pages_.empty() && pages_.size() > 1)
+                    pages_.pop();
 
+                nextPageItem_ = new Item();
+                nextPageItem_->name = *collectionCycleIt_;
+                menuMode_ = false;
+
+                keyLastTime_ = currentTime_;
+                return RETROFE_NEXT_PAGE_REQUEST;
+            }
+        }
+    }
+
+    // Ignore other keys while the menu is scrolling
+    if ( page->isIdle( ) && currentTime_ - keyLastTime_ > keyDelayTime_ )
+    {
         // Handle Collection Up/Down keys
-        else if (!kioskLock_ && ((input_.keystate(UserInput::KeyCodeCollectionUp)   && ( page->isHorizontalScroll( ) || !input_.keystate(UserInput::KeyCodeUp))) ||
+        if (!kioskLock_ && ((input_.keystate(UserInput::KeyCodeCollectionUp)   && ( page->isHorizontalScroll( ) || !input_.keystate(UserInput::KeyCodeUp))) ||
                  (input_.keystate(UserInput::KeyCodeCollectionLeft) && (!page->isHorizontalScroll( ) || !input_.keystate(UserInput::KeyCodeLeft)))))
         {
             attract_.reset( );
@@ -1857,25 +1904,6 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             }
         }
 
-        else if (!kioskLock_ && input_.keystate(UserInput::KeyCodeCycleCollection))
-        {
-            attract_.reset();
-            if (collectionCycle_.size()) {
-                collectionCycleIt_++;
-                if (collectionCycleIt_ == collectionCycle_.end()) {
-                    collectionCycleIt_ = collectionCycle_.begin();
-                }
-                if (!pages_.empty() && pages_.size() > 1)
-                    pages_.pop();
-
-                nextPageItem_ = new Item();
-                nextPageItem_->name = *collectionCycleIt_;
-                menuMode_ = false;
-
-                state = RETROFE_NEXT_PAGE_REQUEST;
-            }
-        }
-
         else if (!kioskLock_ && input_.keystate(UserInput::KeyCodePrevCyclePlaylist))
         {
             if (!isStandalonePlaylist(currentPage_->getPlaylistName()))
@@ -1905,7 +1933,8 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             page->removePlaylist( );
 
             // don't trigger playlist change events but refresh item states
-            currentPage_->onNewItemSelected();
+            currentPage_->reallocateMenuSpritePoints(); // update playlist menu
+
             state = RETROFE_PLAYLIST_ENTER;
         }
 

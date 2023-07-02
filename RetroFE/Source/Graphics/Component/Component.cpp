@@ -174,6 +174,7 @@ void Component::update(float dt)
         }
         if (newTweens && newTweens->size() > 0)
         {
+            //todo delete old tweens?
             animationType_ = animationRequestedType_;
             currentTweens_ = newTweens;
             currentTweenIndex_ = 0;
