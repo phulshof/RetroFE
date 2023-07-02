@@ -176,6 +176,9 @@ void RetroFE::launchEnter( )
     config_.getProperty( "mouseY",    mouseY );
     if ( hideMouse )
         SDL_WarpMouseGlobal( mouseX, mouseY );
+#ifdef WIN32            
+			postMessage("MediaplayerHiddenWindow",0x8001, 75, 0);		
+#endif			
 }
 
 
@@ -215,7 +218,9 @@ void RetroFE::launchExit( )
     config_.getProperty( "mouseY",    mouseY );
     if ( hideMouse )
         SDL_WarpMouseGlobal( mouseX, mouseY );
-
+#ifdef WIN32            
+			postMessage("MediaplayerHiddenWindow",0x8001, 76, 0);		
+#endif			
 }
 
 
