@@ -9,6 +9,9 @@ v0.10.34.2
 	- added start.bat/sh exit.bat/sh launch on start/exit of retrofe (monkofthefunk)
 	- added animated marquee to linux (monkofthefunk)
 	- fixed crash on settings reboot (monkofthefunk)
+	- added screensaver setting that will quit upon mouse move or button down (monkofthefunk)
+	- fixed removal of favorite in favorite playlist, update menu (monkofthefunk)
+	- make quit combo and collection cycle faster but cycle button isn't as sensitive (monkofthefunk)
 
 v0.10.34.1
 	- added vsync; fix if vSync is yes skip SDL_Delay fps limiter (inigomonyota)
