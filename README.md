@@ -48,7 +48,7 @@ Depending on your version of OS X the GUI will read user defined Environment var
 If you don't use Homebrew you will need to download and install the same dependencies as given in the linux instuctions.
 You may need to export the libs with $LIBRARY_PATH and or supply the include folders with $CPATH before building.
 
-	export LIBRARY_PATH=/usr/local/opt/gst-plugins-base/lib:/usr/local/opt/gstreamer/lib:/usr/local/lib:/usr/local/opt/glib/lib:/usr/local/opt/gettext/lib
+	export LIBRARY_PATH=/opt/homebrew/opt/gst-plugins-base/lib:/opt/homebrew/opt/gstreamer/lib:/opt/homebrew/lib:/opt/homebrew/opt/glib/lib:/opt/homebrew/opt/gettext/lib
 
 Download the source code:
 
