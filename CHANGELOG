@@ -17,6 +17,7 @@ v0.10.34.2
 	- fixed not showing splash when screensaver enabled (monkofthefunk)
 	- made collection cycle button a bit more responsive (monkofthefunk)
 	- fixed collection cycle button and lastKeyPressed logic (monkofthefunk)
+	- fixed multi monitor start up crash (monkofthefunk)
 
 v0.10.34.1
 	- added vsync; fix if vSync is yes skip SDL_Delay fps limiter (inigomonyota)
