@@ -94,6 +94,7 @@ private:
     bool MapKey(std::string keyDescription, KeyCode_E key);
     bool MapKey(std::string keyDescription, KeyCode_E key, bool required);
     Configuration &config_;
+    bool updated_;
     SDL_JoystickID joysticks_[cMaxJoy];
     std::vector<std::pair<InputHandler *, KeyCode_E> > keyHandlers_;
     bool lastKeyState_[KeyCodeMax]; 

@@ -26,6 +26,7 @@
 
 UserInput::UserInput(Configuration &c)
     : config_(c)
+    , updated_(false)
 {
     for(unsigned int i = 0; i < KeyCodeMax; ++i)
     {
@@ -301,15 +302,17 @@ void UserInput::resetStates()
             keyHandlers_[i].first->reset();
         }
         currentKeyState_[keyHandlers_[i].second] = false;
+        lastKeyState_[keyHandlers_[i].second] = false;
     }
 }
 
 
 bool UserInput::update( SDL_Event &e )
 {
-    bool updated = false;
-
-    memcpy( lastKeyState_, currentKeyState_, sizeof( lastKeyState_ ) );
+    if (updated_) {
+        memcpy(lastKeyState_, currentKeyState_, sizeof(lastKeyState_));
+    }
+    updated_ = false;
     memset( currentKeyState_, 0, sizeof( currentKeyState_ ) );
 
     // Handle adding a joystick
@@ -364,13 +367,13 @@ bool UserInput::update( SDL_Event &e )
         InputHandler *h = keyHandlers_[i].first;
         if ( h )
         {
-            if ( h->update( e ) ) updated = true;
+            if ( h->update( e ) ) updated_ = true;
 
             currentKeyState_[keyHandlers_[i].second] |= h->pressed( );
         }
     }
     
-    return updated;
+    return updated_;
 }
 
 
@@ -382,8 +385,6 @@ bool UserInput::keystate(KeyCode_E code)
 bool UserInput::lastKeyPressed(KeyCode_E code)
 {
     if (lastKeyState_[code]) {
-        resetStates();
-
         return true;
     }
     return false;

@@ -16,6 +16,7 @@ v0.10.34.2
 	- fixed back button not updating collection cycle postion (monkofthefunk)
 	- fixed not showing splash when screensaver enabled (monkofthefunk)
 	- made collection cycle button a bit more responsive (monkofthefunk)
+	- fixed collection cycle button and lastKeyPressed logic (monkofthefunk)
 
 v0.10.34.1
 	- added vsync; fix if vSync is yes skip SDL_Delay fps limiter (inigomonyota)

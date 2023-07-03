@@ -1675,9 +1675,11 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
     SDL_Event e;
     while ( SDL_PollEvent( &e ) )
     {
+        Logger::write(Logger::ZONE_ERROR, "RetroFE", std::to_string(e.type) + " " + std::to_string(e.key.keysym.scancode));
+
         // some how !SDL_KEYUP prevents double action
         input_.update(e);
-        if (e.type == SDL_KEYDOWN && !SDL_KEYUP || 
+        if (e.type == SDL_POLLSENTINEL ||
             (screensaver && ssExitInputs[e.type])
         ){
             break;
@@ -1760,11 +1762,12 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             }
         }
         // KeyCodeCycleCollection shared with KeyCodeQuitCombo1 and can missfire
-        else if (!kioskLock_ && input_.lastKeyPressed(UserInput::KeyCodeCycleCollection))
-        {
+        else if (!kioskLock_ && input_.lastKeyPressed(UserInput::KeyCodeCycleCollection)){
+            // delay a bit longer for next cycle or ignore second keyboard hit count
             if (!(currentTime_ - keyLastTime_ > keyDelayTime_ + 1.0)) {
                 return RETROFE_IDLE;
             }
+            input_.resetStates();
             keyLastTime_ = currentTime_;
 
             attract_.reset();
@@ -1782,6 +1785,7 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
                
                 return RETROFE_NEXT_PAGE_REQUEST;
             }
+            return RETROFE_IDLE;
         }
         else if (!kioskLock_ && (input_.keystate(UserInput::KeyCodeCyclePlaylist) ||
             input_.keystate(UserInput::KeyCodeNextCyclePlaylist))
