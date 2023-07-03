@@ -12,6 +12,10 @@ v0.10.34.2
 	- added screensaver setting that will quit upon mouse move or button down (monkofthefunk)
 	- fixed removal of favorite in favorite playlist, update menu (monkofthefunk)
 	- make quit combo and collection cycle faster but cycle button isn't as sensitive (monkofthefunk)
+	- move playlist cycle and back button out of idle check (monkofthefunk)
+	- fixed back button not updating collection cycle postion (monkofthefunk)
+	- fixed not showing splash when screensaver enabled (monkofthefunk)
+	- made collection cycle button a bit more responsive (monkofthefunk)
 
 v0.10.34.1
 	- added vsync; fix if vSync is yes skip SDL_Delay fps limiter (inigomonyota)

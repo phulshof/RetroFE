@@ -379,6 +379,16 @@ bool UserInput::keystate(KeyCode_E code)
     return currentKeyState_[code];
 }
 
+bool UserInput::lastKeyPressed(KeyCode_E code)
+{
+    if (lastKeyState_[code]) {
+        resetStates();
+
+        return true;
+    }
+    return false;
+}
+
 bool UserInput::newKeyPressed(KeyCode_E code)
 {
     return currentKeyState_[code] && !lastKeyState_[code];

@@ -84,6 +84,7 @@ public:
     void resetStates();
     bool update(SDL_Event &e);
     bool keystate(KeyCode_E);
+    bool lastKeyPressed(KeyCode_E code);
     bool newKeyPressed(KeyCode_E code);
     void clearJoysticks( );
     void reconfigure();
