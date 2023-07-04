@@ -18,6 +18,7 @@ v0.10.34.2
 	- made collection cycle button a bit more responsive (monkofthefunk)
 	- fixed collection cycle button and lastKeyPressed logic (monkofthefunk)
 	- fixed multi monitor start up crash (monkofthefunk)
+	- added random video on start for screensaver (monkofthefunk)
 
 v0.10.34.1
 	- added vsync; fix if vSync is yes skip SDL_Delay fps limiter (inigomonyota)
