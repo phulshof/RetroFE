@@ -20,6 +20,7 @@ v0.10.34.2
 	- fixed multi monitor start up crash (monkofthefunk)
 	- added random video on start for screensaver (monkofthefunk)
 	- fixed select sound making background play sound while game launched (monkofthefunk)
+	- added prevCycleCollection button (monkofthefunk)
 
 v0.10.34.1
 	- added vsync; fix if vSync is yes skip SDL_Delay fps limiter (inigomonyota)

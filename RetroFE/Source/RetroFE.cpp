@@ -1787,6 +1787,32 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             }
             return RETROFE_IDLE;
         }
+        else if (!kioskLock_ && input_.keystate(UserInput::KeyCodePrevCycleCollection)) {
+            // delay a bit longer for next cycle or ignore second keyboard hit count
+            if (!(currentTime_ - keyLastTime_ > keyDelayTime_ + 1.0)) {
+                return RETROFE_IDLE;
+            }
+            input_.resetStates();
+            keyLastTime_ = currentTime_;
+
+            attract_.reset();
+            if (collectionCycle_.size()) {
+                if (collectionCycleIt_ == collectionCycle_.begin()) {
+                    collectionCycleIt_ = collectionCycle_.end();
+                }
+                collectionCycleIt_--;
+
+                if (!pages_.empty() && pages_.size() > 1)
+                    pages_.pop();
+
+                nextPageItem_ = new Item();
+                nextPageItem_->name = *collectionCycleIt_;
+                menuMode_ = false;
+
+                return RETROFE_NEXT_PAGE_REQUEST;
+            }
+            return RETROFE_IDLE;
+        }
         else if (!kioskLock_ && (input_.keystate(UserInput::KeyCodeCyclePlaylist) ||
             input_.keystate(UserInput::KeyCodeNextCyclePlaylist))
         ){

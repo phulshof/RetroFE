@@ -75,6 +75,7 @@ public:
         KeyCodeQuitCombo1,
         KeyCodeQuitCombo2,
         KeyCodeCycleCollection,
+        KeyCodePrevCycleCollection,
         KeyCodeMax,
     };
 
