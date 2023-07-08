@@ -24,6 +24,9 @@
 #include <locale>
 #include <list>
 
+#ifdef WIN32
+    #include <Windows.h>
+#endif
 
 Utils::Utils()
 {
@@ -32,6 +35,15 @@ Utils::Utils()
 Utils::~Utils()
 {
 }
+
+#ifdef WIN32
+void Utils::postMessage( LPCTSTR windowTitle, UINT Msg, WPARAM wParam, LPARAM lParam ) {
+    HWND hwnd = FindWindow(NULL, windowTitle);
+	if (hwnd != NULL) {
+        PostMessage(hwnd, Msg, wParam, lParam);
+    }
+}
+#endif
 
 std::string Utils::toLower(std::string str)
 {

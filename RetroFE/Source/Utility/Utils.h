@@ -18,6 +18,12 @@
 #include <string>
 #include <vector>
 #include <list>
+
+#ifdef WIN32
+    #define NOMINMAX
+    #include <windows.h>
+#endif
+
 class Utils
 {
 public:
@@ -27,6 +33,9 @@ public:
     static float convertFloat(std::string content);
     static int convertInt(std::string content);
     static void replaceSlashesWithUnderscores(std::string &content);
+#ifdef WIN32    
+    static void postMessage(LPCTSTR windowTitle, UINT Msg, WPARAM wParam, LPARAM lParam );
+#endif    
     static std::string getDirectory(std::string filePath);
     static std::string getParentDirectory(std::string filePath);
     static std::string getEnvVar(std::string const& key);
