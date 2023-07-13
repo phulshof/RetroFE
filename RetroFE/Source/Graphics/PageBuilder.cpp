@@ -74,7 +74,7 @@ PageBuilder::~PageBuilder()
 {
 }
 
-Page *PageBuilder::buildPage( std::string collectionName )
+Page *PageBuilder::buildPage( std::string collectionName, bool ignoreMainDefault )
 {
     Page *page = NULL;
 
@@ -91,6 +91,14 @@ Page *PageBuilder::buildPage( std::string collectionName )
     {
         layoutPath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, "collections", collectionName);
         layoutPath = Utils::combinePath(layoutPath, "layout");
+
+        if (ignoreMainDefault) {
+            std::ifstream file((layoutPath + ".xml").c_str());
+            // check collection has layout otherwise it would have used default folder layout
+            if (!file.good()) {
+                return NULL;
+            }
+        }
     }
 
     std::vector<std::string> layouts;
@@ -1031,7 +1039,7 @@ ScrollingList * PageBuilder::buildMenu(xml_node<> *menuXml, Page &page)
     xml_attribute<> *minScrollTimeXml      = menuXml->first_attribute("minScrollTime");
     xml_attribute<> *scrollOrientationXml  = menuXml->first_attribute("orientation");
     xml_attribute<>* selectedImage         = menuXml->first_attribute("selectedImage");
-
+    xml_attribute<>* textFallback          = menuXml->first_attribute("textFallback");
 
     if(menuTypeXml)
     {
@@ -1111,6 +1119,8 @@ ScrollingList * PageBuilder::buildMenu(xml_node<> *menuXml, Page &page)
             menu->horizontalScroll = true;
         }
     }
+
+    menu->enableTextFallback(textFallback && Utils::toLower(textFallback->value()) == "true");
 
     buildViewInfo(menuXml, menu->baseViewInfo);
 

@@ -103,6 +103,7 @@ public:
     void setScrollAcceleration( float value );
     void setStartScrollTime( float value );
     void setMinScrollTime( float value );
+    void enableTextFallback(bool value);
     bool horizontalScroll;
     void deallocateSpritePoints( );
     void allocateSpritePoints( );
@@ -120,6 +121,7 @@ private:
     bool commonMode_;
     bool playlistType_;
     bool selectedImage_;
+    bool textFallback_;
 
     std::vector<Component *> *spriteList_;
     std::vector<ViewInfo *> *scrollPoints_;

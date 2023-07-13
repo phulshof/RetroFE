@@ -21,6 +21,8 @@ v0.10.34.2
 	- added random video on start for screensaver (monkofthefunk)
 	- fixed select sound making background play sound while game launched (monkofthefunk)
 	- added prevCycleCollection button (monkofthefunk)
+	- added collection setting specific "ignoreDefaultLayout=false" for collection menu support to use current collection layout and not load default if the selected collection doesn't have one (monkofthefunk)
+	- added textFallback to menu to turn off if no image/video found (monkofthefunk)
 
 v0.10.34.1
 	- added vsync; fix if vSync is yes skip SDL_Delay fps limiter (inigomonyota)

@@ -71,6 +71,7 @@ ScrollingList::ScrollingList( Configuration &c,
     , imageType_( imageType )
     , videoType_( videoType )
     , items_( NULL )
+    , textFallback_(true)
 {
 }
 
@@ -82,6 +83,7 @@ ScrollingList::ScrollingList( const ScrollingList &copy )
     , commonMode_( copy.commonMode_ )
     , playlistType_(copy.playlistType_)
     , selectedImage_(copy.selectedImage_)
+    , textFallback_(true)
     , spriteList_( NULL )
     , itemIndex_( 0 )
     , selectedOffsetIndex_( copy.selectedOffsetIndex_ )
@@ -183,6 +185,10 @@ void ScrollingList::setMinScrollTime( float value )
     minScrollTime_ = value;
 }
 
+void ScrollingList::enableTextFallback(bool value)
+{
+    textFallback_ = value;
+}
 
 void ScrollingList::deallocateSpritePoints( )
 {
@@ -209,18 +215,19 @@ void ScrollingList::allocateSpritePoints( )
         allocateTexture( i, item );
 
         Component *c = components_.at( i );
-        c->allocateGraphicsMemory( );
+        if (c) {
+            c->allocateGraphicsMemory();
+        
+            ViewInfo *view = scrollPoints_->at( i );
 
-        ViewInfo *view = scrollPoints_->at( i );
+            resetTweens( c, tweenPoints_->at( i ), view, view, 0 );
 
-        resetTweens( c, tweenPoints_->at( i ), view, view, 0 );
-
-        if ( old && !newItemSelected )
-        {
-            c->baseViewInfo = old->baseViewInfo;
-            delete old;
+            if ( old && !newItemSelected )
+            {
+                c->baseViewInfo = old->baseViewInfo;
+                delete old;
+            }
         }
-
     }
 }
 
@@ -1054,9 +1061,13 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
 
     }
 
-    if ( !t )
+    if (!t)
     {
-        t = new Text(item->title, page, fontInst_, baseViewInfo.Monitor );
+        std::string title = item->title;
+        if (!textFallback_){
+            title = "";
+        }
+        t = new Text(title, page, fontInst_, baseViewInfo.Monitor );
     }
 
     if ( t )
@@ -1187,11 +1198,13 @@ void ScrollingList::scroll( bool forward )
         }
 
         Component *c = components_.at( i );
-        c->allocateGraphicsMemory( );
+        if (c) {
+            c->allocateGraphicsMemory();
 
-        resetTweens( c, tweenPoints_->at( nextI ), scrollPoints_->at( i ), scrollPoints_->at( nextI ), scrollPeriod_ );
-        c->baseViewInfo.font = scrollPoints_->at( nextI )->font; // Use the font settings of the next index
-        c->triggerEvent(  "menuScroll" );
+            resetTweens(c, tweenPoints_->at(nextI), scrollPoints_->at(i), scrollPoints_->at(nextI), scrollPeriod_);
+            c->baseViewInfo.font = scrollPoints_->at(nextI)->font; // Use the font settings of the next index
+            c->triggerEvent("menuScroll");
+        }
     }
 
     // Reorder the components
