@@ -138,7 +138,7 @@ void Launcher::startScript()
     std::string exe = Configuration::absolutePath + "\\start.bat";
 
 #else
-    std::string exe = "start.sh";
+    std::string exe = "./start.sh";
 #endif
     execute(exe, "", Configuration::absolutePath, false);
 }
@@ -149,7 +149,7 @@ void Launcher::exitScript()
     std::string exe = Configuration::absolutePath + "\\exit.bat";
    
 #else
-    std::string exe = "exit.sh";
+    std::string exe = "./exit.sh";
 #endif
     execute(exe, "", Configuration::absolutePath, false);
 }
