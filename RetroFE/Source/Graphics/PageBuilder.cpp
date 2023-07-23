@@ -107,7 +107,7 @@ Page *PageBuilder::buildPage( std::string collectionName, bool ignoreMainDefault
     for ( int i = 0; i < SDL::getNumScreens(); i++ )
         layouts.push_back("layout - " + std::to_string( i ) );
    
-    for ( unsigned int layer = 0; layer < layouts.size(); layer++ )
+    for ( size_t layer = 0; layer < layouts.size(); layer++ )
     {
 		if (layer > 0 )
             monitor_ = layer - 1;

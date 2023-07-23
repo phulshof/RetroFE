@@ -76,7 +76,7 @@ public:
     void letterScroll(ScrollDirection direction);
     void metaScroll(ScrollDirection direction, std::string attribute);
     void cfwLetterSubScroll(ScrollDirection direction);
-    size_t getCollectionSize();
+    unsigned int getCollectionSize();
     unsigned int getSelectedIndex();
     void selectRandom();
     void start();

@@ -542,7 +542,7 @@ void CollectionInfoBuilder::loadPlaylistItems(CollectionInfo* info, std::map<std
         std::string basename = (std::string::npos == position) ? file : file.substr(0, position);
 
         std::string comparator = ".txt";
-        size_t start = file.length() - comparator.length();
+        int start = file.length() - comparator.length();
 
         if (start >= 0)
         {
@@ -924,7 +924,7 @@ void CollectionInfoBuilder::ImportRomDirectory(std::string path, CollectionInfo 
                 for(extensionsIt = extensions.begin(); extensionsIt != extensions.end(); ++extensionsIt)
                 {
                     std::string comparator = "." + *extensionsIt;
-                    size_t start = file.length() - comparator.length() + 1;
+                    int start = file.length() - comparator.length() + 1;
 
                     if (start >= 0)
                     {

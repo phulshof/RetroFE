@@ -28,7 +28,7 @@ public:
     void clear();
     std::vector<Tween *> *tweens();
     Tween *getTween(unsigned int index);
-    size_t size();
+    unsigned int size();
 
 private:
     std::vector<Tween *> set_;

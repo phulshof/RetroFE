@@ -77,7 +77,7 @@ bool MenuParser::buildTextMenu(CollectionInfo *collection, bool sort)
             std::string basename = (std::string::npos == position)? file : file.substr(0, position);
 
             std::string comparator = ".txt";
-            size_t start = file.length() - comparator.length();
+            int start = file.length() - comparator.length();
 
             if(start >= 0)
             {

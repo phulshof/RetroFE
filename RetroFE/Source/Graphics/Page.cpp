@@ -266,7 +266,7 @@ void Page::pushMenu(ScrollingList *s, int index)
     // If index < 0 then append to the menus_ vector
     if(index < 0)
     {
-        index = static_cast<int>(menus_.size());
+        index = menus_.size();
     }
 
     // Increase menus_ as needed
@@ -820,7 +820,7 @@ void Page::cfwLetterSubScroll(ScrollDirection direction)
 }
 
 
-size_t Page::getCollectionSize()
+unsigned int Page::getCollectionSize()
 {
     ScrollingList* amenu = getAnActiveMenu();
     if (!amenu) return 0;
@@ -982,11 +982,11 @@ void Page::favPlaylist()
 void Page::nextPlaylist()
 {
     MenuInfo_S &info = collections_.back();
-    size_t numlists = info.collection->playlists.size();
+    unsigned int numlists = info.collection->playlists.size();
     // save last playlist selected item
     rememberSelectedItem();
 
-    for(size_t i = 0; i <= numlists; ++i)
+    for(unsigned int i = 0; i <= numlists; ++i)
     {
         playlist_++;
         // wrap
@@ -1010,11 +1010,11 @@ void Page::nextPlaylist()
 void Page::prevPlaylist()
 {
     MenuInfo_S &info = collections_.back();
-    size_t numlists = info.collection->playlists.size();
+    unsigned int numlists = info.collection->playlists.size();
     // save last playlist selected item
     rememberSelectedItem();
 
-    for(size_t i = 0; i <= numlists; ++i)
+    for(unsigned int i = 0; i <= numlists; ++i)
     {
         // wrap
         if(playlist_ == info.collection->playlists.begin())
@@ -1040,14 +1040,14 @@ void Page::selectPlaylist(std::string playlist)
 {
     MenuInfo_S &info = collections_.back();
     info.collection->Save();
-    size_t numlists = info.collection->playlists.size();
+    unsigned int numlists = info.collection->playlists.size();
     // save last playlist selected item
     rememberSelectedItem();
 
     // Store current playlist
     CollectionInfo::Playlists_T::iterator playlist_store = playlist_;
 
-    for(size_t i = 0; i <= numlists; ++i)
+    for(unsigned int i = 0; i <= numlists; ++i)
     {
         playlist_++;
         // wrap

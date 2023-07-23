@@ -59,7 +59,7 @@ Tween *TweenSet::getTween(unsigned int index)
 }
 
 
-size_t TweenSet::size()
+unsigned int TweenSet::size()
 {
     return set_.size();
 }
