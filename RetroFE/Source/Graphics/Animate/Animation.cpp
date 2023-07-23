@@ -62,7 +62,7 @@ TweenSet *Animation::tweenSet(unsigned int index)
 }
 
 
-unsigned int Animation::size()
+size_t Animation::size()
 {
     return animationVector_.size();
 }
