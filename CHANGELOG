@@ -23,6 +23,7 @@ v0.10.34.2
 	- added prevCycleCollection button (monkofthefunk)
 	- added collection setting specific "ignoreDefaultLayout=false" for collection menu support to use current collection layout and not load default if the selected collection doesn't have one (monkofthefunk)
 	- added textFallback to menu to turn off if no image/video found (monkofthefunk)
+	- fixed size_t warnings (monkofthefunk)
 
 v0.10.34.1
 	- added vsync; fix if vSync is yes skip SDL_Delay fps limiter (inigomonyota)
