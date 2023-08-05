@@ -114,7 +114,7 @@ if args.os == 'windows':
     else:
       src_exe = os.path.join(base_path, 'RetroFE', 'Build', 'Release', 'retrofe.exe')
       
-    core_path = os.path.join(output_path, 'core')
+    core_path = os.path.join(output_path, 'retrofe')
     
     # create the core folder
     if not os.path.exists(core_path):

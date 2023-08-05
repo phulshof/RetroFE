@@ -107,7 +107,7 @@ Copy your live RetroFE system to any folder of your choosing:
 	Install cmake (https://cmake.org/download/)
 	Install git (https://git-scm.com/download/win)
 	Install 7zip (https://www.7-zip.org/)
-	Install gstreamer and gstreamer-devel to c:/gstreamer(x86, not 64 bit!) (https://gstreamer.freedesktop.org/data/pkg/windows/1.18.3/msvc/)
+	Install gstreamer and gstreamer-devel to c:/gstreamer(x86-64 bit) (https://gstreamer.freedesktop.org/data/pkg/windows/1.22.4/msvc/)
 
 ## Download and compile the source code ##
 
@@ -121,7 +121,7 @@ Setup Environment (to setup necessary variables and paths to compile in visual s
 
 Generate visual studio solution files
 
-	cmake -A Win32 -B .\RetroFE\Build -D GSTREAMER_ROOT=C:\gstreamer\1.0\msvc_x86 -S .\RetroFE\Source
+	cmake -A x64 -B .\RetroFE\Build -D GSTREAMER_ROOT=C:\gstreamer\1.0\msvc_x86_64 -S .\RetroFE\Source
   
 Compile RetroFE and create a full environment by running the following commands
 
