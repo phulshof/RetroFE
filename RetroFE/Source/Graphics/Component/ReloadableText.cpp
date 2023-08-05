@@ -55,7 +55,7 @@ ReloadableText::~ReloadableText()
     }
 }
 
-void ReloadableText::update(float dt)
+bool ReloadableText::update(float dt)
 {
     if (newItemSelected ||
        (newScrollItemSelected && getMenuScrollReload()) ||
@@ -66,8 +66,7 @@ void ReloadableText::update(float dt)
     }
 
     // needs to be ran at the end to prevent the NewItemSelected flag from being detected
-    Component::update(dt);
-
+    return Component::update(dt);
 }
 
 void ReloadableText::allocateGraphicsMemory()

@@ -65,7 +65,7 @@ void ReloadableMedia::enableTextFallback_(bool value)
     textFallback_ = value;
 }
 
-void ReloadableMedia::update(float dt)
+bool ReloadableMedia::update(float dt)
 {
     if (newItemSelected ||
        (newScrollItemSelected && getMenuScrollReload()) ||
@@ -93,8 +93,7 @@ void ReloadableMedia::update(float dt)
     }
 
     // needs to be ran at the end to prevent the NewItemSelected flag from being detected
-    Component::update(dt);
-
+    return Component::update(dt);
 }
 
 void ReloadableMedia::allocateGraphicsMemory()

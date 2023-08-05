@@ -27,7 +27,7 @@ class ReloadableText : public Component
 public:
     ReloadableText(std::string type, Page &page, Configuration &config, bool systemMode, Font *font, std::string layoutKey, std::string timeFormat, std::string textFormat, std::string singlePrefix, std::string singlePostfix, std::string pluralPrefix, std::string pluralPostfix);
     virtual ~ReloadableText();
-    void     update(float dt);
+    bool     update(float dt);
     void     draw();
     void     freeGraphicsMemory();
     void     allocateGraphicsMemory();

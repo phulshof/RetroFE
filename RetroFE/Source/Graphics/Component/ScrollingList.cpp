@@ -673,22 +673,25 @@ void ScrollingList::triggerEventOnAll(std::string event, int menuIndex)
     }
 }
 
-void ScrollingList::update( float dt )
+bool ScrollingList::update( float dt )
 {
+    bool done = Component::update( dt );
 
-    Component::update( dt );
-
-    if (components_.size( ) == 0 ) return;
-    if (!items_ ) return;
+    if (components_.size( ) == 0 ) 
+        return done;
+    if (!items_ ) 
+        return done;
 
     for ( unsigned int i = 0; i < scrollPoints_->size( ); i++ )
     {
         Component *c = components_.at( i );
         if (c) {
             c->playlistName = playlistName;
-            c->update(dt);
+           done &= c->update(dt);
         }
     }
+
+    return done;
 }
 
 

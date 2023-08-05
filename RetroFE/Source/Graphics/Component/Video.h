@@ -25,7 +25,7 @@ public:
     Video( std::string file, std::string altFile, int numLoops, Page &page, int monitor );
     virtual ~Video( );
     static void setEnabled(bool enabled);
-    void update(float dt);
+    bool update(float dt);
     void freeGraphicsMemory( );
     void allocateGraphicsMemory( );
     void draw( );

@@ -53,7 +53,7 @@ void Video::setEnabled(bool enabled)
 }
 
 
-void Video::update(float dt)
+bool Video::update(float dt)
 {
     if(video_)
     {
@@ -66,7 +66,8 @@ void Video::update(float dt)
 
         video_->update(dt);
     }
-    Component::update(dt);
+    
+    return Component::update(dt);
 }
 
 
@@ -82,7 +83,6 @@ void Video::freeGraphicsMemory( )
 
 void Video::allocateGraphicsMemory( )
 {
-
     Component::allocateGraphicsMemory( );
 
     if (enabled_ && !video_)

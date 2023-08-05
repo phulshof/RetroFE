@@ -64,7 +64,7 @@ ReloadableScrollingText::~ReloadableScrollingText( )
 }
 
 
-void ReloadableScrollingText::update(float dt)
+bool ReloadableScrollingText::update(float dt)
 {
 
     if (waitEndTime_ > 0)
@@ -97,7 +97,7 @@ void ReloadableScrollingText::update(float dt)
         newItemSelected = false;
     }
 
-    Component::update(dt);
+    return Component::update(dt);
 }
 
 

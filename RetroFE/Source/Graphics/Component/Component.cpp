@@ -26,6 +26,7 @@ Component::Component(Page &p)
     tweens_                   = NULL;
     backgroundTexture_        = NULL;
     menuScrollReload_         = false;
+    animationDoneRemove_ = false;
     freeGraphicsMemory();
     id_                       = -1;
 }
@@ -150,7 +151,7 @@ void Component::setTweens(AnimationEvents *set)
     tweens_ = set;
 }
 
-void Component::update(float dt)
+bool Component::update(float dt)
 {
     elapsedTweenTime_ += dt;
     if (animationRequested_ && animationRequestedType_ != "")
@@ -206,6 +207,8 @@ void Component::update(float dt)
       currentTweens_     = NULL;
       currentTweenIndex_ = 0;
     }
+
+    return currentTweenComplete_;
 }
 
 void Component::draw()
@@ -467,6 +470,16 @@ void Component::setMenuScrollReload(bool menuScrollReload)
 bool Component::getMenuScrollReload()
 {
     return menuScrollReload_;
+}
+
+void Component::setAnimationDoneRemove(bool value)
+{
+    animationDoneRemove_ = value;
+}
+
+bool Component::getAnimationDoneRemove()
+{
+    return animationDoneRemove_;
 }
 
 int Component::getId( )

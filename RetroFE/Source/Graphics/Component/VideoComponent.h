@@ -27,7 +27,7 @@ class VideoComponent : public Component
 public:
     VideoComponent(IVideo *videoInst, Page &p, std::string videoFile);
     virtual ~VideoComponent();
-    void update(float dt);
+    bool update(float dt);
     void draw();
     void freeGraphicsMemory();
     void allocateGraphicsMemory();

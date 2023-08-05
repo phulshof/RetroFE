@@ -30,7 +30,7 @@ public:
     ReloadableMedia(Configuration &config, bool systemMode, bool layoutMode, bool commonMode, bool menuMode, std::string type, std::string imageType, Page &page, 
         int displayOffset, bool isVideo, Font *font, bool jukebox, int jukeboxNumLoops, int randomSelect);
     virtual ~ReloadableMedia();
-    void update(float dt);
+    bool update(float dt);
     void draw();
     void freeGraphicsMemory();
     void allocateGraphicsMemory();

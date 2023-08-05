@@ -1197,7 +1197,9 @@ void Page::update(float dt)
     {
         if (*it) {
             (*it)->playlistName = playlistName;
-            (*it)->update(dt);
+            if ((*it)->update(dt) && (*it)->getAnimationDoneRemove()) {
+                (*it)->freeGraphicsMemory();
+            }
         }
     }
 }

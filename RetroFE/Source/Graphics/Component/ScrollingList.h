@@ -97,7 +97,7 @@ public:
     unsigned int getSelectedItemPosition();
     void allocateGraphicsMemory( );
     void freeGraphicsMemory( );
-    void update( float dt );
+    bool update( float dt );
     void draw( );
     void draw( unsigned int layer );
     void setScrollAcceleration( float value );

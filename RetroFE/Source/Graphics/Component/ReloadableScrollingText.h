@@ -26,7 +26,7 @@ class ReloadableScrollingText : public Component
 public:
     ReloadableScrollingText(Configuration &config, bool systemMode, bool layoutMode, bool menuMode, std::string type, std::string textFormat, std::string singlePrefix, std::string singlePostfix, std::string pluralPrefix, std::string pluralPostfix, std::string alignment, Page &page, int displayOffset, Font *font, std::string direction, float scrollingSpeed, float startPosition, float startTime, float endTime );
     virtual ~ReloadableScrollingText( );
-    void     update(float dt);
+    bool     update(float dt);
     void     draw( );
     void     allocateGraphicsMemory( );
     void     freeGraphicsMemory( );

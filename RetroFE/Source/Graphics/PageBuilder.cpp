@@ -103,8 +103,8 @@ Page *PageBuilder::buildPage( std::string collectionName, bool ignoreMainDefault
 
     std::vector<std::string> layouts;
     layouts.push_back(layoutPage);
-    // todo replace numScreens with numLayers
-    for ( int i = 0; i < SDL::getNumScreens(); i++ )
+    // layout - #.xml
+    for (int i = 0; i < 4; i++)
         layouts.push_back("layout - " + std::to_string( i ) );
    
     for ( unsigned int layer = 0; layer < layouts.size(); layer++ )
@@ -448,19 +448,22 @@ bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
             altImagePath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, std::string(src->value()));
 
             int monitor = monitorXml ? Utils::convertInt(monitorXml->value()) : monitor_;
-            bool additive = additiveXml ? bool(additiveXml->value()) : false;
-            Image *c = new Image(imagePath, altImagePath, *page, monitor, additive);
-            c->setId( id );
-            xml_attribute<> *menuScrollReload = componentXml->first_attribute("menuScrollReload");
-            if (menuScrollReload &&
-                (Utils::toLower(menuScrollReload->value()) == "true" ||
-                 Utils::toLower(menuScrollReload->value()) == "yes"))
-            {
-                c->setMenuScrollReload(true);
+            // don't add videos if display doesn't exist
+            if (monitor + 1 <= SDL::getScreenCount()) {
+                bool additive = additiveXml ? bool(additiveXml->value()) : false;
+                Image* c = new Image(imagePath, altImagePath, *page, monitor, additive);
+                c->setId(id);
+                xml_attribute<>* menuScrollReload = componentXml->first_attribute("menuScrollReload");
+                if (menuScrollReload &&
+                    (Utils::toLower(menuScrollReload->value()) == "true" ||
+                        Utils::toLower(menuScrollReload->value()) == "yes"))
+                {
+                    c->setMenuScrollReload(true);
+                }
+                buildViewInfo(componentXml, c->baseViewInfo);
+                loadTweens(c, componentXml);
+                page->addComponent(c);
             }
-            buildViewInfo(componentXml, c->baseViewInfo);
-            loadTweens(c, componentXml);
-            page->addComponent(c);
         }
     }
 
@@ -493,18 +496,28 @@ bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
             int numLoops = numLoopsXml ? Utils::convertInt(numLoopsXml->value()) : 1;
 
             int monitor = monitorXml ? Utils::convertInt(monitorXml->value()) : monitor_;
-            Video *c = new Video(videoPath, altVideoPath, numLoops, *page, monitor);
-            c->setId( id );
-            xml_attribute<> *menuScrollReload = componentXml->first_attribute("menuScrollReload");
-            if (menuScrollReload &&
-                (Utils::toLower(menuScrollReload->value()) == "true" ||
-                 Utils::toLower(menuScrollReload->value()) == "yes"))
-            {
-                c->setMenuScrollReload(true);
+            // don't add videos if display doesn't exist
+            if (monitor + 1 <= SDL::getScreenCount()) {
+                Video* c = new Video(videoPath, altVideoPath, numLoops, *page, monitor);
+                c->setId(id);
+                xml_attribute<>* menuScrollReload = componentXml->first_attribute("menuScrollReload");
+                if (menuScrollReload &&
+                    (Utils::toLower(menuScrollReload->value()) == "true" ||
+                        Utils::toLower(menuScrollReload->value()) == "yes"))
+                {
+                    c->setMenuScrollReload(true);
+                }
+                xml_attribute<>* animationDoneRemove = componentXml->first_attribute("animationDoneRemove");
+                if (animationDoneRemove &&
+                    (Utils::toLower(animationDoneRemove->value()) == "true" ||
+                        Utils::toLower(animationDoneRemove->value()) == "yes"))
+                {
+                    c->setAnimationDoneRemove(true);
+                }
+                buildViewInfo(componentXml, c->baseViewInfo);
+                loadTweens(c, componentXml);
+                page->addComponent(c);
             }
-            buildViewInfo(componentXml, c->baseViewInfo);
-            loadTweens(c, componentXml);
-            page->addComponent(c);
         }
     }
 

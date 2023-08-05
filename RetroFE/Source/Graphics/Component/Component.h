@@ -44,7 +44,7 @@ public:
     bool newScrollItemSelected;
     void setId( int id );
 
-    virtual void update(float dt);
+    virtual bool update(float dt);
     virtual void draw();
     void setTweens(AnimationEvents *set);
     virtual bool isPlaying();
@@ -62,6 +62,8 @@ public:
     std::string collectionName;
     void setMenuScrollReload(bool menuScrollReload);
     bool getMenuScrollReload();
+    void setAnimationDoneRemove(bool value);
+    bool getAnimationDoneRemove();
     virtual void setText(std::string text, int id = -1) {};
     virtual void setImage(std::string filePath, int id = -1) {};
     int getId( );
@@ -87,6 +89,7 @@ private:
     std::string  animationType_;
     bool         animationRequested_;
     bool         menuScrollReload_;
+    bool         animationDoneRemove_;
     int          menuIndex_;
     int          id_;
 };
