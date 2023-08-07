@@ -48,6 +48,7 @@ VideoComponent * VideoBuilder::createVideo(std::string path, Page &page, std::st
 
         if(video)
         {
+            Logger::write(Logger::ZONE_DEBUG, "Component", "Create - VideoC " + file);
             component = new VideoComponent(video, page, file);
         }
     }

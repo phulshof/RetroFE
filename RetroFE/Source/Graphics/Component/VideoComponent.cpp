@@ -33,15 +33,15 @@ VideoComponent::VideoComponent(IVideo *videoInst, Page &p, std::string videoFile
 
 VideoComponent::~VideoComponent()
 {
-    Logger::write(Logger::ZONE_DEBUG, "Component", "Deleted - VideoC " + videoFile_);
-
     freeGraphicsMemory();
 
     if(videoInst_)
     {
-        videoInst_->stop();
         if ( VideoFactory::canDelete( videoInst_ ) )
+        {
             delete videoInst_;
+            Logger::write(Logger::ZONE_DEBUG, "Component", "Deleted - VideoC " + videoFile_);
+        }
         videoInst_ = NULL;
     }
 }
@@ -84,8 +84,6 @@ bool VideoComponent::update(float dt)
 
 void VideoComponent::allocateGraphicsMemory()
 {
-    Logger::write(Logger::ZONE_DEBUG, "Component", "Create - VideoC " + videoFile_);
-
     Component::allocateGraphicsMemory();
 
     if(!isPlaying_)
