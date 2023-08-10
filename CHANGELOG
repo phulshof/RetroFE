@@ -25,10 +25,11 @@ v0.10.34.2
 	- added textFallback to menu to turn off if no image/video found (monkofthefunk)
 	- fixed size_t warnings (monkofthefunk)
 	- fixed size_t exception (monkofthefunk)
-  - changes to facilitate compiling 64-bit instead of puny 32-bit (inigomontoya)
-  - fixed don't add videos to monitor=2+ if display doesn't exist (monkofthefunk)
+	- changes to facilitate compiling 64-bit instead of puny 32-bit (inigomontoya)
+	- fixed don't add videos to monitor=2+ if display doesn't exist (monkofthefunk)
 	- added to layout animationDoneRemove remove video, to free up a video slot after a one time video is done (monkofthefunk)
 	- fixed layer count tide to numScreens setting, also allow single screen to allow second monitor show desktop (monkofthefunk)
+	- fixed updating layout defined controls upon "back" menu/layout change (monkofthefunk)
 
 v0.10.34.1
 	- added vsync; fix if vSync is yes skip SDL_Delay fps limiter (inigomonyota)

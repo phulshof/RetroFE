@@ -756,9 +756,8 @@ bool RetroFE::run( )
                     Page *page = pb.buildPage( nextPageItem_->name, ignoreDefaultLayout);
                     if (page)
                     {
-                        if (page->controlsType() != "") {
+                        if (page->controlsType() != currentPage_->controlsType()) {
                             updatePageControls(page->controlsType());
-                            page->setControlsType("");
                         }
                         currentPage_->freeGraphicsMemory( );
                         pages_.push( currentPage_ );
@@ -1316,10 +1315,14 @@ bool RetroFE::run( )
                 lastMenuPlaylists_[collectionName] = currentPage_->getPlaylistName( );
                 if (currentPage_->getMenuDepth( ) == 1)
                 {
+                    Page* page = pages_.top();
+                    pages_.pop();
+                    if (page->controlsType() != currentPage_->controlsType()) {
+                        updatePageControls(page->controlsType());
+                    }
                     currentPage_->deInitialize( );
                     delete currentPage_;
-                    currentPage_ = pages_.top( );
-                    pages_.pop( );
+                    currentPage_ = page;
                     if (currentPage_->getSelectedItem() != NULL) {
                         currentPage_->allocateGraphicsMemory();
                         currentPage_->setLocked(kioskLock_);
@@ -1399,9 +1402,8 @@ bool RetroFE::run( )
                 Page *page = pb.buildPage( );
                 if (page)
                 {
-                    if (page->controlsType() != "") {
+                    if (page->controlsType() != currentPage_->controlsType()) {
                         updatePageControls(page->controlsType());
-                        page->setControlsType("");
                     }
                     currentPage_->freeGraphicsMemory( );
                     pages_.push( currentPage_ );
@@ -2203,7 +2205,6 @@ Page* RetroFE::loadPage(std::string collectionName)
     else {
         if (page->controlsType() != "") {
             updatePageControls(page->controlsType());
-            page->setControlsType("");
         }
     }
 
