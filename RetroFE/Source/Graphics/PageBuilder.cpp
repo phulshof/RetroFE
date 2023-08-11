@@ -1422,6 +1422,11 @@ void PageBuilder::buildViewInfo(xml_node<> *componentXml, ViewInfo &info, xml_no
     info.Restart = restart ? Utils::toLower(restart->value()) == "true" : false;
     info.Additive = additive ? Utils::toLower(additive->value()) == "true" : false;
 
+    bool disableVideoRestart;
+    config_.getProperty("disableVideoRestart", disableVideoRestart);
+    if (disableVideoRestart)
+        info.Restart = false;
+
     if(fontColor)
     {
       Font *font = addFont(componentXml, defaultXml);

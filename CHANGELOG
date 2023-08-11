@@ -30,6 +30,7 @@ v0.10.34.2
 	- added to layout animationDoneRemove remove video, to free up a video slot after a one time video is done (monkofthefunk)
 	- fixed layer count tide to numScreens setting, also allow single screen to allow second monitor show desktop (monkofthefunk)
 	- fixed updating layout defined controls upon "back" menu/layout change (monkofthefunk)
+	- added disableVideoRestart to turn off a layout's "restart" on video selected (monkofthefunk)
 
 v0.10.34.1
 	- added vsync; fix if vSync is yes skip SDL_Delay fps limiter (inigomonyota)
