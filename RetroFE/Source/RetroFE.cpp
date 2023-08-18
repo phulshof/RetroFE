@@ -1244,9 +1244,16 @@ bool RetroFE::run( )
 
         // Launching game; start onGameEnter animation
         case RETROFE_LAUNCH_ENTER:
-            currentPage_->enterGame();  // Start onGameEnter animation
-            currentPage_->playSelect(); // Play launch sound
-            state = RETROFE_LAUNCH_REQUEST;
+            if ( currentPage_->isMenuScrolling() )
+            {
+                state =  RETROFE_IDLE;
+            }
+            else
+            {
+                currentPage_->enterGame( );  // Start onGameEnter animation
+                currentPage_->playSelect( ); // Play launch sound
+                state = RETROFE_LAUNCH_REQUEST;
+            }
             break;
 
         // Wait for onGameEnter animation to finish; launch game; start onGameExit animation
