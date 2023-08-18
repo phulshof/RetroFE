@@ -28,9 +28,9 @@ public:
     AnimationEvents(AnimationEvents &copy);
     ~AnimationEvents();
 
-    Animation *getAnimation(std::string tween);
-    Animation *getAnimation(std::string tween, int index);
-    void setAnimation(std::string tween, int index, Animation *animation);
+    Animation *getAnimation(const std::string& tween);
+    Animation *getAnimation(const std::string& tween, int index);
+    void setAnimation(const std::string& tween, int index, Animation *animation);
     void clear();
 
 private:

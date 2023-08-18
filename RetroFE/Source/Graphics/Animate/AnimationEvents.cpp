@@ -40,12 +40,12 @@ AnimationEvents::~AnimationEvents()
     clear();
 }
 
-Animation *AnimationEvents::getAnimation(std::string tween)
+Animation *AnimationEvents::getAnimation(const std::string& tween)
 {
     return getAnimation(tween, -1);
 }
 
-Animation *AnimationEvents::getAnimation(std::string tween, int index)
+Animation *AnimationEvents::getAnimation(const std::string& tween, int index)
 {
     if(animationMap_[tween].find(-1) == animationMap_[tween].end())
     {
@@ -61,7 +61,7 @@ Animation *AnimationEvents::getAnimation(std::string tween, int index)
 }
 
 
-void AnimationEvents::setAnimation(std::string tween, int index, Animation *animation)
+void AnimationEvents::setAnimation(const std::string& tween, int index, Animation *animation)
 {
     if(animationMap_[tween].find(index) != animationMap_[tween].end())
     {

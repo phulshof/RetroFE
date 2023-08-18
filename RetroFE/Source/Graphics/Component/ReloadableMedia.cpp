@@ -478,7 +478,7 @@ void ReloadableMedia::reloadTexture()
 }
 
 
-Component *ReloadableMedia::findComponent(std::string collection, std::string type, std::string basename, std::string filepath, bool systemMode, bool isVideo)
+Component *ReloadableMedia::findComponent(const std::string& collection, const std::string& type, const std::string& basename, std::string filepath, bool systemMode, bool isVideo)
 {
     std::string imagePath;
     Component *component = NULL;

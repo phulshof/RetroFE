@@ -18,7 +18,7 @@
 #include "../../Utility/Log.h"
 #include <fstream>
 
-Image * ImageBuilder::CreateImage(std::string path, Page &p, std::string name, int monitor, bool additive)
+Image * ImageBuilder::CreateImage(const std::string& path, Page &p, const std::string& name, int monitor, bool additive)
 {
     Image *image = NULL;
     static std::vector<std::string> extensions = {

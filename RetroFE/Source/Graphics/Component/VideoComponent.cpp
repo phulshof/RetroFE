@@ -22,7 +22,7 @@
 #include "../../Video/VideoFactory.h"
 #include "../../SDL.h"
 
-VideoComponent::VideoComponent(IVideo *videoInst, Page &p, std::string videoFile)
+VideoComponent::VideoComponent(IVideo *videoInst, Page &p, const std::string& videoFile)
     : Component(p)
     , videoFile_(videoFile)
     , videoInst_(videoInst)

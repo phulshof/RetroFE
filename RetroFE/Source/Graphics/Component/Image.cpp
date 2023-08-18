@@ -19,7 +19,7 @@
 #include "../../Utility/Log.h"
 #include <SDL2/SDL_image.h>
 
-Image::Image(std::string file, std::string altFile, Page &p, int monitor, bool additive)
+Image::Image(const std::string& file, const std::string& altFile, Page &p, int monitor, bool additive)
     : Component(p)
     , texture_(NULL)
     , file_(file)

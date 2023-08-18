@@ -20,7 +20,7 @@
 #include <fstream>
 
 
-VideoComponent * VideoBuilder::createVideo(std::string path, Page &page, std::string name, int monitor, bool isTypeVideo, int numLoops)
+VideoComponent * VideoBuilder::createVideo(const std::string& path, Page &page, const std::string& name, int monitor, bool isTypeVideo, int numLoops)
 {
     VideoComponent *component = NULL;
     

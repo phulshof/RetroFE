@@ -131,7 +131,7 @@ void ScrollingList::setItems( std::vector<Item *> *items )
     }
 }
 
-void ScrollingList::selectItemByName(std::string name)
+void ScrollingList::selectItemByName(const std::string& name)
 {
     size_t size = items_->size();
     unsigned int index = 0;
@@ -418,19 +418,19 @@ void ScrollingList::letterChange(bool increment)
 }
 
 
-void ScrollingList::metaUp(std::string attribute)
+void ScrollingList::metaUp(const std::string& attribute)
 {
     metaChange(true, attribute);
 }
 
 
-void ScrollingList::metaDown(std::string attribute)
+void ScrollingList::metaDown(const std::string& attribute)
 {
     metaChange(false, attribute);
 }
 
 
-void ScrollingList::metaChange(bool increment, std::string attribute)
+void ScrollingList::metaChange(bool increment, const std::string& attribute)
 {
     size_t itemSize = items_->size();
 

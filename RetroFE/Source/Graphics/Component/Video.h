@@ -22,7 +22,7 @@
 class Video : public Component
 {
 public:
-    Video( std::string file, std::string altFile, int numLoops, Page &page, int monitor );
+    Video( const std::string& file, const std::string& altFile, int numLoops, Page &page, int monitor );
     virtual ~Video( );
     static void setEnabled(bool enabled);
     bool update(float dt);

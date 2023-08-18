@@ -26,7 +26,7 @@
 bool Video::enabled_ = true;
 
 
-Video::Video(std::string file, std::string altFile, int numLoops, Page &p, int monitor)
+Video::Video(const std::string& file, const std::string& altFile, int numLoops, Page &p, int monitor)
     : Component(p)
     , video_(NULL)
     , file_(file)

@@ -38,6 +38,7 @@ v0.10.34.2
     - fixed case in layouts where "center" in from or to fields would always be 0. (inigomontoya)
 	- fixed attract mode entering right collection and fast scroll to launch game (monkofthefunk, inigomontoya)
     - fixed occasional entering of wrong game (inigomontoya)
+    - built SDL2 and SDL2_image DLLs from scratch
     
     
 v0.10.34.1

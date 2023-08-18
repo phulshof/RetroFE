@@ -34,7 +34,7 @@ public:
     void draw();
     void freeGraphicsMemory();
     void allocateGraphicsMemory();
-    Component *findComponent(std::string collection, std::string type, std::string basename, std::string filepath, bool systemMode, bool isVideo);
+    Component *findComponent(const std::string& collection, const std::string& type, const std::string& basename, std::string filepath, bool systemMode, bool isVideo);
 
     void enableTextFallback_(bool value);
     virtual bool isJukeboxPlaying();

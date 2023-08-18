@@ -68,7 +68,7 @@ public:
     bool allocateTexture( unsigned int index, Item *i );
     void deallocateTexture( unsigned int index );
     void setItems( std::vector<Item *> *items );
-    void selectItemByName(std::string name);
+    void selectItemByName(const std::string& name);
     std::string getSelectedItemName();
     void destroyItems( );
     void setPoints( std::vector<ViewInfo *> *scrollPoints, std::vector<AnimationEvents *> *tweenPoints );
@@ -80,9 +80,9 @@ public:
     void letterUp( );
     void letterDown( );
     void letterChange( bool increment );
-    void metaUp(std::string attribute);
-    void metaDown(std::string attribute);
-    void metaChange(bool increment, std::string attribute);
+    void metaUp(const std::string& attribute);
+    void metaDown(const std::string& attribute);
+    void metaChange(bool increment, const std::string& attribute);
     void subChange( bool increment );
     void cfwLetterSubUp( );
     void cfwLetterSubDown( );

@@ -109,7 +109,7 @@ public:
     void  setMinShowTime(float value);
     float getMinShowTime();
     std::string controlsType();
-    void setControlsType(std::string type);
+    void setControlsType(const std::string& type);
     void  menuScroll();
     void  highlightEnter();
     void  highlightExit();
@@ -119,15 +119,15 @@ public:
     void playlistNextExit();
     void playlistPrevEnter();
     void playlistPrevExit();
-    void triggerEventOnAllMenus(std::string event);
+    void triggerEventOnAllMenus(const std::string& event);
     void  menuJumpEnter();
     void  menuJumpExit();
     void  attractEnter( );
     void  attract( );
     void  attractExit( );
     void  jukeboxJump( );
-    void  triggerEvent( std::string action );
-    void  setText( std::string text, int id );
+    void  triggerEvent( const std::string& action );
+    void  setText( const std::string& text, int id );
     void  addPlaylist();
     void  removePlaylist();
     void  togglePlaylist();
