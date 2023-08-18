@@ -18,24 +18,13 @@
 #include "../Collection/Item.h"
 #include "../Utility/Log.h"
 
-ComponentItemBindingBuilder::ComponentItemBindingBuilder()
-{
-}
+std::vector<ComponentItemBinding> ComponentItemBindingBuilder::buildCollectionItems(const std::vector<Item*>& infoList) {
+    std::vector<ComponentItemBinding> bindings;
+    bindings.reserve(infoList.size()); // Reserve space to avoid repeated reallocations.
 
-ComponentItemBindingBuilder::~ComponentItemBindingBuilder()
-{
-}
-
-std::vector<ComponentItemBinding *> *ComponentItemBindingBuilder::buildCollectionItems(std::vector<Item *> *infoList)
-{
-    std::vector<ComponentItemBinding *> *sprites = new std::vector<ComponentItemBinding *>();
-    std::vector<Item *>::iterator it;
-
-    for(it = infoList->begin(); it != infoList->end(); ++it)
-    {
-        ComponentItemBinding *s = new ComponentItemBinding(*it);
-        sprites->push_back(s);
+    for(const auto& itemPtr : infoList) {
+        bindings.emplace_back(nullptr, itemPtr);
     }
 
-    return sprites;
+    return bindings; // RVO will optimize away the copy.
 }

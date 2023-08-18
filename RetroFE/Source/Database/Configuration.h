@@ -25,7 +25,7 @@ public:
     Configuration();
     virtual ~Configuration();
     static void initialize();
-    static std::string convertToAbsolutePath(std::string prefix, std::string path);
+    static std::string convertToAbsolutePath(const std::string& prefix, const std::string& path);
     static std::string trimEnds(std::string str);
 	void clearProperties( );
     // gets the global configuration

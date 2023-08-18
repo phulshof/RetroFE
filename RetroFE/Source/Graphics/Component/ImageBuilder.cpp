@@ -21,14 +21,9 @@
 Image * ImageBuilder::CreateImage(std::string path, Page &p, std::string name, int monitor, bool additive)
 {
     Image *image = NULL;
-    std::vector<std::string> extensions;
-
-    extensions.push_back("png");
-    extensions.push_back("PNG");
-    extensions.push_back("jpg");
-    extensions.push_back("JPG");
-    extensions.push_back("jpeg");
-    extensions.push_back("JPEG");
+    static std::vector<std::string> extensions = {
+        "png", "PNG", "jpg", "JPG", "jpeg", "JPEG"
+    };
 
     std::string prefix = Utils::combinePath(path, name);
     std::string file;

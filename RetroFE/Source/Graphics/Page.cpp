@@ -63,68 +63,46 @@ Page::~Page()
 
 void Page::deInitialize()
 {
+    cleanup();
 
-    cleanup( );
-
-    MenuVector_T::iterator it = menus_.begin();
-    while(it != menus_.end())
+    // Deinitialize and clear menus_
+    for (auto& menuVector : menus_)
     {
-        std::vector<ScrollingList *>::iterator it2 = menus_[std::distance(menus_.begin(), it)].begin();
-        while(it2 != menus_[std::distance(menus_.begin(), it)].end())
+        for (ScrollingList* menu : menuVector)
         {
-            ScrollingList *menu = *it2;
-            menus_[std::distance(menus_.begin(), it)].erase(it2);
             delete menu;
-            it2 = menus_[std::distance(menus_.begin(), it)].begin();
         }
-        menus_.erase(it);
-        it = menus_.begin();
+        menuVector.clear();
     }
+    menus_.clear();
 
-    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    // Deinitialize and clear LayerComponents
+    for (Component* component : LayerComponents)
     {
-        delete *it;
+        delete component;
     }
     LayerComponents.clear();
 
+    // Delete sound chunks and reset pointers
+    delete loadSoundChunk_;
+    loadSoundChunk_ = nullptr;
 
-    if(loadSoundChunk_)
+    delete unloadSoundChunk_;
+    unloadSoundChunk_ = nullptr;
+
+    delete highlightSoundChunk_;
+    highlightSoundChunk_ = nullptr;
+
+    delete selectSoundChunk_;
+    selectSoundChunk_ = nullptr;
+
+    // Deinitialize and clear collections_
+    for (auto& collectionEntry : collections_)
     {
-        delete loadSoundChunk_;
-        loadSoundChunk_ = NULL;
+        collectionEntry.collection->Save();
+        delete collectionEntry.collection;
     }
-
-    if(unloadSoundChunk_)
-    {
-        delete unloadSoundChunk_;
-        unloadSoundChunk_ = NULL;
-    }
-
-
-    if(highlightSoundChunk_)
-    {
-        delete highlightSoundChunk_;
-        highlightSoundChunk_ = NULL;
-    }
-
-    if(selectSoundChunk_)
-    {
-        delete selectSoundChunk_;
-        selectSoundChunk_ = NULL;
-    }
-    CollectionVector_T::iterator itc = collections_.begin();
-
-    while(itc != collections_.end())
-    {
-        itc->collection->Save();
-
-        if(itc->collection)
-        {
-            delete itc->collection;
-        }
-        collections_.erase(itc);
-        itc = collections_.begin();
-    }
+    collections_.clear();
 }
 
 
@@ -190,12 +168,12 @@ void Page::onNewItemSelected()
 {
     if(!getAnActiveMenu()) return;
 
-    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
+    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); ++it)
     {
-        for(std::vector<ScrollingList *>::iterator it2 = menus_[std::distance(menus_.begin(), it)].begin(); it2 != menus_[std::distance(menus_.begin(), it)].end(); it2++)
+        for(std::vector<ScrollingList *>::iterator it2 = it->begin(); it2 != it->end(); ++it2)
         {
             ScrollingList *menu = *it2;
-            if(menu) 
+            if(menu)
                 menu->setNewItemSelected();
         }
     }
@@ -204,8 +182,8 @@ void Page::onNewItemSelected()
     {
         (*it)->setNewItemSelected();
     }
-
 }
+
 
 void Page::returnToRememberSelectedItem()
 {
@@ -314,22 +292,19 @@ bool Page::addComponent(Component *c)
 
 bool Page::isMenuIdle()
 {
-    bool idle = true;
-
-    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
+    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); ++it)
     {
-        for(std::vector<ScrollingList *>::iterator it2 = menus_[std::distance(menus_.begin(), it)].begin(); it2 != menus_[std::distance(menus_.begin(), it)].end(); it2++)
+        for(std::vector<ScrollingList *>::iterator it2 = it->begin(); it2 != it->end(); ++it2)
         {
             ScrollingList *menu = *it2;
 
             if(!menu->isIdle())
             {
-                idle = false;
-                break;
+                return false;
             }
         }
     }
-    return idle;
+    return true;
 }
 
 
@@ -348,49 +323,50 @@ bool Page::isIdle()
 
 bool Page::isAttractIdle()
 {
-    bool idle = true;
-
-    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
+    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); ++it)
     {
-        for(std::vector<ScrollingList *>::iterator it2 = menus_[std::distance(menus_.begin(), it)].begin(); it2 != menus_[std::distance(menus_.begin(), it)].end(); it2++)
+        for(std::vector<ScrollingList *>::iterator it2 = it->begin(); it2 != it->end(); ++it2)
         {
             ScrollingList *menu = *it2;
 
             if(!menu->isAttractIdle())
             {
-                idle = false;
-                break;
+                return false;
             }
         }
     }
 
-    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end() && idle; ++it)
+    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
     {
-        idle = (*it)->isAttractIdle();
+        if (!(*it)->isAttractIdle())
+        {
+            return false;
+        }
     }
 
-    return idle;
+    return true;
 }
 
 
 bool Page::isGraphicsIdle()
 {
-    bool idle = true;
-
-    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end() && idle; ++it)
+    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
     {
-        idle = (*it)->isIdle();
+        if (!(*it)->isIdle())
+        {
+            return false;
+        }
     }
 
-    return idle;
+    return true;
 }
 
 
 void Page::start()
 {
-    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
+    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); ++it)
     {
-        for(std::vector<ScrollingList *>::iterator it2 = menus_[std::distance(menus_.begin(), it)].begin(); it2 != menus_[std::distance(menus_.begin(), it)].end(); it2++)
+        for(std::vector<ScrollingList *>::iterator it2 = it->begin(); it2 != it->end(); ++it2)
         {
             ScrollingList *menu = *it2;
             menu->triggerEvent( "enter" );
@@ -412,9 +388,9 @@ void Page::start()
 
 void Page::stop()
 {
-    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
+    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); ++it)
     {
-        for(std::vector<ScrollingList *>::iterator it2 = menus_[std::distance(menus_.begin(), it)].begin(); it2 != menus_[std::distance(menus_.begin(), it)].end(); it2++)
+        for(std::vector<ScrollingList *>::iterator it2 = it->begin(); it2 != it->end(); ++it2)
         {
             ScrollingList *menu = *it2;
             menu->triggerEvent( "exit" );
@@ -433,6 +409,7 @@ void Page::stop()
     }
 }
 
+
 void Page::setSelectedItem()
 {
     selectedItem_ = getSelectedMenuItem();
@@ -446,7 +423,6 @@ Item *Page::getSelectedItem()
 
     return selectedItem_;
 }
-
 
 Item *Page::getSelectedItem(int offset)
 {
@@ -641,12 +617,16 @@ void Page::triggerEventOnAllMenus(std::string event)
     Item* item = selectedItem_;
 
     if (!item) return;
-    for (MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
+
+    unsigned int menuIndex = 0;
+
+    for (MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); ++it, ++menuIndex)
     {
-        for (std::vector<ScrollingList*>::iterator it2 = menus_[std::distance(menus_.begin(), it)].begin(); it2 != menus_[std::distance(menus_.begin(), it)].end(); it2++)
+        for (std::vector<ScrollingList*>::iterator it2 = it->begin(); it2 != it->end(); ++it2)
         {
             ScrollingList* menu = *it2;
-            if (menuDepth_ - 1 == static_cast<unsigned int>(distance(menus_.begin(), it)))
+
+            if (menuDepth_ - 1 == menuIndex)
             {
                 // Also trigger animations for index i for active menu
                 menu->triggerEvent(event, MENU_INDEX_HIGH + menuDepth_ - 1);
@@ -665,6 +645,7 @@ void Page::triggerEventOnAllMenus(std::string event)
         (*it)->triggerEvent(event, menuDepth_ - 1);
     }
 }
+
 
 void Page::triggerEvent( std::string action )
 {
@@ -1176,11 +1157,12 @@ bool Page::playlistExists(std::string playlist)
 void Page::update(float dt)
 {
     std::string playlistName = getPlaylistName();
-    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
+
+    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); ++it)
     {
-        for(std::vector<ScrollingList *>::iterator it2 = menus_[std::distance(menus_.begin(), it)].begin(); it2 != menus_[std::distance(menus_.begin(), it)].end(); it2++)
+        for(std::vector<ScrollingList*>::iterator it2 = it->begin(); it2 != it->end(); ++it2)
         {
-            ScrollingList *menu = *it2;
+            ScrollingList* menu = *it2;
             menu->playlistName = playlistName;
             menu->update(dt);
         }
@@ -1193,16 +1175,19 @@ void Page::update(float dt)
         textStatusComponent_->setText(status);
     }
 
-    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    for(std::vector<Component*>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
     {
-        if (*it) {
+        if (*it) 
+        {
             (*it)->playlistName = playlistName;
-            if ((*it)->update(dt) && (*it)->getAnimationDoneRemove()) {
+            if ((*it)->update(dt) && (*it)->getAnimationDoneRemove()) 
+            {
                 (*it)->freeGraphicsMemory();
             }
         }
     }
 }
+
 
 void Page::updateReloadables(float dt)
 {
@@ -1246,21 +1231,23 @@ void Page::draw()
 {
     for(unsigned int i = 0; i < NUM_LAYERS; ++i)
     {
+        // Drawing Components based on their layer
         for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
         {
-            if(*it && (*it)->baseViewInfo.Layer == i) (*it)->draw();
+            if(*it && (*it)->baseViewInfo.Layer == i) 
+                (*it)->draw();
         }
 
-        for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
+        // Drawing Menus
+        for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); ++it)
         {
-            for(std::vector<ScrollingList *>::iterator it2 = menus_[std::distance(menus_.begin(), it)].begin(); it2 != menus_[std::distance(menus_.begin(), it)].end(); it2++)
+            for(std::vector<ScrollingList*>::iterator it2 = it->begin(); it2 != it->end(); ++it2)
             {
                 ScrollingList *menu = *it2;
                 menu->draw(i);
             }
         }
     }
-
 }
 
 
@@ -1351,23 +1338,22 @@ CollectionInfo *Page::getCollection()
 
 void Page::freeGraphicsMemory()
 {
-    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
+    for (auto& menuVector : menus_)
     {
-        for(std::vector<ScrollingList *>::iterator it2 = menus_[std::distance(menus_.begin(), it)].begin(); it2 != menus_[std::distance(menus_.begin(), it)].end(); it2++)
+        for (ScrollingList* menu : menuVector)
         {
-            ScrollingList *menu = *it2;
             menu->freeGraphicsMemory();
         }
     }
 
-    if(loadSoundChunk_) loadSoundChunk_->free();
-    if(unloadSoundChunk_) unloadSoundChunk_->free();
-    if(highlightSoundChunk_) highlightSoundChunk_->free();
-    if(selectSoundChunk_) selectSoundChunk_->free();
+    if (loadSoundChunk_) loadSoundChunk_->free();
+    if (unloadSoundChunk_) unloadSoundChunk_->free();
+    if (highlightSoundChunk_) highlightSoundChunk_->free();
+    if (selectSoundChunk_) selectSoundChunk_->free();
 
-    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    for (Component* component : LayerComponents)
     {
-        (*it)->freeGraphicsMemory();
+        component->freeGraphicsMemory();
     }
 }
 
@@ -1376,26 +1362,33 @@ void Page::allocateGraphicsMemory()
 {
     Logger::write(Logger::ZONE_DEBUG, "Page", "Allocating graphics memory");
 
-    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
+    int currentDepth = 0;
+    for (auto& menuList : menus_)
     {
-        if ( std::distance(menus_.begin(), it) < (signed int)menuDepth_ )
+        if (currentDepth < static_cast<int>(menuDepth_))
         {
-            for(std::vector<ScrollingList *>::iterator it2 = menus_[std::distance(menus_.begin(), it)].begin(); it2 != menus_[std::distance(menus_.begin(), it)].end(); it2++)
+            for (auto& menu : menuList)
             {
-                ScrollingList *menu = *it2;
-                menu->allocateGraphicsMemory();
+                if (menu) 
+                {
+                    menu->allocateGraphicsMemory();
+                }
             }
         }
+        ++currentDepth;
     }
 
-    if(loadSoundChunk_) loadSoundChunk_->allocate();
-    if(unloadSoundChunk_) unloadSoundChunk_->allocate();
-    if(highlightSoundChunk_) highlightSoundChunk_->allocate();
-    if(selectSoundChunk_) selectSoundChunk_->allocate();
+    if (loadSoundChunk_) loadSoundChunk_->allocate();
+    if (unloadSoundChunk_) unloadSoundChunk_->allocate();
+    if (highlightSoundChunk_) highlightSoundChunk_->allocate();
+    if (selectSoundChunk_) selectSoundChunk_->allocate();
 
-    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    for (auto& component : LayerComponents)
     {
-        (*it)->allocateGraphicsMemory();
+        if (component) 
+        {
+            component->allocateGraphicsMemory();
+        }
     }
     Logger::write(Logger::ZONE_DEBUG, "Page", "Allocate graphics memory complete");
 }
@@ -1403,36 +1396,33 @@ void Page::allocateGraphicsMemory()
 
 void Page::deInitializeFonts()
 {
-    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
+    for (auto& menuVector : menus_)
     {
-        for(std::vector<ScrollingList *>::iterator it2 = menus_[std::distance(menus_.begin(), it)].begin(); it2 != menus_[std::distance(menus_.begin(), it)].end(); it2++)
+        for (ScrollingList* menu : menuVector)
         {
-            ScrollingList *menu = *it2;
-            menu->deInitializeFonts( );
+            menu->deInitializeFonts();
         }
     }
 
-    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    for (Component* component : LayerComponents)
     {
-        (*it)->deInitializeFonts();
+        component->deInitializeFonts();
     }
 }
 
-
 void Page::initializeFonts()
 {
-    for(MenuVector_T::iterator it = menus_.begin(); it != menus_.end(); it++)
+    for (auto& menuVector : menus_)
     {
-        for(std::vector<ScrollingList *>::iterator it2 = menus_[std::distance(menus_.begin(), it)].begin(); it2 != menus_[std::distance(menus_.begin(), it)].end(); it2++)
+        for (ScrollingList* menu : menuVector)
         {
-            ScrollingList *menu = *it2;
-            menu->initializeFonts( );
+            menu->initializeFonts();
         }
     }
 
-    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    for (Component* component : LayerComponents)
     {
-        (*it)->initializeFonts( );
+        component->initializeFonts();
     }
 }
 
@@ -1458,10 +1448,8 @@ bool Page::isSelectPlaying()
 
 void Page::reallocateMenuSpritePoints(bool updatePlaylistMenu)
 {
-    for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
+    for(ScrollingList *menu : activeMenu_)
     {
-        ScrollingList *menu = *it;
-        // if menu exists and is not a playlist or playlist menu is allowed to be updated
         if(menu && (!menu->isPlaylist() || updatePlaylistMenu))
         {
             menu->deallocateSpritePoints();
@@ -1479,48 +1467,45 @@ bool Page::isMenuScrolling()
 
 bool Page::isPlaying()
 {
-
-    bool retVal = false;
-
-    for(std::vector<Component *>::iterator it = LayerComponents.begin(); it != LayerComponents.end(); ++it)
+    for(auto& component : LayerComponents)
     {
-        if ((*it)->baseViewInfo.Monitor == 0) {
-            retVal |= (*it)->isPlaying();
+        if (component->baseViewInfo.Monitor == 0 && component->isPlaying())
+        {
+            return true;
         }
     }
-
-    return retVal;
-
+    return false;
 }
 
 
 void Page::resetScrollPeriod()
 {
-    for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
+    for(auto& menu : activeMenu_)
     {
-        ScrollingList *menu = *it;
-        if(menu) menu->resetScrollPeriod();
+        if(menu)
+        {
+            menu->resetScrollPeriod();
+        }
     }
-    return;
 }
 
 
 void Page::updateScrollPeriod()
 {
-    for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
+    for(auto& menu : activeMenu_)
     {
-        ScrollingList *menu = *it;
-        if(menu) menu->updateScrollPeriod();
+        if(menu)
+        {
+            menu->updateScrollPeriod();
+        }
     }
-    return;
 }
 
 
 void Page::scroll(bool forward)
 {
-    for(std::vector<ScrollingList *>::iterator it = activeMenu_.begin(); it != activeMenu_.end(); it++)
+    for(auto& menu : activeMenu_)
     {
-        ScrollingList *menu = *it;
         if(menu && !menu->isPlaylist())
         {
             menu->scroll(forward);
@@ -1531,7 +1516,6 @@ void Page::scroll(bool forward)
     {
         highlightSoundChunk_->play();
     }
-    return;
 }
 
 

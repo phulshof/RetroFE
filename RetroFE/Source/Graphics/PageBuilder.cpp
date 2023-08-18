@@ -1513,17 +1513,37 @@ void PageBuilder::getAnimationEvents(xml_node<> *node, TweenSet &tweens)
                 bool  fromDefined = true;
                 if (from)
                 {
-                    fromValue = Utils::convertFloat(from->value());
+                    std::string fromStr = from->value();
+                    if(fromStr == "left") {
+                        fromValue = 0.0f;
+                    } else if(fromStr == "center") {
+                        fromValue = static_cast<float>(layoutWidth_) / 2;
+                    } else if(fromStr == "right" || fromStr == "stretch") {
+                        fromValue = static_cast<float>(layoutWidth_);
+                    } else {
+                        fromValue = Utils::convertFloat(fromStr);
+                    }
                 }
                 else
                 {
-                   fromDefined = false;
+                    fromDefined = false;
                 }
+
                 float toValue = 0.0f;
                 if (to)
                 {
-                    toValue = Utils::convertFloat(to->value());
+                    std::string toStr = to->value();
+                    if(toStr == "left") {
+                        toValue = 0.0f;
+                    } else if(toStr == "center") {
+                        toValue = static_cast<float>(layoutWidth_) / 2;
+                    } else if(toStr == "right" || toStr == "stretch") {
+                        toValue = static_cast<float>(layoutWidth_);
+                    } else {
+                        toValue = Utils::convertFloat(toStr);
+                    }
                 }
+
                 float durationValue = Utils::convertFloat(durationXml->value());
 
                 TweenAlgorithm algorithm = LINEAR;
@@ -1532,7 +1552,6 @@ void PageBuilder::getAnimationEvents(xml_node<> *node, TweenSet &tweens)
                 if(algorithmXml)
                 {
                     algorithm = Tween::getTweenType(algorithmXml->value());
-
                 }
 
                 if(Tween::getTweenProperty(animateType, property))

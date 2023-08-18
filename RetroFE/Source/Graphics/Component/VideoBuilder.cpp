@@ -16,7 +16,6 @@
 
 #include "VideoBuilder.h"
 #include "../../Utility/Utils.h"
-#include "../../Utility/Log.h"
 #include "../../Video/VideoFactory.h"
 #include <fstream>
 
@@ -24,20 +23,12 @@
 VideoComponent * VideoBuilder::createVideo(std::string path, Page &page, std::string name, int monitor, bool isTypeVideo, int numLoops)
 {
     VideoComponent *component = NULL;
-    std::vector<std::string> extensions;
-
-    extensions.push_back("mp4");
-    extensions.push_back("MP4");
-    extensions.push_back("avi");
-    extensions.push_back("AVI");
-    extensions.push_back("mkv");
-    extensions.push_back("MKV");
-    extensions.push_back("mp3");
-    extensions.push_back("MP3");
-    extensions.push_back("wav");
-    extensions.push_back("WAV");
-    extensions.push_back("flac");
-    extensions.push_back("FLAC");
+    
+    // Declare the extensions vector as static so it's only initialized once.
+    static std::vector<std::string> extensions = {
+        "mp4", "MP4", "avi", "AVI", "mkv", "MKV",
+        "mp3", "MP3", "wav", "WAV", "flac", "FLAC"
+    };
 
     std::string prefix = Utils::combinePath(path, name);
     std::string file;
@@ -48,7 +39,6 @@ VideoComponent * VideoBuilder::createVideo(std::string path, Page &page, std::st
 
         if(video)
         {
-            Logger::write(Logger::ZONE_DEBUG, "Component", "Create - VideoC " + file);
             component = new VideoComponent(video, page, file);
         }
     }

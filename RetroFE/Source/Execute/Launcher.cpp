@@ -158,7 +158,10 @@ void Launcher::LEDBlinky( int command, std::string collection, Item *collectionI
 {
 	std::string LEDBlinkyDirectory = "";
 	config_.getProperty( "LEDBlinkyDirectory", LEDBlinkyDirectory );
-	std::string exe  = LEDBlinkyDirectory + "\\LEDBlinky.exe";
+	if (LEDBlinkyDirectory == "") {
+        return;
+    }
+    std::string exe  = LEDBlinkyDirectory + "\\LEDBlinky.exe";
 	std::string args = std::to_string( command );
 	bool wait = false;
 	if ( command == 2 )

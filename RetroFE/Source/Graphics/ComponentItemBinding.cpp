@@ -15,19 +15,7 @@
  */
 #include "ComponentItemBinding.h"
 
-ComponentItemBinding::ComponentItemBinding( Component *c, Item *item)
-    : component(c)
-    , item(item)
-{
-}
+ComponentItemBinding::ComponentItemBinding(Component* c, Item* i)
+    : component(c), item(i) {}
 
-ComponentItemBinding::ComponentItemBinding(Item *item)
-    : component(NULL)
-    , item(item)
-{
-}
-
-ComponentItemBinding::~ComponentItemBinding()
-{
-}
 

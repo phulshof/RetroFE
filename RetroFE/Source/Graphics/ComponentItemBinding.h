@@ -18,13 +18,17 @@
 #include "Component/Component.h"
 #include "../Collection/Item.h"
 
-class ComponentItemBinding
-{
+class ComponentItemBinding {
 public:
-    ComponentItemBinding(Component *c, Item *item);
-    ComponentItemBinding(Item *item);
-    virtual ~ComponentItemBinding();
+    // Default constructor and single-argument constructor have been combined.
+    ComponentItemBinding(Component* c = nullptr, Item* i = nullptr);
+    ~ComponentItemBinding() = default; // No dynamic memory to deallocate.
 
-    Component *component;
-    Item *item;
+    Component* getComponent() const { return component; }
+    Item* getItem() const { return item; }
+
+private:
+    Component* component;
+    Item* item;
 };
+

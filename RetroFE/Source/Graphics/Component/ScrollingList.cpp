@@ -38,6 +38,7 @@
 #include <sstream>
 #include <cctype>
 #include <iomanip>
+#include <algorithm>
 
 
 ScrollingList::ScrollingList( Configuration &c,
@@ -139,20 +140,23 @@ void ScrollingList::selectItemByName(std::string name)
     {
         index = loopDecrement(itemIndex_, i, size);
 
-        if (items_->at((index + selectedOffsetIndex_) % size)->name == name) {
+        if ((*items_)[(index + selectedOffsetIndex_) % size]->name == name) {
             itemIndex_ = index;
             break;
         }
     }
 }
 
+
 std::string ScrollingList::getSelectedItemName()
 {
-    if (!items_->size())
+    size_t size = items_->size();
+    if (!size)
         return "";
     
-    return items_->at((itemIndex_ + selectedOffsetIndex_) % static_cast<int>(items_->size()))->name;
+    return (*items_)[(itemIndex_ + selectedOffsetIndex_) % static_cast<int>(size)]->name;
 }
+
 
 unsigned int ScrollingList::loopIncrement(size_t offset, size_t index, size_t size )
 {
@@ -161,11 +165,13 @@ unsigned int ScrollingList::loopIncrement(size_t offset, size_t index, size_t si
 }
 
 
-unsigned int ScrollingList::loopDecrement(size_t offset, size_t index, size_t size )
+unsigned int ScrollingList::loopDecrement(size_t offset, size_t index, size_t size)
 {
-    if ( size == 0 ) return 0;
-    return static_cast<int>(((offset % size ) - (index % size ) + size ) % size);
+    if (size == 0) return 0;
+    size_t result = offset + size - index;
+    return static_cast<unsigned int>(result % size);
 }
+
 
 
 void ScrollingList::setScrollAcceleration( float value )
@@ -192,37 +198,43 @@ void ScrollingList::enableTextFallback(bool value)
 
 void ScrollingList::deallocateSpritePoints( )
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
+    size_t componentSize = components_.size();
+  
+    for ( unsigned int i = 0; i < componentSize; ++i )
     {
         deallocateTexture( i );
     }
 }
 
 
-void ScrollingList::allocateSpritePoints( )
+void ScrollingList::allocateSpritePoints()
 {
-    if ( !items_ || items_->size( ) == 0 ) return;
-    if ( !scrollPoints_ ) return;
-    if ( components_.size( ) == 0 ) return;
+    if (!items_ || items_->empty()) return;
+    if (!scrollPoints_ || scrollPoints_->empty()) return;
+    if (components_.empty()) return;
 
-    for ( unsigned int i = 0; i < scrollPoints_->size( ); ++i )
+    size_t itemsSize = items_->size();
+    size_t scrollPointsSize = scrollPoints_->size();
+
+    for (unsigned int i = 0; i < scrollPointsSize; ++i)
     {
-        unsigned int index  = loopIncrement( itemIndex_, i, items_->size());
-        Item *item = items_->at( index );
+        unsigned int index = loopIncrement(itemIndex_, i, itemsSize);
+        Item* item = (*items_)[index];  // using [] instead of at()
 
-        Component *old = components_.at( i );
+        Component* old = components_[i];  // using [] instead of at()
 
-        allocateTexture( i, item );
+        allocateTexture(i, item);
 
-        Component *c = components_.at( i );
-        if (c) {
+        Component* c = components_[i];  // using [] instead of at()
+        if (c)
+        {
             c->allocateGraphicsMemory();
-        
-            ViewInfo *view = scrollPoints_->at( i );
 
-            resetTweens( c, tweenPoints_->at( i ), view, view, 0 );
+            ViewInfo* view = (*scrollPoints_)[i];  // using [] instead of at()
 
-            if ( old && !newItemSelected )
+            resetTweens(c, (*tweenPoints_)[i], view, view, 0);  // using [] instead of at()
+
+            if (old && !newItemSelected)
             {
                 c->baseViewInfo = old->baseViewInfo;
                 delete old;
@@ -232,16 +244,20 @@ void ScrollingList::allocateSpritePoints( )
 }
 
 
-void ScrollingList::destroyItems( )
+
+void ScrollingList::destroyItems()
 {
-    for ( unsigned int i = 0; i < components_.size( ); ++i )
+    size_t componentSize = components_.size();
+
+    for (unsigned int i = 0; i < componentSize; ++i)
     {
-        if ( components_.at( i ) )
+        Component* component = components_[i];
+        if (component)
         {
-            components_.at( i )->freeGraphicsMemory( );
-            delete components_.at( i );
+            component->freeGraphicsMemory();
+            delete component;
+            components_[i] = NULL;
         }
-        components_.at( i ) = NULL;
     }
 }
 
@@ -287,30 +303,32 @@ void ScrollingList::setSelectedIndex( int selectedIndex )
 }
 
 
-Item *ScrollingList::getItemByOffset( int offset )
+Item *ScrollingList::getItemByOffset(int offset)
 {
+    size_t itemSize = items_->size();
+    if (!items_ || itemSize == 0) return NULL;
 
-    if ( !items_ || items_->size( ) == 0 ) return NULL;
-
-    unsigned int index = getSelectedIndex( );
-    if ( offset >= 0 )
+    unsigned int index = getSelectedIndex();
+    if (offset >= 0)
     {
-        index = loopIncrement( index, offset, items_->size( ) );
+        index = loopIncrement(index, offset, itemSize);
     }
     else
     {
-        index = loopDecrement( index, offset*-1, items_->size( ) );
+        index = loopDecrement(index, offset * -1, itemSize);
     }
     
-    return items_->at( index );
-
+    return (*items_)[index];
 }
+
 
 
 Item* ScrollingList::getSelectedItem()
 {
-    if (!items_ || items_->size() == 0) return NULL;
-    return items_->at(loopIncrement(itemIndex_, selectedOffsetIndex_, items_->size()));
+    size_t itemSize = items_->size();
+    if (!items_ || itemSize == 0) return NULL;
+    
+    return (*items_)[loopIncrement(itemIndex_, selectedOffsetIndex_, itemSize)];
 }
 
 
@@ -330,8 +348,9 @@ void ScrollingList::pageDown()
 
 void ScrollingList::random( )
 {
-    if ( !items_ || items_->size( ) == 0 ) return;
-    itemIndex_ = rand( ) % items_->size( );
+    size_t itemSize = items_->size();
+    if ( !items_ || itemSize == 0 ) return;
+    itemIndex_ = rand( ) % itemSize;
 }
 
 
@@ -347,63 +366,53 @@ void ScrollingList::letterDown( )
 }
 
 
-void ScrollingList::letterChange( bool increment)
+void ScrollingList::letterChange(bool increment)
 {
+    size_t itemSize = items_->size();
+    if (!items_ || itemSize == 0) return;
 
-    if ( !items_ || items_->size( ) == 0 ) return;
+    Item* startItem = (*items_)[(itemIndex_ + selectedOffsetIndex_) % itemSize];
+    std::string startname = (*items_)[(itemIndex_ + selectedOffsetIndex_) % itemSize]->lowercaseFullTitle();
 
-    Item       *startItem = items_->at( (itemIndex_+selectedOffsetIndex_ ) % items_->size( ) );
-    std::string startname = items_->at( (itemIndex_+selectedOffsetIndex_ ) % items_->size( ) )->lowercaseFullTitle( );
-
-    for ( unsigned int i = 0; i < items_->size( ); ++i )
+    for (unsigned int i = 0; i < itemSize; ++i)
     {
-        unsigned int index = 0;
-        if ( increment )
-        {
-            index = loopIncrement( itemIndex_, i, items_->size( ) );
-        }
-        else
-        {
-            index = loopDecrement( itemIndex_, i, items_->size( ) );
-        }
+        unsigned int index = increment ? loopIncrement(itemIndex_, i, itemSize) : loopDecrement(itemIndex_, i, itemSize);
 
-        std::string endname = items_->at( (index+selectedOffsetIndex_ ) % items_->size( ) )->lowercaseFullTitle( );
+        std::string endname = (*items_)[(index + selectedOffsetIndex_) % itemSize]->lowercaseFullTitle();
 
-        // check if we are changing characters from a-z, or changing from alpha character to non-alpha character
-        if ((isalpha(startname[0] ) ^ isalpha(endname[0] ) ) ||
-            (isalpha(startname[0] ) && isalpha(endname[0] ) && startname[0] != endname[0] ) )
+        if ((isalpha(startname[0]) ^ isalpha(endname[0])) ||
+            (isalpha(startname[0]) && isalpha(endname[0]) && startname[0] != endname[0]))
         {
             itemIndex_ = index;
             break;
         }
     }
 
-    if ( !increment ) // For decrement, find the first game of the new letter
+    if (!increment)
     {
         bool prevLetterSubToCurrent = false;
-        config_.getProperty( "prevLetterSubToCurrent", prevLetterSubToCurrent );
-        if ( !prevLetterSubToCurrent || items_->at( (itemIndex_+1+selectedOffsetIndex_ ) % items_->size( ) ) == startItem )
+        config_.getProperty("prevLetterSubToCurrent", prevLetterSubToCurrent);
+        if (!prevLetterSubToCurrent || (*items_)[(itemIndex_ + 1 + selectedOffsetIndex_) % itemSize] == startItem)
         {
-            startname = items_->at( (itemIndex_+selectedOffsetIndex_ ) % items_->size( ) )->lowercaseFullTitle( );
+            startname = (*items_)[(itemIndex_ + selectedOffsetIndex_) % itemSize]->lowercaseFullTitle();
 
-            for ( unsigned int i = 0; i < items_->size( ); ++i )
+            for (unsigned int i = 0; i < itemSize; ++i)
             {
-                unsigned int index = loopDecrement( itemIndex_, i, items_->size( ) );
+                unsigned int index = loopDecrement(itemIndex_, i, itemSize);
 
-                std::string endname = items_->at( (index+selectedOffsetIndex_ ) % items_->size( ) )->lowercaseFullTitle( );
+                std::string endname = (*items_)[(index + selectedOffsetIndex_) % itemSize]->lowercaseFullTitle();
 
-                // check if we are changing characters from a-z, or changing from alpha character to non-alpha character
-                if ((isalpha(startname[0] ) ^ isalpha(endname[0] ) ) ||
-                    (isalpha(startname[0] ) && isalpha(endname[0] ) && startname[0] != endname[0] ) )
+                if ((isalpha(startname[0]) ^ isalpha(endname[0])) ||
+                    (isalpha(startname[0]) && isalpha(endname[0]) && startname[0] != endname[0]))
                 {
-                    itemIndex_ = loopIncrement( index,1,items_->size( ) );
+                    itemIndex_ = loopIncrement(index, 1, itemSize);
                     break;
                 }
             }
         }
         else
         {
-            itemIndex_ = loopIncrement( itemIndex_,1,items_->size( ) );
+            itemIndex_ = loopIncrement(itemIndex_, 1, itemSize);
         }
     }
 }
@@ -423,25 +432,17 @@ void ScrollingList::metaDown(std::string attribute)
 
 void ScrollingList::metaChange(bool increment, std::string attribute)
 {
+    size_t itemSize = items_->size();
 
-    if (!items_ || items_->size() == 0) return;
+    if (!items_ || itemSize == 0) return;
 
-    Item* startItem = items_->at((itemIndex_ + selectedOffsetIndex_) % items_->size());
-    std::string startValue = items_->at((itemIndex_ + selectedOffsetIndex_) % items_->size())->getMetaAttribute(attribute);
+    Item* startItem = (*items_)[(itemIndex_ + selectedOffsetIndex_) % itemSize];
+    std::string startValue = (*items_)[(itemIndex_ + selectedOffsetIndex_) % itemSize]->getMetaAttribute(attribute);
 
-    for (unsigned int i = 0; i < items_->size(); ++i)
+    for (unsigned int i = 0; i < itemSize; ++i)
     {
-        unsigned int index = 0;
-        if (increment)
-        {
-            index = loopIncrement(itemIndex_, i, items_->size());
-        }
-        else
-        {
-            index = loopDecrement(itemIndex_, i, items_->size());
-        }
-
-        std::string endValue = items_->at((index + selectedOffsetIndex_) % items_->size())->getMetaAttribute(attribute);
+        unsigned int index = increment ? loopIncrement(itemIndex_, i, itemSize) : loopDecrement(itemIndex_, i, itemSize);
+        std::string endValue = (*items_)[(index + selectedOffsetIndex_) % itemSize]->getMetaAttribute(attribute);
 
         if (startValue != endValue) {
             itemIndex_ = index;
@@ -449,55 +450,46 @@ void ScrollingList::metaChange(bool increment, std::string attribute)
         }
     }
 
-    if (!increment) // For decrement, find the first game of the new meta attribute
+    if (!increment)
     {
         bool prevLetterSubToCurrent = false;
         config_.getProperty("prevLetterSubToCurrent", prevLetterSubToCurrent);
-        if (!prevLetterSubToCurrent || items_->at((itemIndex_ + 1 + selectedOffsetIndex_) % items_->size()) == startItem)
+        if (!prevLetterSubToCurrent || (*items_)[(itemIndex_ + 1 + selectedOffsetIndex_) % itemSize] == startItem)
         {
-            startValue = items_->at((itemIndex_ + selectedOffsetIndex_) % items_->size())->getMetaAttribute(attribute);
+            startValue = (*items_)[(itemIndex_ + selectedOffsetIndex_) % itemSize]->getMetaAttribute(attribute);
 
-            for (unsigned int i = 0; i < items_->size(); ++i)
+            for (unsigned int i = 0; i < itemSize; ++i)
             {
-                unsigned int index = loopDecrement(itemIndex_, i, items_->size());
-
-                std::string endValue = items_->at((index + selectedOffsetIndex_) % items_->size())->getMetaAttribute(attribute);
+                unsigned int index = loopDecrement(itemIndex_, i, itemSize);
+                std::string endValue = (*items_)[(index + selectedOffsetIndex_) % itemSize]->getMetaAttribute(attribute);
 
                 if (startValue != endValue) {
-                    itemIndex_ = loopIncrement(index, 1, items_->size());
+                    itemIndex_ = loopIncrement(index, 1, itemSize);
                     break;
                 }
             }
         }
         else
         {
-            itemIndex_ = loopIncrement(itemIndex_, 1, items_->size());
+            itemIndex_ = loopIncrement(itemIndex_, 1, itemSize);
         }
     }
 }
 
 
-void ScrollingList::subChange( bool increment )
+void ScrollingList::subChange(bool increment)
 {
+    size_t itemSize = items_->size();
 
-    if ( !items_ || items_->size( ) == 0 ) return;
+    if (!items_ || itemSize == 0) return;
 
-    Item       *startItem = items_->at( (itemIndex_+selectedOffsetIndex_ ) % items_->size( ) );
-    std::string startname = items_->at( (itemIndex_+selectedOffsetIndex_ ) % items_->size( ) )->collectionInfo->lowercaseName( );
+    Item* startItem = (*items_)[(itemIndex_ + selectedOffsetIndex_) % itemSize];
+    std::string startname = (*items_)[(itemIndex_ + selectedOffsetIndex_) % itemSize]->collectionInfo->lowercaseName();
 
-    for ( unsigned int i = 0; i < items_->size( ); ++i )
+    for (unsigned int i = 0; i < itemSize; ++i)
     {
-        unsigned int index = 0;
-        if ( increment )
-        {
-            index = loopIncrement( itemIndex_, i, items_->size( ) );
-        }
-        else
-        {
-            index = loopDecrement( itemIndex_, i, items_->size( ) );
-        }
-
-        std::string endname = items_->at( (index+selectedOffsetIndex_ ) % items_->size( ) )->collectionInfo->lowercaseName( );
+        unsigned int index = increment ? loopIncrement(itemIndex_, i, itemSize) : loopDecrement(itemIndex_, i, itemSize);
+        std::string endname = (*items_)[(index + selectedOffsetIndex_) % itemSize]->collectionInfo->lowercaseName();
 
         if (startname != endname)
         {
@@ -506,62 +498,61 @@ void ScrollingList::subChange( bool increment )
         }
     }
 
-    if ( !increment ) // For decrement, find the first game of the new sub
+    if (!increment) // For decrement, find the first game of the new sub
     {
         bool prevLetterSubToCurrent = false;
-        config_.getProperty( "prevLetterSubToCurrent", prevLetterSubToCurrent );
-        if ( !prevLetterSubToCurrent || items_->at( (itemIndex_+1+selectedOffsetIndex_ ) % items_->size( ) ) == startItem )
+        config_.getProperty("prevLetterSubToCurrent", prevLetterSubToCurrent);
+        if (!prevLetterSubToCurrent || (*items_)[(itemIndex_ + 1 + selectedOffsetIndex_) % itemSize] == startItem)
         {
-            startname = items_->at( (itemIndex_+selectedOffsetIndex_ ) % items_->size( ) )->collectionInfo->lowercaseName( );
+            startname = (*items_)[(itemIndex_ + selectedOffsetIndex_) % itemSize]->collectionInfo->lowercaseName();
 
-            for ( unsigned int i = 0; i < items_->size( ); ++i )
+            for (unsigned int i = 0; i < itemSize; ++i)
             {
-                unsigned int index = loopDecrement( itemIndex_, i, items_->size( ) );
-
-                std::string endname = items_->at( (index+selectedOffsetIndex_ ) % items_->size( ) )->collectionInfo->lowercaseName( );
+                unsigned int index = loopDecrement(itemIndex_, i, itemSize);
+                std::string endname = (*items_)[(index + selectedOffsetIndex_) % itemSize]->collectionInfo->lowercaseName();
 
                 if (startname != endname)
                 {
-                    itemIndex_ = loopIncrement( index,1,items_->size( ) );
+                    itemIndex_ = loopIncrement(index, 1, itemSize);
                     break;
                 }
             }
         }
         else
         {
-            itemIndex_ = loopIncrement( itemIndex_,1,items_->size( ) );
+            itemIndex_ = loopIncrement(itemIndex_, 1, itemSize);
         }
     }
 }
 
 
-void ScrollingList::cfwLetterSubUp( )
+void ScrollingList::cfwLetterSubUp()
 {
-    if (Utils::toLower( collectionName ) != items_->at( (itemIndex_+selectedOffsetIndex_ ) % items_->size( ) )->collectionInfo->lowercaseName( ))
-        subChange( true );
+    if (Utils::toLower(collectionName) != (*items_)[(itemIndex_+selectedOffsetIndex_) % items_->size()]->collectionInfo->lowercaseName())
+        subChange(true);
     else
-        letterChange( true );
+        letterChange(true);
 }
 
 
-void ScrollingList::cfwLetterSubDown( )
+void ScrollingList::cfwLetterSubDown()
 {
-    if (Utils::toLower( collectionName ) != items_->at( (itemIndex_+selectedOffsetIndex_ ) % items_->size( ) )->collectionInfo->lowercaseName( ))
+    if (Utils::toLower(collectionName) != (*items_)[(itemIndex_+selectedOffsetIndex_) % items_->size()]->collectionInfo->lowercaseName())
     {
-        subChange( false );
-        if (Utils::toLower( collectionName ) == items_->at( (itemIndex_+selectedOffsetIndex_ ) % items_->size( ) )->collectionInfo->lowercaseName( ))
+        subChange(false);
+        if (Utils::toLower(collectionName) == (*items_)[(itemIndex_+selectedOffsetIndex_) % items_->size()]->collectionInfo->lowercaseName())
         {
-            subChange( true );
-            letterChange( false );
+            subChange(true);
+            letterChange(false);
         }
     }
     else
     {
-        letterChange( false );
-        if (Utils::toLower( collectionName ) != items_->at( (itemIndex_+selectedOffsetIndex_ ) % items_->size( ) )->collectionInfo->lowercaseName( ))
+        letterChange(false);
+        if (Utils::toLower(collectionName) != (*items_)[(itemIndex_+selectedOffsetIndex_) % items_->size()]->collectionInfo->lowercaseName())
         {
-            letterChange( true );
-            subChange( false );
+            letterChange(true);
+            subChange(false);
         }
     }
 }
@@ -666,33 +657,39 @@ void ScrollingList::triggerJukeboxJumpEvent( int menuIndex )
 
 void ScrollingList::triggerEventOnAll(std::string event, int menuIndex)
 {
-    for (unsigned int i = 0; i < components_.size(); ++i)
+    size_t componentSize = components_.size();
+    for (unsigned int i = 0; i < componentSize; ++i)
     {
-        Component* c = components_.at(i);
+        Component* c = components_[i];
         if (c) c->triggerEvent(event, menuIndex);
     }
 }
 
-bool ScrollingList::update( float dt )
+
+bool ScrollingList::update(float dt)
 {
-    bool done = Component::update( dt );
+    bool done = Component::update(dt);
 
-    if (components_.size( ) == 0 ) 
+    if (components_.empty()) 
         return done;
-    if (!items_ ) 
+    if (!items_) 
         return done;
 
-    for ( unsigned int i = 0; i < scrollPoints_->size( ); i++ )
+    size_t scrollPointsSize = scrollPoints_->size();
+    
+    for (unsigned int i = 0; i < scrollPointsSize; i++)
     {
-        Component *c = components_.at( i );
-        if (c) {
+        Component *c = components_[i];
+        if (c) 
+        {
             c->playlistName = playlistName;
-           done &= c->update(dt);
+            done &= c->update(dt);
         }
     }
 
     return done;
 }
+
 
 
 unsigned int ScrollingList::getSelectedIndex( )
@@ -1075,7 +1072,7 @@ bool ScrollingList::allocateTexture( unsigned int index, Item *item )
 
     if ( t )
     {
-        components_.at( index ) = t;
+        components_[index] = t;
     }
 
     return true;
@@ -1086,7 +1083,7 @@ void ScrollingList::deallocateTexture( unsigned int index )
 {
     if ( components_.size(  ) <= index ) return;
 
-    Component *s = components_.at( index );
+    Component *s = components_[index];
 
     if ( s )
         s->freeGraphicsMemory(  );
@@ -1099,26 +1096,28 @@ void ScrollingList::draw(  )
 }
 
 
-void ScrollingList::draw( unsigned int layer )
+void ScrollingList::draw(unsigned int layer)
 {
+    size_t componentSize = components_.size();
     
-    if ( components_.size(  ) == 0 ) return;
+    if (componentSize == 0) return;
 
-    for ( unsigned int i = 0; i < components_.size(  ); ++i )
+    for (unsigned int i = 0; i < componentSize; ++i)
     {
-        Component *c = components_.at( i );
-        if ( c && c->baseViewInfo.Layer == layer ) c->draw(  );
+        Component *c = components_[i];
+        if (c && c->baseViewInfo.Layer == layer) c->draw();
     }
 }
 
 
 bool ScrollingList::isIdle(  )
 {
+    size_t componentSize = components_.size();
     if ( !Component::isIdle(  ) ) return false;
 
-    for ( unsigned int i = 0; i < components_.size(  ); ++i )
+    for ( unsigned int i = 0; i < componentSize; ++i )
     {
-        Component *c = components_.at( i );
+        Component *c = components_[i];
         if ( c && !c->isIdle(  ) ) return false;
     }
 
@@ -1128,11 +1127,12 @@ bool ScrollingList::isIdle(  )
 
 bool ScrollingList::isAttractIdle(  )
 {
+    size_t componentSize = components_.size();
     if ( !Component::isAttractIdle(  ) ) return false;
 
-    for ( unsigned int i = 0; i < components_.size(  ); ++i )
+    for ( unsigned int i = 0; i < componentSize; ++i )
     {
-        Component *c = components_.at( i );
+        Component *c = components_[i];
         if ( c && !c->isAttractIdle(  ) ) return false;
     }
 
@@ -1157,86 +1157,75 @@ void ScrollingList::updateScrollPeriod(  )
 }
 
 
-void ScrollingList::scroll( bool forward )
+void ScrollingList::scroll(bool forward)
 {
-    // playlist menus don't scroll
-    if (playlistType_)
+    // Exit conditions
+    if (playlistType_ || !items_ || items_->empty() || !scrollPoints_ || scrollPoints_->empty())
         return;
 
-    if ( !items_ || items_->size(  ) == 0 ) return;
-    if ( !scrollPoints_ || scrollPoints_->size(  ) == 0 ) return;
-
-    if ( scrollPeriod_ < minScrollTime_ )
-    {
+    if (scrollPeriod_ < minScrollTime_)
         scrollPeriod_ = minScrollTime_;
-    }
+
+    size_t itemsSize = items_->size();
+    size_t scrollPointsSize = scrollPoints_->size();
 
     // Replace the item that's scrolled out
-    if ( forward )
+    Item *i;
+    if (forward)
     {
-        Item *i    = items_->at( loopIncrement( itemIndex_, scrollPoints_->size(  ), items_->size(  ) ) );
-        itemIndex_ = loopIncrement( itemIndex_, 1, items_->size(  ) );
-        deallocateTexture( 0 );
-        allocateTexture( 0, i );
+        i = (*items_)[loopIncrement(itemIndex_, scrollPointsSize, itemsSize)];
+        itemIndex_ = loopIncrement(itemIndex_, 1, itemsSize);
+        deallocateTexture(0);
+        allocateTexture(0, i);
     }
     else
     {
-        Item *i    = items_->at( loopDecrement( itemIndex_, 1, items_->size(  ) ) );
-        itemIndex_ = loopDecrement( itemIndex_, 1, items_->size(  ) );
-        deallocateTexture( loopDecrement( 0, 1, components_.size(  ) ) );
-        allocateTexture( loopDecrement( 0, 1, components_.size(  ) ), i );
+        i = (*items_)[loopDecrement(itemIndex_, 1, itemsSize)];
+        itemIndex_ = loopDecrement(itemIndex_, 1, itemsSize);
+        deallocateTexture(loopDecrement(0, 1, components_.size()));
+        allocateTexture(loopDecrement(0, 1, components_.size()), i);
     }
 
     // Set the animations
-    for ( unsigned int i = 0; i < scrollPoints_->size(  ); i++ )
+    for (size_t i = 0; i < scrollPointsSize; ++i)
     {
-        unsigned int nextI;
-        if ( forward )
+        size_t nextI;
+        if (forward) 
         {
-            nextI = loopDecrement( i, 1, scrollPoints_->size(  ) );
+            nextI = (i == 0) ? scrollPointsSize - 1 : i - 1;
         }
         else
         {
-            nextI = loopIncrement( i, 1, scrollPoints_->size(  ) );
+            nextI = (i == scrollPointsSize - 1) ? 0 : i + 1;
         }
 
-        Component *c = components_.at( i );
-        if (c) {
-            c->allocateGraphicsMemory();
+        Component *c = components_[i];
+        if (c)
+        {
+            auto& nextTweenPoint = (*tweenPoints_)[nextI];
+            auto& currentScrollPoint = (*scrollPoints_)[i];
+            auto& nextScrollPoint = (*scrollPoints_)[nextI];
 
-            resetTweens(c, tweenPoints_->at(nextI), scrollPoints_->at(i), scrollPoints_->at(nextI), scrollPeriod_);
-            c->baseViewInfo.font = scrollPoints_->at(nextI)->font; // Use the font settings of the next index
+            c->allocateGraphicsMemory();
+            resetTweens(c, nextTweenPoint, currentScrollPoint, nextScrollPoint, scrollPeriod_);
+            c->baseViewInfo.font = nextScrollPoint->font;
             c->triggerEvent("menuScroll");
         }
     }
 
-    // Reorder the components
-    Component *c = components_.at( 0 );
-    if ( forward )
+    // Reorder the components using std::rotate
+    if (forward)
     {
-        for (size_t i = scrollPoints_->size(  ); i > 0; i-- )
-        {
-            unsigned int prevI = loopDecrement( i, 1, scrollPoints_->size(  ) );
-            Component *store   = components_.at( prevI );
-            components_[prevI] = c;
-            c                  = store;
-            
-        }
+        std::rotate(components_.begin(), components_.begin() + 1, components_.begin() + scrollPointsSize);
     }
     else
     {
-        for (size_t i = 0; i < scrollPoints_->size(  ); i++ )
-        {
-            unsigned int nextI = loopIncrement( i, 1, scrollPoints_->size(  ) );
-            Component *store   = components_.at( nextI );
-            components_[nextI] = c;
-            c                  = store;
-            
-        }
+        std::rotate(components_.begin(), components_.end() - 1, components_.end());
     }
 
     return;
 }
+
 
 bool ScrollingList::isPlaylist()
 {

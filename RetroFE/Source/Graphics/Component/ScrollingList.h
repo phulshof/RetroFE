@@ -114,8 +114,8 @@ public:
 private:
 
     void resetTweens( Component *c, AnimationEvents *sets, ViewInfo *currentViewInfo, ViewInfo *nextViewInfo, double scrollTime );
-    unsigned int loopIncrement(size_t offset, size_t i, size_t size );
-    unsigned int loopDecrement(size_t offset, size_t i, size_t size );
+    inline unsigned int loopIncrement(size_t offset, size_t i, size_t size );
+    inline unsigned int loopDecrement(size_t offset, size_t i, size_t size );
 
     bool layoutMode_;
     bool commonMode_;

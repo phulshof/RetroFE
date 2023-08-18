@@ -382,6 +382,12 @@ bool CollectionInfoBuilder::ImportDirectory(CollectionInfo *info, std::string me
         delete it->second;
         excludeFilter.erase(it);
     }
+    while (curretPlayCountList.size() > 0)
+    {
+        std::map<std::string, Item*>::iterator it = curretPlayCountList.begin();
+        delete it->second;
+        curretPlayCountList.erase(it);
+    }
 
     return true;
 }
@@ -542,7 +548,7 @@ void CollectionInfoBuilder::loadPlaylistItems(CollectionInfo* info, std::map<std
         std::string basename = (std::string::npos == position) ? file : file.substr(0, position);
 
         std::string comparator = ".txt";
-        size_t start = file.length() >= comparator.length() ? file.length() - comparator.length() : 0;
+        size_t start = file.length() - comparator.length();
 
         if (start >= 0)
         {
@@ -924,35 +930,38 @@ void CollectionInfoBuilder::ImportRomDirectory(std::string path, CollectionInfo 
                 for(extensionsIt = extensions.begin(); extensionsIt != extensions.end(); ++extensionsIt)
                 {
                     std::string comparator = "." + *extensionsIt;
-                    size_t start = file.length() >= comparator.length() + 1 ? file.length() - comparator.length() + 1 : 0;
+                    size_t start = file.length() - comparator.length() + 1;
 
                     if (start >= 0)
                     {
                         if (file.compare(start, comparator.length(), *extensionsIt) == 0)
                         {
-                            Item *i = new Item();
-
-                            i->name           = basename;
-                            i->fullTitle      = basename;
-                            i->title          = basename;
-                            i->collectionInfo = info;
-                            i->filepath       = path + Utils::pathSeparator;
-
-                            if ( emuarc )
-                            {
-                                i->file      = basename;
-                                i->name      = Utils::getFileName( path );
-                                i->fullTitle = i->name;
-                                i->title     = i->name;
-                            }
-
                             // Add item if it doesn't already exist
                             bool found = false;
-                            for ( std::vector<Item*>::iterator it = info->items.begin(); it != info->items.end( ); it++ )
-                               if ( (*it)->name == basename )
-                                   found = true;
-                            if ( !found )
+                            for (std::vector<Item*>::iterator it = info->items.begin(); it != info->items.end(); it++) {
+                                if ((*it)->name == basename) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                Item* i = new Item();
+
+                                i->name = basename;
+                                i->fullTitle = basename;
+                                i->title = basename;
+                                i->collectionInfo = info;
+                                i->filepath = path + Utils::pathSeparator;
+
+                                if (emuarc)
+                                {
+                                    i->file = basename;
+                                    i->name = Utils::getFileName(path);
+                                    i->fullTitle = i->name;
+                                    i->title = i->name;
+                                }
                                 info->items.push_back(i);
+                            }
                         }
                     }
                 }

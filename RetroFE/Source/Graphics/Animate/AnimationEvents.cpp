@@ -47,41 +47,39 @@ Animation *AnimationEvents::getAnimation(std::string tween)
 
 Animation *AnimationEvents::getAnimation(std::string tween, int index)
 {
-    if(animationMap_.find(tween) == animationMap_.end())
+    if(animationMap_[tween].find(-1) == animationMap_[tween].end())
+    {
         animationMap_[tween][-1] = new Animation();
+    }
 
     if(animationMap_[tween].find(index) == animationMap_[tween].end())
     {
         index = -1;
-        if(animationMap_[tween].find(index) == animationMap_[tween].end())
-        {
-            animationMap_[tween][index] = new Animation();
-        }
     }
+
     return animationMap_[tween][index];
 }
 
+
 void AnimationEvents::setAnimation(std::string tween, int index, Animation *animation)
 {
+    if(animationMap_[tween].find(index) != animationMap_[tween].end())
+    {
+        delete animationMap_[tween][index];
+    }
     animationMap_[tween][index] = animation;
 }
 
+
 void AnimationEvents::clear()
 {
-    std::map<std::string, std::map<int, Animation *> >::iterator it = animationMap_.begin();
-    while(it != animationMap_.end())
+    for (auto &outerPair : animationMap_)
     {
-        std::map<int, Animation *>::iterator it2 = (it->second).begin();
-        while(it2 != (it->second).end())
+        for (auto &innerPair : outerPair.second)
         {
-            delete it2->second;
-            (it->second).erase(it2);
+            delete innerPair.second;
         }
-
-        (it->second).clear();
-        animationMap_.erase(it);
-        it = animationMap_.begin();
+        outerPair.second.clear();
     }
-
     animationMap_.clear();
 }

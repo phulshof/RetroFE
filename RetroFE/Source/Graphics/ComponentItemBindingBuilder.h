@@ -16,15 +16,13 @@
 #pragma once
 
 #include <vector>
-#include <string>
+#include "ComponentItemBinding.h"
 
-class Item;
-class ComponentItemBinding;
-
-class ComponentItemBindingBuilder
-{
+class ComponentItemBindingBuilder {
 public:
-    ComponentItemBindingBuilder();
-    virtual ~ComponentItemBindingBuilder();
-    static std::vector<ComponentItemBinding *> *buildCollectionItems(std::vector<Item *> *infoList);
+    ComponentItemBindingBuilder() = default;
+    ~ComponentItemBindingBuilder() = default;
+
+    // Return by value to take advantage of RVO.
+    static std::vector<ComponentItemBinding> buildCollectionItems(const std::vector<Item*>& infoList);
 };

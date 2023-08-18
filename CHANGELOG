@@ -31,6 +31,11 @@ v0.10.34.2
 	- fixed layer count tide to numScreens setting, also allow single screen to allow second monitor show desktop (monkofthefunk)
 	- fixed updating layout defined controls upon "back" menu/layout change (monkofthefunk)
 	- added disableVideoRestart to turn off a layout's "restart" on video selected (monkofthefunk)
+    - big optimization pass, refactored functions for speed/clarity (inigomontoya)
+    - fixed case where if Windows scaling was set to anything other than 100%, SDL would create an inappropriate size window and let windows scale it (inigomontoya)
+    - if LEDBlinkyDirectory is not set or absent, LEDBlinky is disabled (inigomontoya)
+    - fixed memory leak in CollectionInfoBuilder (monkofthefunk)
+    - fixed case in layouts where "center" in from or to fields would always be 0. (inigomontoya)
 
 v0.10.34.1
 	- added vsync; fix if vSync is yes skip SDL_Delay fps limiter (inigomonyota)

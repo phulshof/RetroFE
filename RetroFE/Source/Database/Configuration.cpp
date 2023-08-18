@@ -342,30 +342,19 @@ void Configuration::childKeyCrumbs(std::string parent, std::vector<std::string> 
     }
 }
 
-std::string Configuration::convertToAbsolutePath(std::string prefix, std::string path)
+std::string Configuration::convertToAbsolutePath(const std::string& prefix, const std::string& path)
 {
-    char first = ' ';
-    char second = ' ';
-
-    if(path.length() >= 0)
-    {
-        first = path.c_str()[0];
-    }
-    if(path.length() >= 1)
-    {
-        second = path.c_str()[1];
-    }
+    char first = (path.size() > 0) ? path[0] : ' ';
+    char second = (path.size() > 1) ? path[1] : ' ';
 
     // check to see if it is already an absolute path
-    if((first != Utils::pathSeparator) &&
-            //(first != '.') &&
-            (second != ':'))
+    if((first != Utils::pathSeparator) && (second != ':'))
     {
-        path = Utils::combinePath(prefix, path);
+        return Utils::combinePath(prefix, path);
     }
-
     return path;
 }
+
 
 bool Configuration::getPropertyAbsolutePath(std::string key, std::string &value)
 {

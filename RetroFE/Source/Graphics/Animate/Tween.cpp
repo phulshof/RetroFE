@@ -14,13 +14,62 @@
  * along with RetroFE.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Tween.h"
+#include "../../Utility/Log.h"
 #include <algorithm>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <string>
 
-std::map<std::string, TweenAlgorithm> Tween::tweenTypeMap_;
-std::map<std::string, TweenProperty> Tween::tweenPropertyMap_;
+std::map<std::string, TweenAlgorithm> Tween::tweenTypeMap_ = {
+    {"easeinquadratic", EASE_IN_QUADRATIC},
+    {"easeoutquadratic", EASE_OUT_QUADRATIC},
+    {"easeinoutquadratic", EASE_INOUT_QUADRATIC},
+    {"easeincubic", EASE_IN_CUBIC},
+    {"easeoutcubic", EASE_OUT_CUBIC},
+    {"easeinoutcubic", EASE_INOUT_CUBIC},
+    {"easeinquartic", EASE_IN_QUARTIC},
+    {"easeoutquartic", EASE_OUT_QUARTIC},
+    {"easeinoutquartic", EASE_INOUT_QUARTIC},
+    {"easeinquintic", EASE_IN_QUINTIC},
+    {"easeoutquintic", EASE_OUT_QUINTIC},
+    {"easeonoutquintic", EASE_INOUT_QUINTIC},
+    {"easeinsine", EASE_IN_SINE},
+    {"easeoutsine", EASE_OUT_SINE},
+    {"easeinoutsine", EASE_INOUT_SINE},
+    {"easeinexponential", EASE_IN_EXPONENTIAL},
+    {"easeoutexponential", EASE_OUT_EXPONENTIAL},
+    {"easeinoutexponential", EASE_INOUT_EXPONENTIAL},
+    {"easeincircular", EASE_IN_CIRCULAR},
+    {"easeoutcircular", EASE_OUT_CIRCULAR},
+    {"easeinoutcircular", EASE_INOUT_CIRCULAR},
+    {"linear", LINEAR}
+};
+
+
+std::map<std::string, TweenProperty> Tween::tweenPropertyMap_ = {
+    {"x", TWEEN_PROPERTY_X},
+    {"y", TWEEN_PROPERTY_Y},
+    {"angle", TWEEN_PROPERTY_ANGLE},
+    {"alpha", TWEEN_PROPERTY_ALPHA},
+    {"width", TWEEN_PROPERTY_WIDTH},
+    {"height", TWEEN_PROPERTY_HEIGHT},
+    {"xorigin", TWEEN_PROPERTY_X_ORIGIN},
+    {"yorigin", TWEEN_PROPERTY_Y_ORIGIN},
+    {"xoffset", TWEEN_PROPERTY_X_OFFSET},
+    {"yoffset", TWEEN_PROPERTY_Y_OFFSET},
+    {"fontsize", TWEEN_PROPERTY_FONT_SIZE},
+    {"backgroundalpha", TWEEN_PROPERTY_BACKGROUND_ALPHA},
+    {"maxwidth", TWEEN_PROPERTY_MAX_WIDTH},
+    {"maxheight", TWEEN_PROPERTY_MAX_HEIGHT},
+    {"layer", TWEEN_PROPERTY_LAYER},
+    {"containerx", TWEEN_PROPERTY_CONTAINER_X},
+    {"containery", TWEEN_PROPERTY_CONTAINER_Y},
+    {"containerwidth", TWEEN_PROPERTY_CONTAINER_WIDTH},
+    {"containerheight", TWEEN_PROPERTY_CONTAINER_HEIGHT},
+    {"volume", TWEEN_PROPERTY_VOLUME},
+    {"nop", TWEEN_PROPERTY_NOP},
+    {"restart", TWEEN_PROPERTY_RESTART}
+};
 
 Tween::Tween(TweenProperty property, TweenAlgorithm type, double start, double end, double duration, std::string playlistFilter)
     : property(property)
@@ -36,76 +85,22 @@ Tween::Tween(TweenProperty property, TweenAlgorithm type, double start, double e
 
 bool Tween::getTweenProperty(std::string name, TweenProperty &property)
 {
-    bool retVal = false;
-
-    if(tweenPropertyMap_.size() == 0)
-    {
-        tweenPropertyMap_["x"]               = TWEEN_PROPERTY_X;
-        tweenPropertyMap_["y"]               = TWEEN_PROPERTY_Y;
-        tweenPropertyMap_["angle"]           = TWEEN_PROPERTY_ANGLE;
-        tweenPropertyMap_["alpha"]           = TWEEN_PROPERTY_ALPHA;
-        tweenPropertyMap_["width"]           = TWEEN_PROPERTY_WIDTH;
-        tweenPropertyMap_["height"]          = TWEEN_PROPERTY_HEIGHT;
-        tweenPropertyMap_["xorigin"]         = TWEEN_PROPERTY_X_ORIGIN;
-        tweenPropertyMap_["yorigin"]         = TWEEN_PROPERTY_Y_ORIGIN;
-        tweenPropertyMap_["xoffset"]         = TWEEN_PROPERTY_X_OFFSET;
-        tweenPropertyMap_["yoffset"]         = TWEEN_PROPERTY_Y_OFFSET;
-        tweenPropertyMap_["fontSize"]        = TWEEN_PROPERTY_FONT_SIZE;
-        tweenPropertyMap_["backgroundalpha"] = TWEEN_PROPERTY_BACKGROUND_ALPHA;
-        tweenPropertyMap_["maxwidth"]        = TWEEN_PROPERTY_MAX_WIDTH;
-        tweenPropertyMap_["maxheight"]       = TWEEN_PROPERTY_MAX_HEIGHT;
-        tweenPropertyMap_["layer"]           = TWEEN_PROPERTY_LAYER;
-        tweenPropertyMap_["containerx"]      = TWEEN_PROPERTY_CONTAINER_X;
-        tweenPropertyMap_["containery"]      = TWEEN_PROPERTY_CONTAINER_Y;
-        tweenPropertyMap_["containerwidth"]  = TWEEN_PROPERTY_CONTAINER_WIDTH;
-        tweenPropertyMap_["containerheight"] = TWEEN_PROPERTY_CONTAINER_HEIGHT;
-        tweenPropertyMap_["volume"]          = TWEEN_PROPERTY_VOLUME;
-        tweenPropertyMap_["nop"]             = TWEEN_PROPERTY_NOP;
-        tweenPropertyMap_["restart"] = TWEEN_PROPERTY_RESTART;
-    }
-
     std::transform(name.begin(), name.end(), name.begin(), ::tolower);
 
     if(tweenPropertyMap_.find(name) != tweenPropertyMap_.end())
     {
         property = tweenPropertyMap_[name];
-        retVal = true;
+        return true;
     }
 
-    return retVal;
+    return false;
 }
 
 
 TweenAlgorithm Tween::getTweenType(std::string name)
 {
-    if(tweenTypeMap_.size() == 0)
-    {
-        tweenTypeMap_["easeinquadratic"] = EASE_IN_QUADRATIC;
-        tweenTypeMap_["easeoutquadratic"] = EASE_OUT_QUADRATIC;
-        tweenTypeMap_["easeinoutquadratic"] = EASE_INOUT_QUADRATIC;
-        tweenTypeMap_["easeincubic"] = EASE_IN_CUBIC;
-        tweenTypeMap_["easeoutcubic"] = EASE_OUT_CUBIC;
-        tweenTypeMap_["easeinoutcubic"] = EASE_INOUT_CUBIC;
-        tweenTypeMap_["easeinquartic"] = EASE_IN_QUARTIC;
-        tweenTypeMap_["easeoutquartic"] = EASE_OUT_QUARTIC;
-        tweenTypeMap_["easeinoutquartic"] = EASE_INOUT_QUARTIC;
-        tweenTypeMap_["easeinquintic"] = EASE_IN_QUINTIC;
-        tweenTypeMap_["easeoutquintic"] = EASE_OUT_QUINTIC;
-        tweenTypeMap_["easeonoutquintic"] = EASE_INOUT_QUINTIC;
-        tweenTypeMap_["easeinsine"] = EASE_IN_SINE;
-        tweenTypeMap_["easeoutsine"] = EASE_OUT_SINE;
-        tweenTypeMap_["easeinoutsine"] = EASE_INOUT_SINE;
-        tweenTypeMap_["easeinexponential"] = EASE_IN_EXPONENTIAL;
-        tweenTypeMap_["easeoutexponential"] = EASE_OUT_EXPONENTIAL;
-        tweenTypeMap_["easeinoutexponential"] = EASE_INOUT_EXPONENTIAL;
-        tweenTypeMap_["easeincircular"] = EASE_IN_CIRCULAR;
-        tweenTypeMap_["easeoutcircular"] = EASE_OUT_CIRCULAR;
-        tweenTypeMap_["easeinoutcircular"] = EASE_INOUT_CIRCULAR;
-        tweenTypeMap_["linear"] = LINEAR;
-    }
-
     std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-
+   
     if(tweenTypeMap_.find(name) != tweenTypeMap_.end())
     {
         return tweenTypeMap_[name];

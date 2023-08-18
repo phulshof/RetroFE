@@ -594,6 +594,7 @@ bool RetroFE::run( )
                 input_.resetStates( );
             }
             currentPage_->playlistExit( );
+            currentPage_->resetScrollPeriod( );
             currentPage_->setScrolling(Page::ScrollDirectionIdle);
             state = RETROFE_PLAYLIST_EXIT;
             break;

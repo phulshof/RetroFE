@@ -45,6 +45,14 @@ bool SDL::initialize( Configuration &config )
     int         audioBuffers  = 4096;
     bool        hideMouse;
 	
+#ifdef WIN32
+    if (!SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE)) 
+    {
+    Logger::write( Logger::ZONE_ERROR, "SDL", "Unable to set DPI awareness hint" );
+    }
+#endif    
+
+    
     Logger::write( Logger::ZONE_INFO, "SDL", "Initializing" );
     if ( SDL_Init( SDL_INIT_TIMER | SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS ) != 0 )
     {
