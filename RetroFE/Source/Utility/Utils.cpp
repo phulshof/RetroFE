@@ -23,7 +23,6 @@
 #include <dirent.h>
 #include <locale>
 #include <list>
-#include <filesystem>
 
 #ifdef WIN32
     #include <Windows.h>
@@ -82,30 +81,82 @@ std::string Utils::filterComments(std::string line)
     return line;
 }
 
-std::string Utils::combinePath(const std::list<std::string>& paths)
+std::string Utils::combinePath(std::list<std::string> &paths)
 {
-    std::filesystem::path result;
-    for (const auto& p : paths)
+    std::list<std::string>::iterator it = paths.begin();
+    std::string path;
+
+    if(it != paths.end())
     {
-        result /= p;
+        path += *it;
+        it++;
     }
-    return result.string();
+
+
+    while(it != paths.end())
+    {
+        path += Utils::pathSeparator;
+        path += *it;
+        it++;
+    }
+
+    return path;
+}
+
+std::string Utils::combinePath(std::string path1, std::string path2)
+{
+    std::list<std::string> paths;
+    paths.push_back(path1);
+    paths.push_back(path2);
+    return combinePath(paths);
+}
+
+std::string Utils::combinePath(std::string path1, std::string path2, std::string path3)
+{
+    std::list<std::string> paths;
+    paths.push_back(path1);
+    paths.push_back(path2);
+    paths.push_back(path3);
+    return combinePath(paths);
+}
+
+std::string Utils::combinePath(std::string path1, std::string path2, std::string path3, std::string path4)
+{
+    std::list<std::string> paths;
+    paths.push_back(path1);
+    paths.push_back(path2);
+    paths.push_back(path3);
+    paths.push_back(path4);
+    return combinePath(paths);
+}
+std::string Utils::combinePath(std::string path1, std::string path2, std::string path3, std::string path4, std::string path5)
+{
+    std::list<std::string> paths;
+    paths.push_back(path1);
+    paths.push_back(path2);
+    paths.push_back(path3);
+    paths.push_back(path4);
+    paths.push_back(path5);
+    return combinePath(paths);
 }
 
 
-bool Utils::findMatchingFile(const std::string& prefix, const std::vector<std::string>& extensions, std::string& file)
+bool Utils::findMatchingFile(std::string prefix, std::vector<std::string> &extensions, std::string &file)
 {
-    for(const auto& ext : extensions)
+    for(unsigned int i = 0; i < extensions.size(); ++i)
     {
-        std::string temp = prefix + "." + ext;
+        std::string temp = prefix + "." + extensions[i];
         temp = Configuration::convertToAbsolutePath(Configuration::absolutePath, temp);
 
-        if(std::filesystem::exists(temp)) 
+        std::ifstream f(temp.c_str());
+
+        if (f.good())
         {
             file = temp;
             return true;
         }
     }
+
     return false;
 }
 
@@ -118,21 +169,31 @@ std::string Utils::replace(
     size_t pos = 0;
     while ((pos = subject.find(search, pos)) != std::string::npos)
     {
-        subject.erase(pos, search.length());
-        subject.insert(pos, replace);
+        subject.replace(pos, search.length(), replace);
         pos += replace.length();
     }
     return subject;
 }
 
 
-float Utils::convertFloat(const std::string& content)
+float Utils::convertFloat(std::string content)
 {
-    return std::stof(content);
+    float retVal = 0;
+    std::stringstream ss;
+    ss << content;
+    ss >> retVal;
+
+    return retVal;
 }
 
-int Utils::convertInt(const std::string& content) {
-    return std::stoi(content);
+int Utils::convertInt(std::string content)
+{
+    int retVal = 0;
+    std::stringstream ss;
+    ss << content;
+    ss >> retVal;
+
+    return retVal;
 }
 
 void Utils::replaceSlashesWithUnderscores(std::string &content)
@@ -211,25 +272,23 @@ std::string Utils::trimEnds(std::string str)
 }
 
 
-void Utils::listToVector(const std::string& str, std::vector<std::string>& vec, char delimiter)
+void Utils::listToVector( std::string str, std::vector<std::string> &vec, char delimiter = ',' )
 {
-    size_t previous = 0;
-    size_t current;
-
-    std::string value;  // Use this outside the loop and reuse it
-
-    while ((current = str.find(delimiter, previous)) != std::string::npos)
+    std::string value;
+    std::size_t current, previous = 0;
+    current = str.find( delimiter );
+    while (current != std::string::npos)
     {
-        value = trimEnds(str.substr(previous, current - previous));
-        if (!value.empty()) {
-            vec.push_back(std::move(value));  // Use std::move to avoid copying the string
+        value = Utils::trimEnds(str.substr(previous, current - previous));
+        if (value != "") {
+            vec.push_back(value);
         }
         previous = current + 1;
+        current  = str.find( delimiter, previous );
     }
-
-    value = trimEnds(str.substr(previous));
-    if (!value.empty()) {
-        vec.push_back(std::move(value));
+    value = Utils::trimEnds(str.substr(previous, current - previous));
+    if (value != "") {
+        vec.push_back(value);
     }
 }
 
