@@ -52,6 +52,7 @@ public:
     unsigned long long getDuration( );
     bool isPaused( );
     void hide(bool hide);
+    int getNumLoops( );
 
 private:
     static void processNewBuffer (GstElement *fakesink, GstBuffer *buf, GstPad *pad, gpointer data);
@@ -77,4 +78,5 @@ private:
     bool paused_;
     bool MuteVideo;
     bool hide_;
+    gint nv12BufferSize_;
 };

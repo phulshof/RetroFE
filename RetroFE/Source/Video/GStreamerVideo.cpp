@@ -55,6 +55,7 @@ GStreamerVideo::GStreamerVideo( int monitor )
     , monitor_(monitor)
 	, MuteVideo(Configuration::MuteVideo)
     , hide_(false)
+    , nv12BufferSize_(0)
 {
     paused_ = false;
 }
@@ -88,9 +89,15 @@ void GStreamerVideo::processNewBuffer(GstElement * /* fakesink */, GstBuffer *bu
                 GstStructure *s = gst_caps_get_structure(caps, 0);
                 gst_structure_get_int(s, "width", &video->width_);
                 gst_structure_get_int(s, "height", &video->height_);
+                video->nv12BufferSize_ = video->width_ * video->height_ * 3 / 2;
                 gst_caps_unref(caps);  // Don't forget to unref the caps
+                if (!video->width_ || !video->height_)
+                {
+                    video->width_ = 0;
+                    video->height_ = 0;
+                }
             }
-            if (video->height_ && video->width_ && !video->videoBuffer_)
+            if (video->width_ && !video->videoBuffer_)
             {
                 video->videoBuffer_ = gst_buffer_ref(buf);
                 video->frameReady_ = true;
@@ -181,7 +188,9 @@ bool GStreamerVideo::stop()
     height_ = 0;
     width_ = 0;
     frameReady_ = false;
-
+    
+    Logger::write(Logger::ZONE_DEBUG, "GStreamerVideo", "Stopped " + Utils::getFileName(currentFile_));
+    
     return true;
 }
 
@@ -202,7 +211,7 @@ bool GStreamerVideo::play(std::string file)
 
     currentFile_ = file;
 
-    stop();
+    //stop();
 
     gchar *uriFile = gst_filename_to_uri (file.c_str(), NULL);
     if(!uriFile)
@@ -322,6 +331,8 @@ bool GStreamerVideo::play(std::string file)
 
         /* Start playing */
         GstStateChangeReturn playState = gst_element_set_state(GST_ELEMENT(playbin_), GST_STATE_PLAYING);
+        Logger::write(Logger::ZONE_DEBUG, "GStreamerVideo", "Playing " + Utils::getFileName(currentFile_));
+        
         //gst_debug_bin_to_dot_file(GST_BIN(playbin_), GST_DEBUG_GRAPH_SHOW_ALL, "pipeline");
         if (playState != GST_STATE_CHANGE_ASYNC)
         {
@@ -412,7 +423,7 @@ void GStreamerVideo::update(float /* dt */)
 	if (!hide_)
 	{
         SDL_LockMutex(SDL::getMutex());
-        if (!texture_ && width_ != 0 && height_ != 0)
+        if (!texture_ && width_ != 0) //no need to check height here
         {
             texture_ = SDL_CreateTexture(SDL::getRenderer(monitor_), SDL_PIXELFORMAT_NV12,
                                         SDL_TEXTUREACCESS_STREAMING, width_, height_);
@@ -428,7 +439,7 @@ void GStreamerVideo::update(float /* dt */)
                 int pitch;
 
                 SDL_LockTexture(texture_, NULL, &pixels, &pitch);
-                gst_buffer_extract(videoBuffer_, 0, pixels, width_ * height_ * 3 / 2);
+                gst_buffer_extract(videoBuffer_, 0, pixels, nv12BufferSize_);
                 SDL_UnlockTexture(texture_);
             }
             else
@@ -474,7 +485,8 @@ void GStreamerVideo::update(float /* dt */)
             }
             else
             {
-                isPlaying_ = false;
+                Logger::write(Logger::ZONE_DEBUG, "GStreamerVideo", "End Of Stream " + Utils::getFileName(currentFile_));
+                stop();
             }
             gst_message_unref(msg);
         }
@@ -586,9 +598,15 @@ void GStreamerVideo::pause( )
 {
     paused_ = !paused_;
     if (paused_)
+    {
         gst_element_set_state(GST_ELEMENT(playbin_), GST_STATE_PAUSED);
+        Logger::write(Logger::ZONE_DEBUG, "GStreamerVideo", "Pausing " + Utils::getFileName(currentFile_));
+    }
     else
+    {
         gst_element_set_state(GST_ELEMENT(playbin_), GST_STATE_PLAYING);
+        Logger::write(Logger::ZONE_DEBUG, "GStreamerVideo", "Unpausing " + Utils::getFileName(currentFile_));
+    }
 }
 
 
@@ -596,8 +614,11 @@ void GStreamerVideo::restart( )
 {
 
     if ( !isPlaying_ )
+    {
+            Logger::write(Logger::ZONE_DEBUG, "GStreamerVideo", "Not playing return");
         return;
-
+    }
+    Logger::write(Logger::ZONE_DEBUG, "GStreamerVideo", "Seek to Start of " + Utils::getFileName(currentFile_));
     gst_element_seek_simple( playbin_, GST_FORMAT_TIME, GstSeekFlags( GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT ), 0 );
 
 }
@@ -624,4 +645,10 @@ unsigned long long GStreamerVideo::getDuration( )
 bool GStreamerVideo::isPaused( )
 {
     return paused_;
+}
+
+
+int GStreamerVideo::getNumLoops( )
+{
+    return numLoops_;
 }
