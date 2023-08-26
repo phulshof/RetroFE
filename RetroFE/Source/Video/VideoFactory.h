@@ -15,8 +15,6 @@
  */
 #pragma once
 
-#include <vector>
-
 class IVideo;
 
 class VideoFactory
@@ -25,12 +23,10 @@ public:
     static IVideo *createVideo( int monitor, bool isTypeVideo, int numLoops = -1 );
     static void    setEnabled(bool enabled);
     static void    setNumLoops(int numLoops);
-    static int     getInstanceCount();
-    static void    addInstance(IVideo* instance);
-    static void    removeInstance(IVideo* instance);
+    static bool    canDelete( IVideo *instance );
 
 private:
     static bool    enabled_;
     static int     numLoops_;
-    static std::vector<IVideo*> videoInstances_;  // Vector to store all IVideo instances
+    static IVideo *instance_;
 };

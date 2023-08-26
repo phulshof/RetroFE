@@ -20,7 +20,6 @@
 #include "../../Video/IVideo.h"
 #include "../../Video/GStreamerVideo.h"
 #include "../../Utility/Log.h"
-#include "../../Utility/Utils.h"
 #include "../../SDL.h"
 
 
@@ -29,7 +28,7 @@ bool Video::enabled_ = true;
 
 Video::Video(const std::string& file, const std::string& altFile, int numLoops, Page &p, int monitor)
     : Component(p)
-    , video_(nullptr)
+    , video_(NULL)
     , file_(file)
     , altFile_(altFile)
     , numLoops_(numLoops)
@@ -41,13 +40,9 @@ Video::Video(const std::string& file, const std::string& altFile, int numLoops, 
 
 Video::~Video( )
 {
-    if (video_ != nullptr)
+    if (video_ != NULL)
     {
-        Component::freeGraphicsMemory();
         delete video_;
-        video_ = nullptr;
-        Logger::write(Logger::ZONE_DEBUG, "Video", "Deleted " + Utils::getFileName(file_));
-
     }
 }
 
@@ -68,6 +63,7 @@ bool Video::update(float dt)
             baseViewInfo.ImageWidth = video_->baseViewInfo.ImageWidth;
             baseViewInfo.ImageHeight = video_->baseViewInfo.ImageHeight;
         }
+
         video_->update(dt);
     }
     
@@ -81,9 +77,6 @@ void Video::freeGraphicsMemory( )
     if (video_)
     {
         video_->freeGraphicsMemory();
-        video_ = nullptr;
-        Logger::write(Logger::ZONE_DEBUG, "Video", "Deleted " + Utils::getFileName(file_));
-
     }
 }
 
@@ -109,7 +102,7 @@ void Video::allocateGraphicsMemory( )
             IVideo      *video = new GStreamerVideo( baseViewInfo.Monitor );
             video->initialize();
             ((GStreamerVideo *)(video))->setNumLoops( numLoops_ );
-            video_ = new VideoComponent( video, page, file, "Video.cpp" );
+            video_ = new VideoComponent( video, page, file );
         }
     }
 

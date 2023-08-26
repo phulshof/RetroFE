@@ -26,7 +26,7 @@ Component::Component(Page &p)
     tweens_                   = NULL;
     backgroundTexture_        = NULL;
     menuScrollReload_         = false;
-    animationDoneRemove_      = false;
+    animationDoneRemove_ = false;
     freeGraphicsMemory();
     id_                       = -1;
 }
@@ -485,14 +485,4 @@ bool Component::getAnimationDoneRemove()
 int Component::getId( )
 {
     return id_;
-}
-
-void Component::setPauseOnScroll(bool value)
-{   
-    pauseOnScroll_ = value;
-}
-
-bool Component::getPauseOnScroll() const 
-{
-    return pauseOnScroll_;
 }
