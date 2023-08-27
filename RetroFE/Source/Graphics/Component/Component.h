@@ -64,10 +64,13 @@ public:
     bool getMenuScrollReload();
     void setAnimationDoneRemove(bool value);
     bool getAnimationDoneRemove();
+    void setPauseOnScroll(bool value);
+    bool getPauseOnScroll() const;
     virtual void setText(std::string text, int id = -1) {};
     virtual void setImage(std::string filePath, int id = -1) {};
     int getId( );
     std::string playlistName;
+    
 
 protected:
     Page &page;
@@ -80,7 +83,7 @@ private:
     AnimationEvents *tweens_;
     Animation *currentTweens_;
     SDL_Texture *backgroundTexture_;
-
+    bool         pauseOnScroll_;
     ViewInfo     storeViewInfo_;
     unsigned int currentTweenIndex_;
     bool         currentTweenComplete_;
@@ -92,4 +95,5 @@ private:
     bool         animationDoneRemove_;
     int          menuIndex_;
     int          id_;
+
 };

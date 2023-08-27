@@ -51,10 +51,11 @@ ViewInfo::ViewInfo()
     , ContainerY(0)
     , ContainerWidth(-1)
     , ContainerHeight(-1)
-	  , Monitor(0)
+	, Monitor(0)
     , Volume(0)
     , Restart(false)
     , Additive(false)
+    , PauseOnScroll(true)
 {
 }
 
