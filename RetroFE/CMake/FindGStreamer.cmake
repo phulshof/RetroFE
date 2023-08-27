@@ -38,6 +38,13 @@ FIND_LIBRARY(GSTREAMER_gstvideo_LIBRARY NAMES gstvideo-1.0 libgstvideo-1.0 gstvi
                                         ENV LIB
                                         DOC "gstvideo library to link with"
                                         NO_SYSTEM_ENVIRONMENT_PATH)
+                                        
+FIND_LIBRARY(GSTREAMER_gstapp_LIBRARY NAMES gstapp-1.0
+                                        PATHS ${GSTREAMER_ROOT}/bin ${GSTREAMER_ROOT}/win32/bin ${GSTREAMER_ROOT}/bin/bin C:/gstreamer/bin ${GSTREAMER_ROOT}/lib ${GSTREAMER_ROOT}/win32/lib /usr/local/lib /usr/lib
+                                        ENV LIB
+                                        DOC "gstapp library to link with"
+                                        NO_SYSTEM_ENVIRONMENT_PATH)
+                                        
 
 #IF (GSTREAMER_gst_INCLUDE_DIR AND GSTREAMER_gstconfig_INCLUDE_DIR AND
 #    GSTREAMER_gstaudio_LIBRARY AND GSTREAMER_gstbase_LIBRARY AND
@@ -46,7 +53,8 @@ FIND_LIBRARY(GSTREAMER_gstvideo_LIBRARY NAMES gstvideo-1.0 libgstvideo-1.0 gstvi
   SET(GSTREAMER_INCLUDE_DIRS ${GSTREAMER_gst_INCLUDE_DIR} ${GSTREAMER_gstconfig_INCLUDE_DIR})
   list(REMOVE_DUPLICATES GSTREAMER_INCLUDE_DIRS)
   SET(GSTREAMER_LIBRARIES ${GSTREAMER_gstaudio_LIBRARY} ${GSTREAMER_gstbase_LIBRARY}
-                          ${GSTREAMER_gstreamer_LIBRARY} ${GSTREAMER_gstvideo_LIBRARY})
+                          ${GSTREAMER_gstreamer_LIBRARY} ${GSTREAMER_gstvideo_LIBRARY}
+                          ${GSTREAMER_gstapp_LIBRARY})
   list(REMOVE_DUPLICATES GSTREAMER_LIBRARIES)
   SET(GSTREAMER_FOUND TRUE)
 #ENDIF (GSTREAMER_gst_INCLUDE_DIR AND GSTREAMER_gstconfig_INCLUDE_DIR AND

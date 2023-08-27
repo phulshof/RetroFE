@@ -1426,6 +1426,11 @@ void PageBuilder::buildViewInfo(xml_node<> *componentXml, ViewInfo &info, xml_no
     config_.getProperty("disableVideoRestart", disableVideoRestart);
     if (disableVideoRestart)
         info.Restart = false;
+    bool disablePauseOnScroll;
+    
+    config_.getProperty("disablePauseOnScroll", disablePauseOnScroll);
+    if (disablePauseOnScroll)
+        info.PauseOnScroll = false;
 
     if(fontColor)
     {

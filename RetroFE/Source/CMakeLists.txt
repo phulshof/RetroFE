@@ -55,7 +55,7 @@ else()
 	pkg_search_module(SDL2_MIXER REQUIRED SDL2_mixer)
 	pkg_search_module(SDL2_TTF REQUIRED SDL2_ttf)
 	pkg_search_module(ZLIB REQUIRED zlib)
-	pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0 gstreamer-video-1.0 gstreamer-audio-1.0)
+	pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0 gstreamer-video-1.0 gstreamer-audio-1.0 gstreamer-app-1.0)
 	pkg_check_modules(Glib2 REQUIRED glib-2.0 gobject-2.0 gthread-2.0 gmodule-2.0)
 	find_package(Threads REQUIRED)
 
