@@ -1,5 +1,5 @@
 # Controls
-[Back](README.MD)
+[Back](README.md)
 
 The controls.conf file, located in your RetroFE directory, contains the
 controls for your RetroFE front-end. Multiple keys can be assigned to a
@@ -327,4 +327,4 @@ If X is omitted, RetroFE will accept input from all controllers.
 
 These codes were taken from <https://wiki.libsdl.org/SDL_Keycode>
 
-[Back](README.MD)
+[Back](README.md)

@@ -1,5 +1,5 @@
 # Meta information database
-[Back](README.MD)
+[Back](README.md)
 
 RetroFE uses the following information to create the item lists for the
 menus:
@@ -11,7 +11,7 @@ menus:
 -   \<collection name>.sub
 
 More information about this can be found in the
-[collections](COLLECTIONS.MD) section of this documentation. As can be seen
+[collections](COLLECTIONS.md) section of this documentation. As can be seen
 though: RetroFE does **not** use the meta xml files to create these
 lists!
 
@@ -35,7 +35,7 @@ manufacturer = Konami
 
 Information in these files will supersede information from the meta
 database when the overwriteXML parameter in the [global
-settings.conf](GLOBAL_SETTINGS.MD) file is set.
+settings.conf](GLOBAL_SETTINGS.md) file is set.
 
 ## HyperSpin xml files
 
@@ -79,4 +79,4 @@ RetroFE supports the following tags (, and will ignore the rest):
 
 MAME xml files are the output of the -listxml output of MAME.
 
-[Back](README.MD)
+[Back](README.md)

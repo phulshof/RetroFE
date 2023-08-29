@@ -1,5 +1,5 @@
 # General Layout Information
-[Back](README.MD)
+[Back](README.md)
 
 Layouts define the look and feel for your frontend. Each layout is a
 folder containing at least the following two main files.
@@ -507,4 +507,4 @@ selected, and are displaying a reloadableImage of type "manufacturer":
           layouts/<layout name>/collections/_common/medium_artwork/manufacturer/Capcom.png
           layouts/<layout name>/collections/_common/medium_artwork/manufacturer/default.png
 
-[Back](README.MD)
+[Back](README.md)
