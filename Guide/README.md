@@ -12,13 +12,13 @@ additional artwork like video, box art, screenshots, etc.
 
 # Index
 
--   [Getting Started](GETTING_STARTED.MD)
--   [Settings](GLOBAL_SETTINGS.MD)
--   [Controls (Keyboard/Gamepad)](CONTROLS.MD)
--   [Collections](COLLECTIONS.MD)
--   [Collection Settings](SETTINGS.MD)
--   [Launchers](LAUNCHERS.MD)
--   [General Layout Structure](PLAYGROUND.MD)
--   [Layouts](LAYOUTS.MD)
--   [Meta information](META_INFORMATION.MD)
+-   [Getting Started](GETTING_STARTED.md)
+-   [Settings](GLOBAL_SETTINGS.md)
+-   [Controls (Keyboard/Gamepad)](CONTROLS.md)
+-   [Collections](COLLECTIONS.md)
+-   [Collection Settings](SETTINGS.md)
+-   [Launchers](LAUNCHERS.md)
+-   [General Layout Structure](PLAYGROUND.md)
+-   [Layouts](LAYOUTS.md)
+-   [Meta information](META_INFORMATION.md)
 

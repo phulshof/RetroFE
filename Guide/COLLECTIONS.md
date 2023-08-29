@@ -1,5 +1,5 @@
 # About collections
-[Back](README.MD)
+[Back](README.md)
 
   
 A collection defines a set of games or menu level that generally have a
@@ -68,7 +68,7 @@ the Main folder
 | include.txt                    | If not empty, include only those files to show on the list, if empty, all files in ROM folder will be included. This file must contain one game per line (without the file extension).                                                                                                                                                                                                                                         |
 | exclude.txt                    | List of ROMs to exclude from showing up on the menu (if you want this collection to be a menu of collections). This file must contain one game per line (without the file extension).                                                                                                                                                                                                                                          |
 | exclude_all.txt                | List of ROMs to exclude from the all playlist. This file must contain one game per line (without the file extension).                                                                                                                                                                                                                                                                                                          |
-| [settings.conf](SETTINGS.MD) | Set ROM file extensions, launcher (emulator to execute), override default media paths, etc                                                                                                                                                                                                                                                                                                                                     |
+| [settings.conf](SETTINGS.md) | Set ROM file extensions, launcher (emulator to execute), override default media paths, etc                                                                                                                                                                                                                                                                                                                                     |
 | \<collectionname>.sub          | Imports a list of games from another collection. (i.e. Your collection is named "Mario". You would have an "Nintendo Entertainment System.sub" and "Super Nintendo Entertainment System.sub". Each sub file would contain a list of all mario games for that system. The .sub file contains one game per line (without the file extension).If the file is blank, the list settings defined for the subcollection will be used. |
 | roms                           | Default location to search for ROM files (can be different if modified in the settings.conf file)                                                                                                                                                                                                                                                                                                                              |
 | playlists                      | Default location for the favorites.txt file allowing you to manage your favorites                                                                                                                                                                                                                                                                                                                                              |
@@ -141,14 +141,14 @@ for a certain system like "Nintendo Entertainment System". It uses the
 contents of the rom directory in combination with the include.txt and
 exclude.txt file in the following manner:
 
-If list.includeMissingItems in the [settings.conf](SETTINGS.MD) is
+If list.includeMissingItems in the [settings.conf](SETTINGS.md) is
 false:
 
         - Read the contents of the roms directory.
         - Keep only the names defined in include.txt.
         - Remove the names defined in exclude.txt.
 
-If list.includeMissingItems in the [settings.conf](SETTINGS.MD) is
+If list.includeMissingItems in the [settings.conf](SETTINGS.md) is
 true:
 
         - Use the names defined in include.txt.
@@ -200,7 +200,7 @@ collection according to the rules defined above for Games collections.
 
 RetroFE supports playlists, a sort of sub collection within a
 collection. You can step through them using the previous/next playlist
-keys defined in your [controls.conf](CONTROLS.MD) file. You can use this
+keys defined in your [controls.conf](CONTROLS.md) file. You can use this
 feature to e.g. show a list of all games from a certain manufacturer or
 a certain genre.
 
@@ -229,7 +229,7 @@ directly from RetroFE using the addPlaylist and removePlaylist controls,
 and a separate key favPlaylist allows you to switch between the
 favorites list and the full game list. You can even use the
 autoFavorites = yes parameter setting in your [global
-settings.conf](GLOBAL_SETTINGS.MD) file to automatically switch to
+settings.conf](GLOBAL_SETTINGS.md) file to automatically switch to
 your favorite games when you enter a collection.
 
-[Back](README.MD)
+[Back](README.md)

@@ -1,5 +1,5 @@
 # Global settings.conf
-[Back](README.MD)
+[Back](README.md)
 
 
 The global settings.conf file, located in your RetroFE directory,
@@ -63,4 +63,4 @@ settings.conf.
 In order to make scripted reconfiguration easier, RetroFE supports the
 filenames settings1.conf, settings2.conf, ..., settings9.conf as well.
 
-[Back](README.MD)
+[Back](README.md)

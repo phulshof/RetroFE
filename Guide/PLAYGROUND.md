@@ -1,6 +1,6 @@
 # General Layout Information
 
-[Back](README)
+[Back](README.md)
 
 Layouts define the look and feel for your frontend. Each layout is a
 folder containing at least the following two main files.
@@ -55,4 +55,4 @@ A layout generally consists of the following structure:
 | menuIndex="1"  | Activate the animation on first submenu.                        |
 | menuIndex="!0" | Activate the animation on every index except for the main menu. |
 
-[Back](README)
+[Back](README.md)
