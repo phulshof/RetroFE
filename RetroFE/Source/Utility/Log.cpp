@@ -76,7 +76,8 @@ void Logger::write(Zone zone, std::string component, std::string message)
     if (config_) {
         std::string level; // Will be initialized to an empty string by default.
         config_->getProperty("log", level);
-        if (level == "" || level.find(zoneStr) == std::string::npos) {
+        // If level is empty or if "ALL" isn't found and the specific zone isn't found either, don't log.
+        if (level != "ALL" && (level == "" || level.find(zoneStr) == std::string::npos)) {
             return;
         }
     }
