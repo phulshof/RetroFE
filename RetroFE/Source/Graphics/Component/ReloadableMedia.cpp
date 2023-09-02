@@ -395,10 +395,8 @@ void ReloadableMedia::reloadTexture()
 
         // ability to randomly select image/video
         if (randomSelect_) {
-            int randImage = (rand() % randomSelect_);
-            if (randImage != 0) {
-                basename = basename + " - " + std::to_string(randImage);
-            }
+            int randImage = 1 + rand() % randomSelect_;
+            basename = basename + " - " + std::to_string(randImage);
         }
 
         if(systemMode_)
