@@ -30,13 +30,13 @@ elseif(MINGW)
 	set(SDL2_TTF_ROOT "${RETROFE_THIRD_PARTY_DIR}/SDL2_ttf-2.20.2-mingw/x86_64-w64-mingw32")
 endif()
 
-	set(ZLIB_ROOT "${RETROFE_THIRD_PARTY_DIR}/zlib128-dll")
+	set(ZLIB_ROOT "${RETROFE_THIRD_PARTY_DIR}/zlib13-dll")
 
 	set(GSTREAMER_ROOT "C:/gstreamer/1.0/msvc_x64" CACHE STRING "location of where your gstreamer include and lib folders reside")
 	set(GLIB2_ROOT "${GSTREAMER_ROOT}")
   
 if(MSVC)  
-	set(DIRENT_INCLUDE_DIR "${RETROFE_THIRD_PARTY_DIR}/dirent-1.20.1/include")
+	set(DIRENT_INCLUDE_DIR "${RETROFE_THIRD_PARTY_DIR}/dirent-1.23.2/include")
 endif()
 endif()
 

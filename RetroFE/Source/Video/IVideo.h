@@ -42,6 +42,4 @@ public:
     virtual unsigned long long getDuration( ) = 0;
     virtual bool isPaused( ) = 0;
     virtual bool isPlaying() = 0;
-    virtual void hide(bool hide) = 0;
-    virtual int getNumLoops( ) = 0;
 };
