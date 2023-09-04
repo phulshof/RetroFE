@@ -247,7 +247,7 @@ bool GStreamerVideo::play(std::string file)
             gst_object_unref(videoSinkPad);
         }
         
-        guint flags = (0x00000001 | 0x00000002);  // the audio and video flags
+        guint flags = (0x00000001 | 0x00000002 | 0x00000010);  // the audio and video flags
         g_object_set(G_OBJECT(playbin_), "uri", uriFile, "video-sink", videoBin_, "instant-uri", TRUE, "flags", flags, NULL);
         g_free( uriFile );
 		
@@ -259,11 +259,11 @@ bool GStreamerVideo::play(std::string file)
 			for (auto& pluginName : decoderPluginNames)
 			{
 			GstElementFactory *factory = gst_element_factory_find(pluginName.c_str());
-			if (factory)
-			{
-				gst_plugin_feature_set_rank(GST_PLUGIN_FEATURE(factory), GST_RANK_NONE);
-				g_object_unref(factory);
-			}
+                if (factory)
+                {
+                    gst_plugin_feature_set_rank(GST_PLUGIN_FEATURE(factory), GST_RANK_NONE);
+                    g_object_unref(factory);
+                }
 			}
 		}
 		#endif
@@ -279,7 +279,7 @@ bool GStreamerVideo::play(std::string file)
                 {
                     // Modify the properties of the avdec_h265 element here
                     // set "thread-type" property to 2 and AvdecMaxThreads in settings.conf (defaults to 2)
-                    g_object_set(G_OBJECT(element), "thread-type", 2, "max-threads", Configuration::AvdecMaxThreads, NULL);
+                    g_object_set(G_OBJECT(element), "thread-type", 2, "max-threads", Configuration::AvdecMaxThreads, "direct-rendering", false, NULL);
                 }
 
             g_free(elementName);
@@ -381,8 +381,6 @@ void GStreamerVideo::update(float /* dt */)
 		}
 	}
 
-
-    
     SDL_LockMutex(SDL::getMutex());
     if (!texture_ && width_ != 0)
     {
