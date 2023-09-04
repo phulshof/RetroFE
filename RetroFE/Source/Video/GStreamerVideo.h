@@ -58,6 +58,7 @@ private:
     GstElement *videoBin_;
     GstElement *videoSink_;
     GstElement *videoConvert_;
+    GstElement *capsFilter_;
     GstCaps *videoConvertCaps_;
     GstBus *videoBus_;
     SDL_Texture* texture_;
