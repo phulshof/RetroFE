@@ -247,7 +247,8 @@ bool GStreamerVideo::play(std::string file)
             gst_object_unref(videoSinkPad);
         }
         
-        g_object_set(G_OBJECT(playbin_), "uri", uriFile, "video-sink", videoBin_, "instant-uri", TRUE, "flags", "audio+video", NULL);
+        guint flags = (0x00000001 | 0x00000002);  // the audio and video flags
+        g_object_set(G_OBJECT(playbin_), "uri", uriFile, "video-sink", videoBin_, "instant-uri", TRUE, "flags", flags, NULL);
         g_free( uriFile );
 		
 		#ifdef WIN32
@@ -266,9 +267,6 @@ bool GStreamerVideo::play(std::string file)
 			}
 		}
 		#endif
-
-
-        isPlaying_ = true;
         
         g_signal_connect(playbin_, "element-setup", G_CALLBACK(+[](GstElement *playbin, GstElement *element, gpointer data) {
         GStreamerVideo *video = static_cast<GStreamerVideo *>(data);
@@ -308,6 +306,7 @@ bool GStreamerVideo::play(std::string file)
             freeElements();
             return false;
         }
+        isPlaying_ = true;
     }
 
     gst_stream_volume_set_volume( GST_STREAM_VOLUME( playbin_ ), GST_STREAM_VOLUME_FORMAT_LINEAR, 0.0 );
