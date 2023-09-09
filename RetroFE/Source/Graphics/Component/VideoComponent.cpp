@@ -57,12 +57,15 @@ bool VideoComponent::update(float dt)
     if(isPlaying_)
     {
         if (baseViewInfo.Restart && hasPlayedOnce_) {
-            videoInst_->restart();
-            Logger::write(Logger::ZONE_DEBUG, "VideoComponent", "Seeking to beginning of " + Utils::getFileName(videoFile_));
+            if (videoInst_)
+            {
+                videoInst_->restart();
+                Logger::write(Logger::ZONE_DEBUG, "VideoComponent", "Seeking to beginning of " + Utils::getFileName(videoFile_));
             
-            baseViewInfo.Restart = false;
+                baseViewInfo.Restart = false;
+            }
         }
-        if (videoInst_->getTexture()) 
+        if (videoInst_ && videoInst_->getTexture()) 
         {
             if (baseViewInfo.PauseOnScroll)
             {
