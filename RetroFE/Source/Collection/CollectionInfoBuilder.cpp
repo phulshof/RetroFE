@@ -475,7 +475,7 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
     conf_.getProperty("firstCollection", firstCollection);
     conf_.getProperty("cyclePlaylist", cycleString);
     // use the global setting as overide if firstCollection == current
-    if (firstCollection != info->name) {
+    if (cycleString == "" || firstCollection != info->name) {
         // check if collection has different setting
         if (conf_.propertyExists(settingPrefix + "cyclePlaylist")) {
             conf_.getProperty(settingPrefix + "cyclePlaylist", cycleString);
@@ -525,7 +525,7 @@ void CollectionInfoBuilder::loadPlaylistItems(CollectionInfo* info, std::map<std
     conf_.getProperty("firstCollection", firstCollection);
     conf_.getProperty("cyclePlaylist", cycleString);
     // use the global setting as overide if firstCollection == current
-    if (firstCollection != info->name) {
+    if (cycleString == "" || firstCollection != info->name) {
         // check if collection has different setting
         if (conf_.propertyExists(settingPrefix + "cyclePlaylist")) {
             conf_.getProperty(settingPrefix + "cyclePlaylist", cycleString);
