@@ -48,11 +48,19 @@ Page::Page(Configuration &config, int layoutWidth, int layoutHeight)
     , controlsType_("")
     , locked_(false)
 {
-    for (int i = 0; i < SDL::getNumScreens(); i++)
+
+    for (int i = 0; i < MAX_LAYOUTS; i++)
     {
         layoutWidth_.push_back(layoutWidth);
         layoutHeight_.push_back(layoutHeight);
     }
+    for (int i = 0; i < SDL::getNumScreens(); i++)
+    {
+        layoutWidthByMonitor_.push_back(layoutWidth);
+        layoutHeightByMonitor_.push_back(layoutHeight);
+    }
+
+    currentLayout_ = 0;
 }
 
 
@@ -104,7 +112,6 @@ void Page::deInitialize()
     }
     collections_.clear();
 }
-
 
 bool Page::isMenusFull()
 {
@@ -1518,38 +1525,74 @@ bool Page::hasSubs()
     return collections_.back().collection->hasSubs;
 }
 
-
-int Page::getLayoutWidth(int monitor)
+void Page::setCurrentLayout(int layout)
 {
-    if ( monitor < SDL::getNumScreens( ) )
-        return layoutWidth_[monitor];
+    currentLayout_ = layout;
+}
+
+int Page::getCurrentLayout()
+{
+    return currentLayout_;
+}
+
+
+int Page::getLayoutWidthByMonitor(int monitor)
+{
+    if (monitor < SDL::getNumScreens())
+        return layoutWidthByMonitor_[monitor];
     else
         return 0;
 }
 
 
-int Page::getLayoutHeight(int monitor)
+int Page::getLayoutHeightByMonitor(int monitor)
 {
-    if ( monitor < SDL::getNumScreens( ) )
-        return layoutHeight_[monitor];
+    if (monitor < SDL::getNumScreens())
+        return layoutHeightByMonitor_[monitor];
     else
         return 0;
 }
 
 
-void Page::setLayoutWidth(int monitor, int width)
+void Page::setLayoutWidthByMonitor(int monitor, int width)
 {
-    if ( monitor < SDL::getNumScreens( ) )
-        layoutWidth_[monitor] = width;
+    if (monitor < SDL::getNumScreens())
+        layoutWidthByMonitor_[monitor] = width;
 }
 
 
-void Page::setLayoutHeight(int monitor, int height)
+void Page::setLayoutHeightByMonitor(int monitor, int height)
 {
-    if ( monitor < SDL::getNumScreens( ) )
-        layoutHeight_[monitor] = height;
+    if (monitor < SDL::getNumScreens())
+        layoutHeightByMonitor_[monitor] = height;
 }
 
+int Page::getLayoutWidth(int layout)
+{
+    currentLayout_ = layout;
+    return layoutWidth_[layout];
+}
+
+
+int Page::getLayoutHeight(int layout)
+{
+    currentLayout_ = layout;
+    return layoutHeight_[layout];
+}
+
+
+void Page::setLayoutWidth(int layout, int width)
+{
+    currentLayout_ = layout;
+    layoutWidth_[layout] = width;
+}
+
+
+void Page::setLayoutHeight(int layout, int height)
+{
+    currentLayout_ = layout;
+    layoutHeight_[layout] = height;
+}
 
 void Page::setJukebox()
 {

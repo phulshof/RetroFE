@@ -59,6 +59,7 @@ public:
     float        Angle;
     float        Alpha;
     unsigned int Layer;
+    unsigned int Layout;
     float        BackgroundRed;
     float        BackgroundGreen;
     float        BackgroundBlue;

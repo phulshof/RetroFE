@@ -36,6 +36,8 @@ Video::Video(const std::string& file, const std::string& altFile, int numLoops, 
 
 {
     baseViewInfo.Monitor = monitor;
+    baseViewInfo.Layout = p.getCurrentLayout();
+
     allocateGraphicsMemory( );
 }
 

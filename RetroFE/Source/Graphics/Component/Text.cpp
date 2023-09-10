@@ -29,6 +29,7 @@ Text::Text( std::string text, Page &p, Font *font, int monitor )
 {
     allocateGraphicsMemory( );
     baseViewInfo.Monitor = monitor;
+    baseViewInfo.Layout = page.getCurrentLayout();
 }
 
 Text::~Text( )
@@ -158,7 +159,7 @@ void Text::draw( )
             }
 
 
-            SDL::renderCopy( t, baseViewInfo.Alpha, &charRect, &rect, baseViewInfo, page.getLayoutWidth(baseViewInfo.Monitor), page.getLayoutHeight(baseViewInfo.Monitor) );
+            SDL::renderCopy( t, baseViewInfo.Alpha, &charRect, &rect, baseViewInfo, page.getLayoutWidthByMonitor(baseViewInfo.Monitor), page.getLayoutHeightByMonitor(baseViewInfo.Monitor) );
 
             rect.x += static_cast<int>( glyph.advance * scale );
 

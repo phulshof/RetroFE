@@ -27,6 +27,7 @@ Image::Image(const std::string& file, const std::string& altFile, Page &p, int m
 {
     baseViewInfo.Monitor = monitor;
     baseViewInfo.Additive = additive;
+    baseViewInfo.Layout = page.getCurrentLayout();
 
     allocateGraphicsMemory();
 }
@@ -98,6 +99,6 @@ void Image::draw()
         rect.h = static_cast<int>(baseViewInfo.ScaledHeight());
         rect.w = static_cast<int>(baseViewInfo.ScaledWidth());
 
-        SDL::renderCopy(texture_, baseViewInfo.Alpha, NULL, &rect, baseViewInfo, page.getLayoutWidth(baseViewInfo.Monitor), page.getLayoutHeight(baseViewInfo.Monitor));
+        SDL::renderCopy(texture_, baseViewInfo.Alpha, NULL, &rect, baseViewInfo, page.getLayoutWidthByMonitor(baseViewInfo.Monitor), page.getLayoutHeightByMonitor(baseViewInfo.Monitor));
     }
 }

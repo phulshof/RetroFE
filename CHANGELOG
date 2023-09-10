@@ -2,6 +2,7 @@ v0.10.34.3
     - changed video pause/restart behavior, also videos will now pause by default if out of view, disablePauseOnScroll=true in settings.conf for global override. (inigomontoya)
     - gstreamer optimizations, implemented a buffer pool, change fakesink to recommended appsink (inigomontoya)
 	- fix randomSelect; bump version number (tcontreras)
+	- fixed second display using first aspect ratio when in different monitor postions; add default ""monitor"" to layout element; increased layouts to 5 (monkofthefunk)
 
 v0.10.34.2
 	- update version *.2 (monkofthefunk)
@@ -42,7 +43,6 @@ v0.10.34.2
 	- fixed attract mode entering right collection and fast scroll to launch game (monkofthefunk, inigomontoya)
     - fixed occasional entering of wrong game (inigomontoya)
     - built SDL2 and SDL2_image DLLs from scratch
-    
     
 v0.10.34.1
 	- added vsync; fix if vSync is yes skip SDL_Delay fps limiter (inigomonyota)

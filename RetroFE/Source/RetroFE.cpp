@@ -408,6 +408,7 @@ bool RetroFE::run( )
     Launcher l( config_ );
     Menu     m( config_, input_ );
     preloadTime = static_cast<float>( SDL_GetTicks( ) ) / 1000;
+
     l.LEDBlinky( 1 );
     l.startScript();
     config_.getProperty("kiosk", kioskLock_);
@@ -437,6 +438,7 @@ bool RetroFE::run( )
                     attract_.reset();
                 }
                 else if (input_.keystate(UserInput::KeyCodeQuit)) {
+                    l.exitScript();
                     running = false;
                     break;
                 }
@@ -446,6 +448,7 @@ bool RetroFE::run( )
         if ( !currentPage_ )
         {
             Logger::write( Logger::ZONE_WARNING, "RetroFE", "Could not load page"  );
+            l.exitScript();
             running = false;
             break;
         }

@@ -81,6 +81,12 @@ public:
     void selectRandom();
     void start();
     void stop();
+    void setCurrentLayout(int layout);
+    int getCurrentLayout();
+    int getLayoutWidthByMonitor(int monitor);
+    int getLayoutHeightByMonitor(int monitor);
+    void setLayoutWidthByMonitor(int monitor, int width);
+    void setLayoutHeightByMonitor(int monitor, int height);
     void setScrolling(ScrollDirection direction);
     bool isHorizontalScroll();
     unsigned int getMenuDepth();
@@ -138,10 +144,10 @@ public:
     void  updateScrollPeriod();
     void  scroll(bool forward);
     bool  hasSubs();
-    int   getLayoutWidth(int monitor);
-    int   getLayoutHeight(int monitor);
-    void  setLayoutWidth(int monitor, int width);
-    void  setLayoutHeight(int monitor, int height);
+    int   getLayoutWidth(int layout);
+    int   getLayoutHeight(int layout);
+    void  setLayoutWidth(int layout, int width);
+    void  setLayoutHeight(int layout, int height);
     void  setJukebox();
     bool  isJukebox();
     bool  isJukeboxPlaying();
@@ -162,6 +168,7 @@ public:
     void setSelectedItem();
     bool fromPreviousPlaylist = false;
     bool fromPlaylistNav = false;
+    static const int MAX_LAYOUTS = 6;
 
 private:
     void playlistChange();
@@ -169,6 +176,7 @@ private:
     Configuration &config_;
     std::string controlsType_;
     bool locked_;
+    int currentLayout_;
 
     struct MenuInfo_S
     {
@@ -208,6 +216,8 @@ private:
     CollectionInfo::Playlists_T::iterator playlist_;
     std::vector<int> layoutWidth_;
     std::vector<int> layoutHeight_;
+    std::vector<int> layoutWidthByMonitor_;
+    std::vector<int> layoutHeightByMonitor_;
     bool jukebox_;
 
 };

@@ -228,7 +228,7 @@ void Component::draw()
                                static_cast<char>(baseViewInfo.BackgroundGreen*255),
                                static_cast<char>(baseViewInfo.BackgroundBlue*255));
 
-        SDL::renderCopy(backgroundTexture_, baseViewInfo.BackgroundAlpha, NULL, &rect, baseViewInfo, page.getLayoutWidth(baseViewInfo.Monitor), page.getLayoutHeight(baseViewInfo.Monitor));
+        SDL::renderCopy(backgroundTexture_, baseViewInfo.BackgroundAlpha, NULL, &rect, baseViewInfo, page.getLayoutWidthByMonitor(baseViewInfo.Monitor), page.getLayoutHeightByMonitor(baseViewInfo.Monitor));
     }
 }
 
