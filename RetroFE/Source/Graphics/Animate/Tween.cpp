@@ -75,10 +75,10 @@ Tween::Tween(TweenProperty property, TweenAlgorithm type, double start, double e
     : property(property)
     , duration(duration)
     , startDefined(true)
-    , type(type)
-    , start(start)
-    , end(end)
     , playlistFilter(playlistFilter)
+    , type(type)
+	, start(start)
+    , end(end)
 {
 }
 

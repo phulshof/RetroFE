@@ -48,10 +48,13 @@ Configuration::~Configuration()
 void Configuration::initialize()
 {
     const char *environment = std::getenv("RETROFE_PATH");
+    std::string sPath; // Declare sPath here
+
 #if defined(__linux) || defined(__APPLE__)
     std::string home_load = std::getenv("HOME") + std::string("/.retrofe");
     std::ifstream retrofe_path(home_load.c_str());
 #endif
+
     // Check Environment for path
     if (environment != NULL)
     {
@@ -71,14 +74,13 @@ void Configuration::initialize()
         HMODULE hModule = GetModuleHandle(NULL);
         CHAR exe[MAX_PATH];
         GetModuleFileName(hModule, exe, MAX_PATH);
-        std::string sPath(exe);
-        sPath = Utils::getDirectory(sPath);
+        sPath = Utils::getDirectory(exe);
         sPath = Utils::getParentDirectory(sPath);
 #elif __APPLE__
     	char exepath[PROC_PIDPATHINFO_MAXSIZE];
     	if( proc_pidpath (getpid(), exepath, sizeof(exepath)) <= 0 ) // Error to console if no path to write logs…
             fprintf(stderr, "Cannot set absolutePath: %s\nOverride with RETROFE_PATH env var\n", strerror(errno));
-        std::string sPath = Utils::getDirectory(exepath);
+        sPath = Utils::getDirectory(exepath);
 
         // RetroFE can be started from the command line: 'retrofe' or as an app, by clicking RetroFE.app.
         // If this was started as an app bundle, relocate it's current working directory to the root folder.
@@ -89,15 +91,21 @@ void Configuration::initialize()
 		sPath = sPath.erase(rootPos);
 #else
         char exepath[1024] = {};
+        char buffer[1024] = {}; // Separate buffer for readlink result
         sprintf(exepath, "/proc/%d/exe", getpid());
-        readlink(exepath, exepath, sizeof(exepath));
-        std::string sPath(exepath);
-        sPath = Utils::getDirectory(sPath);
+        ssize_t len = readlink(exepath, buffer, sizeof(buffer) - 1);
+        if (len != -1)
+        {
+            buffer[len] = '\0'; // Null-terminate the result
+            sPath = Utils::getDirectory(buffer);
+        }
 #endif
 
         absolutePath = sPath;
     }
 }
+
+
 
 
 void Configuration::clearProperties( )

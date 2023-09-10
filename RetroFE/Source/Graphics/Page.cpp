@@ -1045,7 +1045,6 @@ void Page::selectPlaylist(std::string playlist)
 void Page::updatePlaylistMenuPosition()
 {
     if (playlistMenu_) {
-        unsigned int i = 0;
         std::string name = getPlaylistName();
         if (name != "") {
             playlistMenu_->selectItemByName(name);
@@ -1244,7 +1243,8 @@ void Page::draw()
 
 void Page::removePlaylist()
 {
-    if(!selectedItem_) return;
+    if (!selectedItem_)
+        return;
 
     MenuInfo_S &info = collections_.back();
     CollectionInfo *collection = info.collection;
@@ -1252,16 +1252,17 @@ void Page::removePlaylist()
     std::vector<Item *> *items = collection->playlists["favorites"];
     std::vector<Item *>::iterator it = std::find(items->begin(), items->end(), selectedItem_);
 
-
-    if(it != items->end())
+    if (it != items->end())
     {
-        unsigned int index = NULL;
-        ScrollingList* amenu = NULL;
+        unsigned int index = 0;  // Initialize with 0 instead of NULL
+        ScrollingList* amenu = nullptr;  // Use nullptr for pointer types
         // get the deleted item's position
-        if (getPlaylistName() == "favorites") {
+        if (getPlaylistName() == "favorites")
+        {
             amenu = getAnActiveMenu();
-            if (amenu) {
-               index = amenu->getScrollOffsetIndex();
+            if (amenu)
+            {
+                index = amenu->getScrollOffsetIndex();
             }
         }
         items->erase(it);
@@ -1270,12 +1271,14 @@ void Page::removePlaylist()
         collection->saveRequest = true;
 
         // set to position to the old deleted position
-        if (amenu) {
+        if (amenu)
+        {
             amenu->setScrollOffsetIndex(index);
         }
     }
     collection->Save();
 }
+
 
 
 void Page::addPlaylist()

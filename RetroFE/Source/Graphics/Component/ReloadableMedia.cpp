@@ -360,7 +360,7 @@ void ReloadableMedia::reloadTexture()
         else if (typeLC == "position")
         {
             if (!selectedItem->collectionInfo->items.empty()) {
-                int position = page.getSelectedIndex() + 1;
+                size_t position = page.getSelectedIndex() + 1;
                 if (position == 1) {
                     basename = '1';
                 }

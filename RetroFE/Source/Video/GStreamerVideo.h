@@ -61,8 +61,6 @@ private:
         NON_CONTIGUOUS  // Non-contiguous buffer layout
     };
     
-    BufferLayout bufferLayout_ = UNKNOWN;
-    
     static void processNewBuffer (GstElement *fakesink, GstBuffer *buf, GstPad *pad, gpointer data);
     static void elementSetupCallback(GstElement *playbin, GstElement *element, GStreamerVideo *video);
     static gboolean busCallback(GstBus *bus, GstMessage *msg, gpointer data);
@@ -95,4 +93,5 @@ private:
     double lastSetVolume_;
     bool lastSetMuteState_;
     guint busWatchId_;
+    BufferLayout bufferLayout_ = UNKNOWN;
 };

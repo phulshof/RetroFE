@@ -44,20 +44,21 @@ GStreamerVideo::GStreamerVideo( int monitor )
     , videoConvertCaps_(NULL)
     , videoBus_(NULL)
     , texture_(NULL)
+    , elementSetupHandlerId_(0)
+    , handoffHandlerId_(0)
     , height_(0)
     , width_(0)
     , videoBuffer_(NULL)
     , frameReady_(false)
     , isPlaying_(false)
     , playCount_(0)
+    , currentFile_("")
     , numLoops_(0)
     , volume_(0.0)
     , currentVolume_(0.0)
+    , monitor_(monitor)
     , lastSetVolume_(0.0)
     , lastSetMuteState_(false)
-    , monitor_(monitor)
-    , elementSetupHandlerId_(0)
-    , handoffHandlerId_(0)
     , busWatchId_(0)
     , bufferLayout_(UNKNOWN)
 {
@@ -428,9 +429,9 @@ void GStreamerVideo::update(float /* dt */)
         if (bufferLayout_ == UNKNOWN)
         {
             GstVideoMeta *meta = gst_buffer_get_video_meta(videoBuffer_);
-            unsigned int expected_y_stride = GST_ROUND_UP_4(width_);
-            unsigned int expected_uv_stride = GST_ROUND_UP_4(expected_y_stride);
-            unsigned int expected_uv_offset = height_ * expected_y_stride;
+            gint expected_y_stride = GST_ROUND_UP_4(width_);
+            gint expected_uv_stride = GST_ROUND_UP_4(expected_y_stride);
+            gsize expected_uv_offset = height_ * expected_y_stride;
 
             // Assume CONTIGUOUS is more likely.
             if (!meta || meta->offset[0] != 0 || meta->stride[0] != expected_y_stride || 

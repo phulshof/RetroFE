@@ -237,7 +237,7 @@ Page *PageBuilder::buildPage( std::string collectionName, bool ignoreMainDefault
                 }
 
                 // add additional controls to replace others based on theme/layout
-                if (controls && controls->value() != "") {
+				if (controls && controls->value() && controls->value()[0] != '\0'){
                     std::string controlLayout = controls->value();
                     Logger::write(Logger::ZONE_INFO, "Layout", "Layout set custom control type " + controlLayout);
                     page->setControlsType(controlLayout);

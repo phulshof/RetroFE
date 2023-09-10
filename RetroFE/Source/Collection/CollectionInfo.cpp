@@ -41,17 +41,17 @@ CollectionInfo::CollectionInfo(
     std::string extensions,
     std::string metadataType,
     std::string metadataPath)
-    : conf_(c)
-    , name(name)
+    : name(name)
     , listpath(listPath)
     , saveRequest(false)
     , metadataType(metadataType)
     , menusort(true)
     , subsSplit(false)
     , hasSubs(false)
+    , sortDesc(false)
+    , conf_(c)  // Initialize conf_ last
     , metadataPath_(metadataPath)
     , extensions_(extensions)
-    , sortDesc(false)
 {
 }
 
