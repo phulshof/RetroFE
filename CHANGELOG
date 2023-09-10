@@ -3,6 +3,8 @@ v0.10.34.3
     - gstreamer optimizations, implemented a buffer pool, change fakesink to recommended appsink (inigomontoya)
 	- fix randomSelect; bump version number (tcontreras)
 	- fixed second display using first aspect ratio when in different monitor postions; add default ""monitor"" to layout element; increased layouts to 5 (monkofthefunk)
+	- fixed global settings no overidding collection playlistCycle/firstPlaylist in a collection's settings (monkofthefunk)
+	- fixed playlist to retain order if menuSort=false; also improved startup speed when loading playlists (monkofthefunk)
 
 v0.10.34.2
 	- update version *.2 (monkofthefunk)

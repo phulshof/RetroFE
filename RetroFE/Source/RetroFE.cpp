@@ -555,13 +555,14 @@ bool RetroFE::run( )
                     }
                     currentPage_->pushCollection(info);
 
-                    // check collection for setting
-                    std::string settingPrefix = "collections." + currentPage_->getCollectionName() + ".";
-                    if (config_.propertyExists(settingPrefix + "firstPlaylist")) {
-                        config_.getProperty(settingPrefix + "firstPlaylist", firstPlaylist_);
-                    }
-                    else {
-                        config_.getProperty("firstPlaylist", firstPlaylist_);
+                    config_.getProperty("firstPlaylist", firstPlaylist_);
+                    // use the global setting as overide if firstCollection == current
+                    if (firstCollection != currentPage_->getCollectionName()) {
+                        // check collection for setting
+                        std::string settingPrefix = "collections." + currentPage_->getCollectionName() + ".";
+                        if (config_.propertyExists(settingPrefix + "firstPlaylist")) {
+                            config_.getProperty(settingPrefix + "firstPlaylist", firstPlaylist_);
+                        }
                     }
 
                     currentPage_->selectPlaylist( firstPlaylist_ );
@@ -1520,20 +1521,20 @@ bool RetroFE::run( )
                         std::string settingPrefix = "collections." + currentPage_->getCollectionName() + ".";
 
                         bool cyclePlaylist = true;
-                        // check if collection has different setting
-                        if (config_.propertyExists(settingPrefix + "attractModeCyclePlaylist")) {
-                            config_.getProperty(settingPrefix + "attractModeCyclePlaylist", cyclePlaylist);
-                        }
-                        else {
-                            config_.getProperty("attractModeCyclePlaylist", cyclePlaylist);
-                        }
-
-                        std::string cycleString;
-                        // check if collection has different setting
-                        if (config_.propertyExists(settingPrefix + "cyclePlaylist")) {
-                            config_.getProperty(settingPrefix + "cyclePlaylist", cycleString);
-                        } else {
-                            config_.getProperty("cyclePlaylist", cycleString);
+                        std::string firstCollection = "";
+                        std::string cycleString = "";
+                        config_.getProperty("firstCollection", firstCollection);
+                        config_.getProperty("attractModeCyclePlaylist", cyclePlaylist);
+                        config_.getProperty("cyclePlaylist", cycleString);
+                        // use the global setting as overide if firstCollection == current
+                        if (firstCollection != currentPage_->getCollectionName()) {
+                            // check if collection has different setting
+                            if (config_.propertyExists(settingPrefix + "attractModeCyclePlaylist")) {
+                                config_.getProperty(settingPrefix + "attractModeCyclePlaylist", cyclePlaylist);
+                            }
+                            if (config_.propertyExists(settingPrefix + "cyclePlaylist")) {
+                                config_.getProperty(settingPrefix + "cyclePlaylist", cycleString);
+                            }
                         }
 
                         // go to next playlist in cycle or from all found playlists
@@ -1631,12 +1632,15 @@ bool RetroFE::isInAttractModeSkipPlaylist(std::string playlist)
     if (lkupAttractModeSkipPlaylist_.empty()) {
         std::string attractModeSkipPlaylist = "";
         std::string settingPrefix = "collections." + currentPage_->getCollectionName() + ".";
-        // check if collection has different setting
-        if (config_.propertyExists(settingPrefix + "attractModeSkipPlaylist")) {
-            config_.getProperty(settingPrefix + "attractModeSkipPlaylist", attractModeSkipPlaylist);
-        }
-        else {
-            config_.getProperty("attractModeSkipPlaylist", attractModeSkipPlaylist);
+        std::string firstCollection = "";
+        config_.getProperty("firstCollection", firstCollection);
+        config_.getProperty("attractModeSkipPlaylist", attractModeSkipPlaylist);
+        // use the global setting as overide if firstCollection == current
+        if (firstCollection != currentPage_->getCollectionName()) {
+            // check if collection has different setting
+            if (config_.propertyExists(settingPrefix + "attractModeSkipPlaylist")) {
+                config_.getProperty(settingPrefix + "attractModeSkipPlaylist", attractModeSkipPlaylist);
+            }
         }
 
         if (attractModeSkipPlaylist != "") {
@@ -1840,12 +1844,15 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
                 attract_.reset();
                 std::string settingPrefix = "collections." + currentPage_->getCollectionName() + ".";
                 std::string cycleString;
-                // check if collection has different setting
-                if (config_.propertyExists(settingPrefix + "cyclePlaylist")) {
-                    config_.getProperty(settingPrefix + "cyclePlaylist", cycleString);
-                }
-                else {
-                    config_.getProperty("cyclePlaylist", cycleString);
+                std::string firstCollection = "";
+                config_.getProperty("firstCollection", firstCollection);
+                config_.getProperty("cyclePlaylist", cycleString);
+                // use the global setting as overide if firstCollection == current
+                if (firstCollection != currentPage_->getCollectionName()) {
+                    // check if collection has different setting
+                    if (config_.propertyExists(settingPrefix + "cyclePlaylist")) {
+                        config_.getProperty(settingPrefix + "cyclePlaylist", cycleString);
+                    }
                 }
 
                 std::vector<std::string> cycleVector;
@@ -1864,12 +1871,15 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
                 attract_.reset();
                 std::string settingPrefix = "collections." + currentPage_->getCollectionName() + ".";
                 std::string cycleString;
-                // check if collection has different setting
-                if (config_.propertyExists(settingPrefix + "cyclePlaylist")) {
-                    config_.getProperty(settingPrefix + "cyclePlaylist", cycleString);
-                }
-                else {
-                    config_.getProperty("cyclePlaylist", cycleString);
+                std::string firstCollection = "";
+                config_.getProperty("firstCollection", firstCollection);
+                config_.getProperty("cyclePlaylist", cycleString);
+                // use the global setting as overide if firstCollection == current
+                if (firstCollection != currentPage_->getCollectionName()) {
+                    // check if collection has different setting
+                    if (config_.propertyExists(settingPrefix + "cyclePlaylist")) {
+                        config_.getProperty(settingPrefix + "cyclePlaylist", cycleString);
+                    }
                 }
                 std::vector<std::string> cycleVector;
                 Utils::listToVector(cycleString, cycleVector, ',');

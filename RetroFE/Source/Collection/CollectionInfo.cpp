@@ -194,7 +194,9 @@ auto CollectionInfo::itemIsLess(std::string sortType)
         // sort by collections first
         if (lhs->collectionInfo->subsSplit && lhs->collectionInfo != rhs->collectionInfo)
             return lhs->collectionInfo->lowercaseName() < rhs->collectionInfo->lowercaseName();
-        if (!lhs->collectionInfo->menusort && !lhs->leaf && !rhs->leaf)
+        
+        // no elements left
+        if (!lhs->leaf && !rhs->leaf)
             return false;
 
         // sort by another attribute
@@ -207,6 +209,11 @@ auto CollectionInfo::itemIsLess(std::string sortType)
                 return desc ? lhsValue > rhsValue : lhsValue < rhsValue;
             }
         }
+
+        // menu sort is false then use playlist's order
+        if (!lhs->collectionInfo->menusort)
+            return false;
+
         // default sort by name
         return lhs->lowercaseFullTitle() < rhs->lowercaseFullTitle();
     };
