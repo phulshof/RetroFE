@@ -819,6 +819,9 @@ unsigned int Page::getSelectedIndex()
 
 bool Page::pushCollection(CollectionInfo *collection)
 {
+    if (!collection) {
+        return false;
+    }
 
     // grow the menu as needed
     if(menus_.size() <= menuDepth_ && getAnActiveMenu())

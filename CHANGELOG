@@ -6,6 +6,8 @@ v0.10.34.3
     - fixed global settings no overidding collection playlistCycle/firstPlaylist in a collection's settings (monkofthefunk)
     - fixed playlist to retain order if menuSort=false; also improved startup speed when loading playlists (monkofthefunk)
     - fixed linux warnings (inigomontoya)
+    - fixed reallocating videos when going back a page (monkofthefunk)
+    - fixed not going into collections when they don't exist (monkofthefunk)
 
 v0.10.34.2
     - update version *.2 (monkofthefunk)

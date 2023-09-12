@@ -24,7 +24,7 @@ int VideoFactory::numLoops_ = 0;
 IVideo *VideoFactory::instance_ = NULL;
 
 
-IVideo *VideoFactory::createVideo( int monitor, bool isTypeVideo, int numLoops )
+IVideo *VideoFactory::createVideo( int monitor, int numLoops )
 {
     IVideo *instance = NULL;
     if (enabled_)

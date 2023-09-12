@@ -16,11 +16,10 @@
 
 #include "VideoBuilder.h"
 #include "../../Utility/Utils.h"
-#include "../../Video/VideoFactory.h"
 #include <fstream>
 
 
-VideoComponent * VideoBuilder::createVideo(const std::string& path, Page &page, const std::string& name, int monitor, bool isTypeVideo, int numLoops)
+VideoComponent * VideoBuilder::createVideo(const std::string& path, Page &page, const std::string& name, int monitor, int numLoops)
 {
     VideoComponent *component = NULL;
     
@@ -35,12 +34,7 @@ VideoComponent * VideoBuilder::createVideo(const std::string& path, Page &page, 
 
     if(Utils::findMatchingFile(prefix, extensions, file))
     {
-        IVideo *video = factory_.createVideo( monitor, isTypeVideo, numLoops );
-
-        if(video)
-        {
-            component = new VideoComponent(video, page, file);
-        }
+        component = new VideoComponent(page, file, monitor, numLoops);
     }
 
     return component;

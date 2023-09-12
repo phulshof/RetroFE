@@ -522,9 +522,9 @@ Component *ReloadableMedia::findComponent(const std::string& collection, const s
     if(isVideo)
     {
         if ( jukebox_ )
-            component = videoBuild.createVideo(imagePath, page, basename, baseViewInfo.Monitor, type=="video", jukeboxNumLoops_);
+            component = videoBuild.createVideo(imagePath, page, basename, baseViewInfo.Monitor, jukeboxNumLoops_);
         else
-            component = videoBuild.createVideo(imagePath, page, basename, baseViewInfo.Monitor, type=="video");
+            component = videoBuild.createVideo(imagePath, page, basename, baseViewInfo.Monitor);
     }
     else
     {

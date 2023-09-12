@@ -108,10 +108,7 @@ void Video::allocateGraphicsMemory( )
 
         if (file != "")
         {
-            IVideo      *video = new GStreamerVideo( baseViewInfo.Monitor );
-            video->initialize();
-            ((GStreamerVideo *)(video))->setNumLoops( numLoops_ );
-            video_ = new VideoComponent( video, page, file );
+            video_ = new VideoComponent(page, file, baseViewInfo.Monitor, numLoops_);
         }
     }
 

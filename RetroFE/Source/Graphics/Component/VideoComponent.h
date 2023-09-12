@@ -19,13 +19,14 @@
 #include "../Page.h"
 #include "../../Collection/Item.h"
 #include "../../Video/IVideo.h"
+#include "../../Video/VideoFactory.h"
 #include <SDL2/SDL.h>
 #include <string>
 
 class VideoComponent : public Component
 {
 public:
-    VideoComponent(IVideo *videoInst, Page &p, const std::string& videoFile);
+    VideoComponent(Page &p, const std::string& videoFile, int monitor, int numLoops);
     virtual ~VideoComponent();
     bool update(float dt);
     void draw();
@@ -48,4 +49,7 @@ private:
     IVideo *videoInst_;
     bool isPlaying_;
     bool hasPlayedOnce_;
+    int numLoops_;
+    int monitor_;
+    VideoFactory factory_;
 };

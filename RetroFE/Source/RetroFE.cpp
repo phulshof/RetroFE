@@ -744,6 +744,17 @@ bool RetroFE::run( )
                 lastMenuOffsets_[collectionName] = currentPage_->getScrollOffsetIndex();
                 lastMenuPlaylists_[collectionName] = currentPage_->getPlaylistName( );
                 std::string nextPageName = nextPageItem_->name;
+                CollectionInfo* info;
+                if (menuMode_)
+                    info = getMenuCollection(nextPageName);
+                else
+                    info = getCollection(nextPageName);
+
+                if (!info) {
+                    Logger::write(Logger::ZONE_ERROR, "RetroFE", "Collection not found with Name " + nextPageName);
+                    state = RETROFE_BACK_MENU_LOAD_ART;
+                    break;
+                }
 
                 if ( !menuMode_ )
                 {
@@ -775,14 +786,7 @@ bool RetroFE::run( )
                     }
                 }
 
-                config_.setProperty( "currentCollection", nextPageName );
-
-                CollectionInfo *info;
-                if ( menuMode_ )
-                    info = getMenuCollection( nextPageName );
-                else
-                    info = getCollection( nextPageName );
-
+                config_.setProperty("currentCollection", nextPageName);
                 currentPage_->pushCollection(info);
 
                 bool rememberMenu = false;

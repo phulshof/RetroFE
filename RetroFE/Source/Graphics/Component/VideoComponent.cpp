@@ -24,14 +24,16 @@
 #include "../../SDL.h"
 #include <string>
 
-VideoComponent::VideoComponent(IVideo *videoInst, Page &p, const std::string& videoFile)
+VideoComponent::VideoComponent(Page &p, const std::string& videoFile, int monitor, int numLoops)
     : Component(p)
     , videoFile_(videoFile)
-    , videoInst_(videoInst)
+    , videoInst_(NULL)
+    , numLoops_(numLoops)
     , isPlaying_(false)
     , hasPlayedOnce_(false)
+    , monitor_(monitor)
 {
-//   AllocateGraphicsMemory();
+    allocateGraphicsMemory();
 }
 
 VideoComponent::~VideoComponent()
@@ -96,16 +98,15 @@ bool VideoComponent::update(float dt)
     return Component::update(dt);
 }
 
-
-
-
-
 void VideoComponent::allocateGraphicsMemory()
 {
     Component::allocateGraphicsMemory();
 
     if(!isPlaying_)
     {
+        if (!videoInst_) {
+            videoInst_ = factory_.createVideo(monitor_, numLoops_);
+        }
         isPlaying_ = videoInst_->play(videoFile_);
     }
 }
