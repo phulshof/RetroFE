@@ -184,9 +184,9 @@ void CollectionInfo::addSubcollection(CollectionInfo *newinfo)
     items.insert(items.begin(), newinfo->items.begin(), newinfo->items.end());
 }
 
-auto CollectionInfo::itemIsLess(std::string sortType)
+auto CollectionInfo::itemIsLess(std::string sortType, bool currentCollectionMenusort)
 {
-    return [sortType](Item* lhs, Item* rhs) {
+    return [sortType, currentCollectionMenusort](Item* lhs, Item* rhs) {
 
         if (lhs->leaf && !rhs->leaf) return true;
         if (!lhs->leaf && rhs->leaf) return false;
@@ -211,7 +211,7 @@ auto CollectionInfo::itemIsLess(std::string sortType)
         }
 
         // menu sort is false then use playlist's order
-        if (!lhs->collectionInfo->menusort)
+        if (!currentCollectionMenusort)
             return false;
 
         // default sort by name
@@ -222,7 +222,7 @@ auto CollectionInfo::itemIsLess(std::string sortType)
 
 void CollectionInfo::sortItems()
 {
-    std::sort( items.begin(), items.end(), itemIsLess(""));
+    std::sort(items.begin(), items.end(), itemIsLess("", menusort));
 }
 
 
@@ -237,7 +237,7 @@ void CollectionInfo::sortPlaylists()
         {
             // temporarily set collection info's sortType so search has access to it
             sortType = Item::validSortType(itP->first) ? itP->first : "";
-            std::sort(itP->second->begin(), itP->second->end(), itemIsLess(sortType));
+            std::sort(itP->second->begin(), itP->second->end(), itemIsLess(sortType, menusort));
         }
     }
     sortType = "";

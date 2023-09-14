@@ -1,4 +1,5 @@
 v0.10.34.3
+    - fixed playlist order if menuSort=false for sub items (arghs15)
     - changed video pause/restart behavior, also videos will now pause by default if out of view, disablePauseOnScroll=true in settings.conf for global override. (inigomontoya)
     - reworked and streamlined gstreamer implementation (inigomontoya) 
     - fix randomSelect; bump version number (tcontreras)
