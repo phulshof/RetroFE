@@ -59,7 +59,6 @@ GStreamerVideo::GStreamerVideo( int monitor )
     , monitor_(monitor)
     , lastSetVolume_(0.0)
     , lastSetMuteState_(false)
-    , busWatchId_(0)
     , bufferLayout_(UNKNOWN)
 {
     paused_ = false;
@@ -184,13 +183,6 @@ bool GStreamerVideo::stop()
 
 void GStreamerVideo::freeElements()
 {
-    // Remove the bus watch
-    if(busWatchId_)
-    {
-        g_source_remove(busWatchId_);
-        busWatchId_ = 0;
-    }
-
     // Unref the video bus
     if(videoBus_)
     {
@@ -272,7 +264,6 @@ bool GStreamerVideo::initializeGstElements(std::string file)
     g_free(uriFile);
     elementSetupHandlerId_ = g_signal_connect(playbin_, "element-setup", G_CALLBACK(elementSetupCallback), this);
     videoBus_ = gst_pipeline_get_bus(GST_PIPELINE(playbin_));
-    busWatchId_ = gst_bus_add_watch(videoBus_, busCallback, this);
     g_object_set(G_OBJECT(videoSink_), "signal-handoffs", TRUE, NULL);
     handoffHandlerId_ = g_signal_connect(videoSink_, "handoff", G_CALLBACK(processNewBuffer), this);
 
@@ -366,44 +357,6 @@ void GStreamerVideo::processNewBuffer(GstElement * /* fakesink */, GstBuffer *bu
             }
         }
     }
-}
-
-
-void GStreamerVideo::onEndOfStream()
-{
-    playCount_++;
-
-    // If the number of loops is 0 or greater than the current playCount_, seek the playback to the beginning.
-    if(!numLoops_ || numLoops_ > playCount_)
-    {
-        gst_element_seek(playbin_,
-                     1.0,
-                     GST_FORMAT_TIME,
-                     GST_SEEK_FLAG_FLUSH,
-                     GST_SEEK_TYPE_SET,
-                     0,
-                     GST_SEEK_TYPE_NONE,
-                     GST_CLOCK_TIME_NONE);
-    }
-    else
-    {
-        stop();
-    }
-}
-
-
-gboolean GStreamerVideo::busCallback(GstBus *bus, GstMessage *msg, gpointer data)
-{
-    GStreamerVideo *video = static_cast<GStreamerVideo*>(data);
-    switch(GST_MESSAGE_TYPE(msg)) 
-    {
-        case GST_MESSAGE_EOS:
-            video->onEndOfStream();
-            break;
-        default:
-            break;
-    }
-    return TRUE;  // Keep the watch alive.
 }
 
 
@@ -517,6 +470,37 @@ void GStreamerVideo::update(float /* dt */)
     }
     SDL_UnlockMutex(SDL::getMutex());
     volumeUpdate();
+    loopHandler();
+}
+
+void GStreamerVideo::loopHandler()
+{
+    if(videoBus_)
+    {
+        GstMessage *msg = gst_bus_pop_filtered(videoBus_, GST_MESSAGE_EOS);
+        if(msg)
+        {
+            playCount_++;
+
+            // If the number of loops is 0 or greater than the current playCount_, seek the playback to the beginning.
+            if(!numLoops_ || numLoops_ > playCount_)
+            {
+                gst_element_seek(playbin_,
+                             1.0,
+                             GST_FORMAT_TIME,
+                             GST_SEEK_FLAG_FLUSH,
+                             GST_SEEK_TYPE_SET,
+                             0,
+                             GST_SEEK_TYPE_NONE,
+                             GST_CLOCK_TIME_NONE);
+            }
+            else
+            {
+                stop();
+            }
+            gst_message_unref(msg);
+        }
+    }
 }
 
 void GStreamerVideo::volumeUpdate()
