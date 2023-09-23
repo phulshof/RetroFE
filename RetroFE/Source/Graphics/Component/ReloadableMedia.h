@@ -27,44 +27,44 @@ class Image;
 class ReloadableMedia : public Component
 {
 public:
-    ReloadableMedia(Configuration &config, bool systemMode, bool layoutMode, bool commonMode, bool menuMode, std::string type, std::string imageType, Page &page, 
-        int displayOffset, bool isVideo, Font *font, bool jukebox, int jukeboxNumLoops, int randomSelect);
+    ReloadableMedia(Configuration& config, bool systemMode, bool layoutMode, bool commonMode, bool menuMode, std::string type, std::string imageType, Page& page,
+        int displayOffset, bool isVideo, Font* font, bool jukebox, int jukeboxNumLoops, int randomSelect);
     virtual ~ReloadableMedia();
     bool update(float dt);
     void draw();
     void freeGraphicsMemory();
     void allocateGraphicsMemory();
-    Component *findComponent(const std::string& collection, const std::string& type, const std::string& basename, std::string filepath, bool systemMode, bool isVideo);
+    Component* findComponent(const std::string& collection, const std::string& type, const std::string& basename, std::string filepath, bool systemMode, bool isVideo);
 
     void enableTextFallback_(bool value);
     virtual bool isJukeboxPlaying();
-    virtual void skipForward( );
-    virtual void skipBackward( );
-    virtual void skipForwardp( );
-    virtual void skipBackwardp( );
-    virtual void pause( );
-    virtual void restart( );
-    virtual unsigned long long getCurrent( );
-    virtual unsigned long long getDuration( );
-    virtual bool isPaused( );
+    virtual void skipForward();
+    virtual void skipBackward();
+    virtual void skipForwardp();
+    virtual void skipBackwardp();
+    virtual void pause();
+    virtual void restart();
+    virtual unsigned long long getCurrent();
+    virtual unsigned long long getDuration();
+    virtual bool isPaused();
 
 
 private:
-    Component *reloadTexture();
-    Configuration &config_;
+    void reloadTexture();
+    Configuration& config_;
     bool systemMode_;
     bool layoutMode_;
     bool commonMode_;
     bool menuMode_;
     int randomSelect_;
-    Component *loadedComponent_;
-    IVideo *videoInst_;
+    Component* loadedComponent_;
+    IVideo* videoInst_;
     bool isVideo_;
-    Font *FfntInst_;
+    Font* FfntInst_;
     bool textFallback_;
     std::string type_;
     std::string currentCollection_;
-    Page *page_;
+    Page* page_;
     int displayOffset_;
     std::string imageType_;
     bool jukebox_;
