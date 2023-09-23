@@ -624,18 +624,19 @@ void Page::triggerEventOnAllMenus(const std::string& event)
     if (!selectedItem_)
         return;
 
+    unsigned int depth = menuDepth_ - 1;
     for (size_t i = 0; i < menus_.size(); ++i)
     {
         for (ScrollingList* menu : menus_[i])
         {
-            unsigned int index = (menuDepth_ - 1 == i) ? MENU_INDEX_HIGH + menuDepth_ - 1 : menuDepth_ - 1;
+            unsigned int index = (depth == i) ? MENU_INDEX_HIGH + depth : depth;
 
             menu->triggerEvent(event, index);
             menu->triggerEventOnAll(event, index);
         }
     }
 
-    unsigned int index = menuDepth_ - 1;
+    unsigned int index = depth;
     for (Component* component : LayerComponents)
     {
         if (component)
@@ -867,7 +868,6 @@ bool Page::pushCollection(CollectionInfo *collection)
 
     playlist_ = info.playlist;
     playlistChange();
-
     if(menuDepth_ < menus_.size())
     {
         menuDepth_++;

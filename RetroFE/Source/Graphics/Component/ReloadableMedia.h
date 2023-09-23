@@ -50,7 +50,7 @@ public:
 
 
 private:
-    void reloadTexture();
+    Component *reloadTexture();
     Configuration &config_;
     bool systemMode_;
     bool layoutMode_;

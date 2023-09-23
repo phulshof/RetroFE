@@ -74,7 +74,7 @@ PageBuilder::~PageBuilder()
 {
 }
 
-Page *PageBuilder::buildPage( std::string collectionName, bool ignoreMainDefault )
+Page *PageBuilder::buildPage( std::string collectionName, bool defaultToCurrentLayout)
 {
     Page *page = NULL;
 
@@ -92,7 +92,7 @@ Page *PageBuilder::buildPage( std::string collectionName, bool ignoreMainDefault
         layoutPath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, "collections", collectionName);
         layoutPath = Utils::combinePath(layoutPath, "layout");
 
-        if (ignoreMainDefault) {
+        if (defaultToCurrentLayout) {
             std::ifstream file((layoutPath + ".xml").c_str());
             // check collection has layout otherwise it would have used default folder layout
             if (!file.good()) {

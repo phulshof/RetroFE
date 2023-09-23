@@ -35,7 +35,7 @@ class PageBuilder
 public:
     PageBuilder(std::string layoutKey, std::string layoutPage, Configuration &c, FontCache *fc, bool isMenu = false);
     virtual ~PageBuilder();
-    Page *buildPage( std::string collectionName = "", bool ignoreMainDefault = false);
+    Page *buildPage( std::string collectionName = "", bool defaultToCurrentLayout = false);
 
 private:
     std::string layoutKey;

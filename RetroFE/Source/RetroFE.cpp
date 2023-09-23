@@ -616,11 +616,6 @@ bool RetroFE::run( )
                         currentPage_->playlistNextExit();
                     }
                 }
-                bool rememberMenu = false;
-                config_.getProperty("rememberMenu", rememberMenu);
-                if (rememberMenu && currentPage_->getPlaylistName() != "lastplayed") {
-                    currentPage_->returnToRememberSelectedItem();
-                }
                 state = RETROFE_PLAYLIST_LOAD_ART;
             }
             break;
@@ -629,7 +624,14 @@ bool RetroFE::run( )
         case RETROFE_PLAYLIST_LOAD_ART:
             if (currentPage_->isIdle( ))
             {
-                currentPage_->onNewItemSelected();
+                bool rememberMenu = false;
+                config_.getProperty("rememberMenu", rememberMenu);
+                if (rememberMenu && currentPage_->getPlaylistName() != "lastplayed") {
+                    currentPage_->returnToRememberSelectedItem();
+                }
+                else {
+                    currentPage_->onNewItemSelected();
+                }
                 currentPage_->reallocateMenuSpritePoints(); // update playlist menu
                 currentPage_->playlistEnter();
                 state = RETROFE_PLAYLIST_ENTER;
@@ -763,14 +765,14 @@ bool RetroFE::run( )
                     config_.getProperty( "layout", layoutName );
                     PageBuilder pb( layoutName, getLayoutFileName(), config_, &fontcache_ );
 
-                    bool ignoreDefaultLayout = false;
+                    bool defaultToCurrentLayout = false;
                     std::string settingPrefix = "collections." + currentPage_->getCollectionName() + ".";
-                    if (config_.propertyExists(settingPrefix + "ignoreDefaultLayout")) {
-                        config_.getProperty(settingPrefix + "ignoreDefaultLayout", ignoreDefaultLayout);
+                    if (config_.propertyExists(settingPrefix + "defaultToCurrentLayout")) {
+                        config_.getProperty(settingPrefix + "defaultToCurrentLayout", defaultToCurrentLayout);
                     }
 
                     // try collection name
-                    Page *page = pb.buildPage( nextPageItem_->name, ignoreDefaultLayout);
+                    Page *page = pb.buildPage( nextPageItem_->name, defaultToCurrentLayout);
                     if (page)
                     {
                         if (page->controlsType() != currentPage_->controlsType()) {
