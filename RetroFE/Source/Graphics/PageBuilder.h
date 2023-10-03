@@ -58,7 +58,7 @@ private:
     float getVerticalAlignment(rapidxml::xml_attribute<> *attribute, float valueIfNull);
     float getHorizontalAlignment(rapidxml::xml_attribute<> *attribute, float valueIfNull);
     void buildViewInfo(rapidxml::xml_node<> *componentXml, ViewInfo &info, rapidxml::xml_node<> *defaultXml = NULL);
-    bool buildComponents(rapidxml::xml_node<> *layout, Page *page);
+    bool buildComponents(rapidxml::xml_node<> *layout, Page *page, std::string);
     void loadTweens(Component *c, rapidxml::xml_node<> *componentXml);
     AnimationEvents *createTweenInstance(rapidxml::xml_node<> *componentXml);
     void buildTweenSet(AnimationEvents *tweens, rapidxml::xml_node<> *componentXml, std::string tagName, std::string tweenName);

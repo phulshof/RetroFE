@@ -250,7 +250,7 @@ Page *PageBuilder::buildPage( std::string collectionName, bool defaultToCurrentL
 
                     // check if collection's assets are in a different theme
                     std::string layoutName;
-                    config_.getProperty("collections." + page->getCollectionName() + ".layout", layoutName);
+                    config_.getProperty("collections." + collectionName + ".layout", layoutName);
                     if (layoutName == "") {
                         config_.getProperty("layout", layoutName);
                     }
@@ -287,7 +287,7 @@ Page *PageBuilder::buildPage( std::string collectionName, bool defaultToCurrentL
                     }
                 }
 
-                if (!buildComponents(root, page))
+                if (!buildComponents(root, page, collectionName))
                 {
                     delete page;
                     page = NULL;
@@ -391,7 +391,7 @@ float PageBuilder::getVerticalAlignment(xml_attribute<> *attribute, float valueI
     return value;
 }
 
-bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
+bool PageBuilder::buildComponents(xml_node<> *layout, Page *page, std::string collectionName)
 {
     xml_attribute<>* layoutMonitorXml = layout->first_attribute("monitor");
     int monitor = layoutMonitorXml ? Utils::convertInt(layoutMonitorXml->value()) : monitor_;
@@ -449,7 +449,7 @@ bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
             imagePath = Utils::combinePath(Configuration::convertToAbsolutePath(layoutPath, imagePath), std::string(src->value()));
             // check if collection's assets are in a different theme
             std::string layoutName;
-            config_.getProperty("collections." + page->getCollectionName() + ".layout", layoutName);
+            config_.getProperty("collections." + collectionName + ".layout", layoutName);
             if (layoutName == "") {
                 config_.getProperty("layout", layoutName);
             }
@@ -505,7 +505,7 @@ bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
 
             // check if collection's assets are in a different theme
             std::string layoutName;
-            config_.getProperty("collections." + page->getCollectionName() + ".layout", layoutName);
+            config_.getProperty("collections." + collectionName + ".layout", layoutName);
             if (layoutName == "") {
                 config_.getProperty("layout", layoutName);
             }
