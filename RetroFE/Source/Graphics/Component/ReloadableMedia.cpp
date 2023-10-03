@@ -492,8 +492,12 @@ Component *ReloadableMedia::findComponent(const std::string& collection, const s
     // check the system folder
     if (layoutMode_)
     {
+        // check if collection's assets are in a different theme
         std::string layoutName;
-        config_.getProperty("layout", layoutName);
+        config_.getProperty("collections." + collection + ".layout", layoutName);
+        if (layoutName == "") {
+            config_.getProperty("layout", layoutName);
+        }
         if (commonMode_)
         {
             imagePath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, "collections", "_common");

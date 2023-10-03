@@ -11,6 +11,7 @@ v0.10.34.3
     - fixed not going into collections when they don't exist (monkofthefunk)
     - changed ignoreDefaultLayout to defaultToCurrentLayout for collection setting that prevents default to root layout if a collection one not found also fixes reloading the page if still on same layout (monkofthefunk)
     - fixed blip between playlists for reloadable videos (monkofthefunk)
+    - added collection setting "layout" that overides global setting, so different themes can be loaded under one collection menu (monkofthefunk)
 
 v0.10.34.2
     - update version *.2 (monkofthefunk)

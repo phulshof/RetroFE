@@ -247,8 +247,13 @@ Page *PageBuilder::buildPage( std::string collectionName, bool defaultToCurrentL
                     xml_attribute<>* src = sound->first_attribute("src");
                     xml_attribute<>* type = sound->first_attribute("type");
                     std::string file = Configuration::convertToAbsolutePath(layoutPath, src->value());
+
+                    // check if collection's assets are in a different theme
                     std::string layoutName;
-                    config_.getProperty("layout", layoutName);
+                    config_.getProperty("collections." + page->getCollectionName() + ".layout", layoutName);
+                    if (layoutName == "") {
+                        config_.getProperty("layout", layoutName);
+                    }
                     std::string altfile = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, std::string(src->value()));
                     if (!type)
                     {
@@ -442,8 +447,12 @@ bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
         {
             std::string imagePath;
             imagePath = Utils::combinePath(Configuration::convertToAbsolutePath(layoutPath, imagePath), std::string(src->value()));
+            // check if collection's assets are in a different theme
             std::string layoutName;
-            config_.getProperty("layout", layoutName);
+            config_.getProperty("collections." + page->getCollectionName() + ".layout", layoutName);
+            if (layoutName == "") {
+                config_.getProperty("layout", layoutName);
+            }
             std::string altImagePath;
             altImagePath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, std::string(src->value()));
             cMonitor = monitorXml ? Utils::convertInt(monitorXml->value()) : monitor;
@@ -493,8 +502,13 @@ bool PageBuilder::buildComponents(xml_node<> *layout, Page *page)
         {
             std::string videoPath;
             videoPath = Utils::combinePath(Configuration::convertToAbsolutePath(layoutPath, videoPath), std::string(srcXml->value()));
+
+            // check if collection's assets are in a different theme
             std::string layoutName;
-            config_.getProperty("layout", layoutName);
+            config_.getProperty("collections." + page->getCollectionName() + ".layout", layoutName);
+            if (layoutName == "") {
+                config_.getProperty("layout", layoutName);
+            }
             std::string altVideoPath;
             altVideoPath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, std::string(srcXml->value()));
             int numLoops = numLoopsXml ? Utils::convertInt(numLoopsXml->value()) : 1;

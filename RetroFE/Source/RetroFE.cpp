@@ -761,8 +761,12 @@ bool RetroFE::run( )
                 if ( !menuMode_ )
                 {
                     // Load new layout if available
+                    // check if collection's assets are in a different theme
                     std::string layoutName;
-                    config_.getProperty( "layout", layoutName );
+                    config_.getProperty("collections." + nextPageItem_->name + ".layout", layoutName);
+                    if (layoutName == "") {
+                        config_.getProperty("layout", layoutName);
+                    }
                     PageBuilder pb( layoutName, getLayoutFileName(), config_, &fontcache_ );
 
                     bool defaultToCurrentLayout = false;
@@ -1422,8 +1426,12 @@ bool RetroFE::run( )
                 std::string collectionName = currentPage_->getCollectionName();
                 lastMenuOffsets_[collectionName]   = currentPage_->getScrollOffsetIndex( );
                 lastMenuPlaylists_[collectionName] = currentPage_->getPlaylistName( );
+                // check if collection's assets are in a different theme
                 std::string layoutName;
-                config_.getProperty( "layout", layoutName );
+                config_.getProperty("collections." + collectionName + ".layout", layoutName);
+                if (layoutName == "") {
+                    config_.getProperty("layout", layoutName);
+                }
                 PageBuilder pb( layoutName, getLayoutFileName(), config_, &fontcache_, true );
                 Page *page = pb.buildPage( );
                 if (page)
@@ -2227,10 +2235,12 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
 // Load a page
 Page* RetroFE::loadPage(std::string collectionName)
 {
+    // check if collection's assets are in a different theme
     std::string layoutName;
-
-    config_.getProperty("layout", layoutName);
-
+    config_.getProperty("collections." + collectionName + ".layout", layoutName);
+    if (layoutName == "") {
+        config_.getProperty("layout", layoutName);
+    }
     PageBuilder pb(layoutName, getLayoutFileName(), config_, &fontcache_);
     Page* page = pb.buildPage(collectionName);
     if (!page)

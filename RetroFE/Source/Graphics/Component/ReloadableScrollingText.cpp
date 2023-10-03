@@ -391,8 +391,12 @@ void ReloadableScrollingText::loadText( std::string collection, std::string type
     // check the system folder
     if (layoutMode_)
     {
+        // check if collection's assets are in a different theme
         std::string layoutName;
-        config_.getProperty("layout", layoutName);
+        config_.getProperty("collections." + collection + ".layout", layoutName);
+        if (layoutName == "") {
+            config_.getProperty("layout", layoutName);
+        }
         textPath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, "collections", collection);
         if (systemMode)
             textPath = Utils::combinePath(textPath, "system_artwork");
