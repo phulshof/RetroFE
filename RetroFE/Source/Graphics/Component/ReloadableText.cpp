@@ -349,7 +349,6 @@ void ReloadableText::ReloadTexture()
     }
 }
 
-
 void ReloadableText::draw()
 {
     if(imageInst_)

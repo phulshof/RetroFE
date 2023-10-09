@@ -42,6 +42,7 @@ public:
     virtual unsigned long long getCurrent( );
     virtual unsigned long long getDuration( );
     virtual bool isPaused( );
+    std::string filePath();
 
 private:
     std::string videoFile_;

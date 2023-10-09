@@ -194,7 +194,10 @@ Component *ReloadableMedia::reloadTexture()
     names.push_back("default");
     // if same playlist then use existing loaded component
     Component* foundComponent = NULL;
-    if (loadedComponent_ != NULL && typeLC.rfind("playlist", 0) == 0 && (page.getPlaylistName() == loadedComponent_->playlistName)) {
+    if (loadedComponent_ != NULL && 
+        (typeLC.rfind("playlist", 0) == 0 && 
+        page.getPlaylistName() == loadedComponent_->playlistName)
+    ) {
         return loadedComponent_;
     }
 
@@ -489,33 +492,26 @@ Component *ReloadableMedia::findComponent(const std::string& collection, const s
     VideoBuilder videoBuild;
     ImageBuilder imageBuild;
 
-    // check the system folder
-    if (layoutMode_)
-    {
-        // check if collection's assets are in a different theme
-        std::string layoutName;
-        config_.getProperty("collections." + collection + ".layout", layoutName);
-        if (layoutName == "") {
-            config_.getProperty("layout", layoutName);
-        }
-        if (commonMode_)
+    if (filepath != "") {
+        imagePath = filepath; 
+    } else {
+        // check the system folder
+        if (layoutMode_)
         {
-            imagePath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, "collections", "_common");
-        }
-        else
-        {
-            imagePath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, "collections", collection);
-        }
-        if (systemMode)
-            imagePath = Utils::combinePath(imagePath, "system_artwork");
-        else
-            imagePath = Utils::combinePath(imagePath, "medium_artwork", type);
-    }
-    else
-    {
-        if (commonMode_)
-        {
-            imagePath = Utils::combinePath(Configuration::absolutePath, "collections", "_common" );
+            // check if collection's assets are in a different theme
+            std::string layoutName;
+            config_.getProperty("collections." + collection + ".layout", layoutName);
+            if (layoutName == "") {
+                config_.getProperty("layout", layoutName);
+            }
+            if (commonMode_)
+            {
+                imagePath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, "collections", "_common");
+            }
+            else
+            {
+                imagePath = Utils::combinePath(Configuration::absolutePath, "layouts", layoutName, "collections", collection);
+            }
             if (systemMode)
                 imagePath = Utils::combinePath(imagePath, "system_artwork");
             else
@@ -523,11 +519,50 @@ Component *ReloadableMedia::findComponent(const std::string& collection, const s
         }
         else
         {
-            config_.getMediaPropertyAbsolutePath(collection, type, systemMode, imagePath);
+            if (commonMode_)
+            {
+                imagePath = Utils::combinePath(Configuration::absolutePath, "collections", "_common" );
+                if (systemMode)
+                    imagePath = Utils::combinePath(imagePath, "system_artwork");
+                else
+                    imagePath = Utils::combinePath(imagePath, "medium_artwork", type);
+            }
+            else
+            {
+                if (commonMode_)
+                {
+                    imagePath = Utils::combinePath(Configuration::absolutePath, "collections", "_common");
+                    if (systemMode)
+                        imagePath = Utils::combinePath(imagePath, "system_artwork");
+                    else
+                        imagePath = Utils::combinePath(imagePath, "medium_artwork", type);
+                }
+                else
+                {
+                    config_.getMediaPropertyAbsolutePath(collection, type, systemMode, imagePath);
+                }
+            }
         }
     }
-    if ( filepath != "" )
-        imagePath = filepath;
+
+    // if file already loaded, don't load again
+    std::vector<std::string> extensions;
+    if (isVideo) {
+        extensions = {
+            "mp4", "MP4", "avi", "AVI", "mkv", "MKV",
+            "mp3", "MP3", "wav", "WAV", "flac", "FLAC"
+        };
+    } else {
+        extensions = {
+        "png", "PNG", "jpg", "JPG", "jpeg", "JPEG"
+        };
+    }
+    std::string filePath;
+    if (loadedComponent_ != NULL && imagePath != "" && (imagePath == loadedComponent_->filePath() || 
+        (Utils::findMatchingFile(Utils::combinePath(imagePath, basename), extensions, filePath) && filePath == loadedComponent_->filePath()))
+        ) {
+        return loadedComponent_;
+    }
 
     if(isVideo)
     {
@@ -543,6 +578,12 @@ Component *ReloadableMedia::findComponent(const std::string& collection, const s
 
     return component;
 
+}
+
+
+std::string filePath()
+{
+    return "";
 }
 
 void ReloadableMedia::draw()

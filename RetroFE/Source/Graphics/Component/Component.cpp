@@ -151,6 +151,11 @@ void Component::setTweens(AnimationEvents *set)
     tweens_ = set;
 }
 
+std::string Component::filePath()
+{
+    return std::string();
+}
+
 bool Component::update(float dt)
 {
     elapsedTweenTime_ += dt;

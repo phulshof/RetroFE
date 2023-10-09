@@ -759,7 +759,6 @@ void ScrollingList::resetTweens( Component *c, AnimationEvents *sets, ViewInfo *
     scrollTween->Push( set );
 }
 
-
 bool ScrollingList::allocateTexture( unsigned int index, Item *item )
 {
 

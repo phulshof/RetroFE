@@ -153,6 +153,10 @@ bool VideoComponent::isPlaying()
     return isPlaying_;
 }
 
+std::string VideoComponent::filePath()
+{
+    return videoFile_;
+}
 
 void VideoComponent::skipForward( )
 {

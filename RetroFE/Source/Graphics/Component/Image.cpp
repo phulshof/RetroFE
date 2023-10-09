@@ -85,6 +85,10 @@ void Image::allocateGraphicsMemory()
 
 }
 
+std::string Image::filePath()
+{
+    return file_;
+}
 
 void Image::draw()
 {

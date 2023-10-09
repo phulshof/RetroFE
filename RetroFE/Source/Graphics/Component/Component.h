@@ -44,6 +44,7 @@ public:
     bool newScrollItemSelected;
     void setId( int id );
 
+    virtual std::string filePath();
     virtual bool update(float dt);
     virtual void draw();
     void setTweens(AnimationEvents *set);

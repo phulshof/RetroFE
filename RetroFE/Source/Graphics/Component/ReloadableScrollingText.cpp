@@ -450,7 +450,6 @@ void ReloadableScrollingText::loadText( std::string collection, std::string type
 
 }
 
-
 void ReloadableScrollingText::draw( )
 {
     Component::draw( );

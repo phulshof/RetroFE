@@ -118,6 +118,11 @@ void Video::allocateGraphicsMemory( )
 }
 
 
+std::string Video::filePath()
+{
+    return file_;
+}
+
 void Video::draw( )
 {
     Component::draw( );

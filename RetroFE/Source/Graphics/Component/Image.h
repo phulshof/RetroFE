@@ -27,6 +27,7 @@ public:
     void freeGraphicsMemory();
     void allocateGraphicsMemory();
     void draw();
+    std::string filePath();
 
 protected:
     SDL_Texture *texture_;

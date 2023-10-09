@@ -30,6 +30,7 @@ public:
     void allocateGraphicsMemory( );
     void draw( );
     virtual bool isPlaying( );
+    std::string filePath();
 
 protected:
     Component  *video_;
