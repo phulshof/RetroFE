@@ -90,6 +90,9 @@ bool UserInput::initialize()
     MapKey("quitCombo2", KeyCodeQuitCombo2, false);
     MapKey("cycleCollection", KeyCodeCycleCollection, false);
     MapKey("prevCycleCollection", KeyCodePrevCycleCollection, false);
+    MapKey("toggleGameInfo", KeyCodeToggleGameInfo, false);
+    MapKey("toggleCollectionInfo", KeyCodeToggleCollectionInfo, false);
+    MapKey("toggleBuildInfo", KeyCodeToggleBuildInfo, false);
 
     bool retVal = true;
 

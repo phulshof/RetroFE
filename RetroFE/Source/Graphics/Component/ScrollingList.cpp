@@ -650,6 +650,33 @@ void ScrollingList::triggerAttractExitEvent( int menuIndex )
     triggerEventOnAll("attractExit", menuIndex);
 }
 
+void ScrollingList::triggerGameInfoEnter(int menuIndex)
+{
+    triggerEventOnAll("gameInfoEnter", menuIndex);
+}
+void ScrollingList::triggerGameInfoExit(int menuIndex)
+{
+    triggerEventOnAll("gameInfoExit", menuIndex);
+}
+
+void ScrollingList::triggerCollectionInfoEnter(int menuIndex)
+{
+    triggerEventOnAll("collectionInfoEnter", menuIndex);
+}
+void ScrollingList::triggerCollectionInfoExit(int menuIndex)
+{
+    triggerEventOnAll("collectionInfoExit", menuIndex);
+}
+
+void ScrollingList::triggerBuildInfoEnter(int menuIndex)
+{
+    triggerEventOnAll("buildInfoEnter", menuIndex);
+}
+void ScrollingList::triggerBuildInfoExit(int menuIndex)
+{
+    triggerEventOnAll("buildInfoExit", menuIndex);
+}
+
 void ScrollingList::triggerJukeboxJumpEvent( int menuIndex )
 {
     triggerEventOnAll("jukeboxJump", menuIndex);

@@ -613,6 +613,32 @@ void Page::attractExit()
     triggerEventOnAllMenus("attractExit");
 }
 
+void Page::gameInfoEnter()
+{
+    triggerEventOnAllMenus("gameInfoEnter");
+}
+void Page::gameInfoExit()
+{
+    triggerEventOnAllMenus("gameInfoExit");
+}
+
+void Page::collectionInfoEnter()
+{
+    triggerEventOnAllMenus("collectionInfoEnter");
+}
+void Page::collectionInfoExit()
+{
+    triggerEventOnAllMenus("collectionInfoExit");
+}
+
+void Page::buildInfoEnter()
+{
+    triggerEventOnAllMenus("buildInfoEnter");
+}
+void Page::buildInfoExit()
+{
+    triggerEventOnAllMenus("buildInfoExit");
+}
 
 void Page::jukeboxJump()
 {

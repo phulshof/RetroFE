@@ -14,6 +14,7 @@ v0.10.34.3
     - added collection setting "layout" that overides global setting, so different themes can be loaded under one collection menu (monkofthefunk)
     - skip loading new reloadable (causing blip) if the asset path is the same (monkofthefunk)
     - update cmake version and add some speed flags to linux build (monkofthefunk)
+    - added toggelGameInfo, toggleCollectionInfo, toggleBuildInfo controls with onGameInfoEnter/Exit etc. events (monkofthefunk)
 
 v0.10.34.2
     - update version *.2 (monkofthefunk)

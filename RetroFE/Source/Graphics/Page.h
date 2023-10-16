@@ -131,6 +131,12 @@ public:
     void  attractEnter( );
     void  attract( );
     void  attractExit( );
+    void gameInfoEnter();
+    void gameInfoExit();
+    void collectionInfoEnter();
+    void collectionInfoExit();
+    void buildInfoEnter();
+    void buildInfoExit();
     void  jukeboxJump( );
     void  triggerEvent( const std::string& action );
     void  setText( const std::string& text, int id );

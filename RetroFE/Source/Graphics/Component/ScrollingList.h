@@ -62,6 +62,12 @@ public:
     void triggerAttractEnterEvent( int menuIndex = -1 );
     void triggerAttractEvent( int menuIndex = -1 );
     void triggerAttractExitEvent( int menuIndex = -1 );
+    void triggerGameInfoEnter(int menuIndex = -1);
+    void triggerGameInfoExit(int menuIndex = -1);
+    void triggerCollectionInfoEnter(int menuIndex = -1);
+    void triggerCollectionInfoExit(int menuIndex = -1);
+    void triggerBuildInfoEnter(int menuIndex = -1);
+    void triggerBuildInfoExit(int menuIndex = -1);
     void triggerJukeboxJumpEvent( int menuIndex = -1 );
     void triggerEventOnAll(std::string event, int menuIndex);
 

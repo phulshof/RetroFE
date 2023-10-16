@@ -70,6 +70,10 @@ private:
         RETROFE_LOAD_ART,
         RETROFE_ENTER,
         RETROFE_SPLASH_EXIT,
+        RETROFE_PLAYLIST_NEXT,
+        RETROFE_PLAYLIST_PREV,
+        RETROFE_PLAYLIST_NEXT_CYCLE,
+        RETROFE_PLAYLIST_PREV_CYCLE,
         RETROFE_PLAYLIST_REQUEST,
         RETROFE_PLAYLIST_EXIT,
         RETROFE_PLAYLIST_LOAD_ART,
@@ -111,6 +115,13 @@ private:
         RETROFE_MENUMODE_START_REQUEST,
         RETROFE_MENUMODE_START_LOAD_ART,
         RETROFE_MENUMODE_START_ENTER,
+        RETROFE_GAMEINFO_REQUEST,
+        RETROFE_GAMEINFO_EXIT,
+        RETROFE_GAMEINFO_ENTER,
+        RETROFE_COLLECTIONINFO_ENTER,
+        RETROFE_COLLECIONINFO_EXIT,
+        RETROFE_BUILDINFO_ENTER,
+        RETROFE_BUILDINFO_EXIT,
         RETROFE_NEW,
         RETROFE_QUIT_REQUEST,
         RETROFE_QUIT,
@@ -135,6 +146,7 @@ private:
     CollectionInfo *getMenuCollection( std::string collectionName );
 	void            saveRetroFEState( );
     std::string getLayoutFileName();
+    void resetInfoToggle();
 
 
     Configuration     &config_;
@@ -157,6 +169,9 @@ private:
 	bool               reboot_;
     bool               kioskLock_;
     bool               paused_;
+    bool                buildInfo_;
+    bool                collectionInfo_;
+    bool                gameInfo_;
 	std::string        firstPlaylist_;
     std::map<std::string, bool> lkupAttractModeSkipPlaylist_;
     std::map<std::string, unsigned int> lastMenuOffsets_;
