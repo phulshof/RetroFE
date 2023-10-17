@@ -15,6 +15,7 @@ v0.10.34.3
     - skip loading new reloadable (causing blip) if the asset path is the same (monkofthefunk)
     - update cmake version and add some speed flags to linux build (monkofthefunk)
     - added toggelGameInfo, toggleCollectionInfo, toggleBuildInfo controls with onGameInfoEnter/Exit etc. events (monkofthefunk)
+    - added setting infoExitOnScroll to call on*InfoExit if open when scrolling (monkofthefunk)
 
 v0.10.34.2
     - update version *.2 (monkofthefunk)

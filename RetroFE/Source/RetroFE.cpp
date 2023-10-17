@@ -633,7 +633,10 @@ bool RetroFE::run( )
             currentPage_->prevPlaylist();
             state = RETROFE_PLAYLIST_REQUEST;
             break;
-
+        case RETROFE_INFO_EXIT:
+            resetInfoToggle();
+            state = RETROFE_IDLE;
+            break;
         case RETROFE_PLAYLIST_PREV_CYCLE:
             config_.getProperty("firstCollection", firstCollection);
             config_.getProperty("cyclePlaylist", cycleString);
@@ -1779,6 +1782,10 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
 {
     bool screensaver = false;
     config_.getProperty("screensaver", screensaver);
+
+    bool infoExitOnScroll = false;
+    config_.getProperty("infoExitOnScroll", infoExitOnScroll);
+
     std::map<unsigned int, bool> ssExitInputs = {
         {SDL_MOUSEMOTION,true},
         {SDL_KEYDOWN,true},
@@ -1821,6 +1828,9 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             page->setScrolling(Page::ScrollDirectionForward);
             page->scroll(true);
             page->updateScrollPeriod( );
+            if (infoExitOnScroll) {
+                return RETROFE_INFO_EXIT;
+            }
             return state;
         }
         else if (input_.keystate(UserInput::KeyCodeLeft))
@@ -1829,6 +1839,9 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             page->setScrolling(Page::ScrollDirectionBack);
             page->scroll(false);
             page->updateScrollPeriod( );
+            if (infoExitOnScroll) {
+                return RETROFE_INFO_EXIT;
+            }
             return state;
         }
     }
@@ -1840,6 +1853,9 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             page->setScrolling(Page::ScrollDirectionForward);
             page->scroll(true);
             page->updateScrollPeriod( );
+            if (infoExitOnScroll) {
+                return RETROFE_INFO_EXIT;
+            }
             return state;
         }
         else if (input_.keystate(UserInput::KeyCodeUp))
@@ -1848,6 +1864,9 @@ RetroFE::RETROFE_STATE RetroFE::processUserInput( Page *page )
             page->setScrolling(Page::ScrollDirectionBack);
             page->scroll(false);
             page->updateScrollPeriod( );
+            if (infoExitOnScroll) {
+                return RETROFE_INFO_EXIT;
+            }
             return state;
         }
     }
