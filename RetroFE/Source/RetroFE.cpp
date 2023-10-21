@@ -1689,8 +1689,13 @@ bool RetroFE::run( )
                     {
                         if ( !attractMode_ && attract_.isSet( ) )
                         {
-                            currentPage_->attractEnter( );
-                            l.LEDBlinky( 5 );
+                            // hide toggle before attract mode
+                            if (buildInfo_ || collectionInfo_ || gameInfo_) {
+                                resetInfoToggle();
+                            } else {
+                                currentPage_->attractEnter( );
+                                l.LEDBlinky( 5 );
+                            }
                         }
                         else if ( attractMode_ && !attract_.isSet( ) )
                         {

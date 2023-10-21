@@ -17,6 +17,7 @@ v0.10.34.3
     - added toggelGameInfo, toggleCollectionInfo, toggleBuildInfo controls with onGameInfoEnter/Exit etc. events (monkofthefunk)
     - added setting infoExitOnScroll to call on*InfoExit if open when scrolling (monkofthefunk)
     - fixed infoExitOnScroll (monkofthefunk)
+    - fixed toggle off on attract mode (monkofthefunk)
 
 v0.10.34.2
     - update version *.2 (monkofthefunk)
