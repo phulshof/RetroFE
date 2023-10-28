@@ -19,6 +19,8 @@ v0.10.34.3
     - fixed infoExitOnScroll (monkofthefunk)
     - fixed toggle off on attract mode (monkofthefunk)
     - added reload of menu and reloadables after game exit to change any art affected by settings or meta change (monkofthefunk)
+    - fixed adding and removing from global playlist; fixed starting on favorite playlist on faorites collection (monkofthefunk)
+    - add randomStart to start on random game (monkofthefunk)
 
 v0.10.34.2
     - update version *.2 (monkofthefunk)
