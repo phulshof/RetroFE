@@ -574,6 +574,10 @@ bool RetroFE::run( )
                         }
                     }
 
+                    if (currentPage_->getCollectionName() == "Favorites") {
+                        firstPlaylist_ = "favorites";
+                    }
+
                     currentPage_->selectPlaylist( firstPlaylist_ );
                     if (currentPage_->getPlaylistName() != firstPlaylist_ )
                         currentPage_->selectPlaylist( "all" );
@@ -910,7 +914,10 @@ bool RetroFE::run( )
                     config_.getProperty("autoPlaylist", autoPlaylist);
                 }
 
-                config_.getProperty( "autoPlaylist", autoPlaylist );
+                if (currentPage_->getCollectionName() == "Favorites") {
+                    autoPlaylist = "favorites";
+                }
+
                 bool returnToRememberedPlaylist = rememberMenu && lastMenuPlaylists_.find(nextPageName) != lastMenuPlaylists_.end();
                 if (returnToRememberedPlaylist)
                 {
@@ -1050,7 +1057,20 @@ bool RetroFE::run( )
                 config_.getProperty( "rememberMenu", rememberMenu );
 
                 std::string autoPlaylist = "all";
-                config_.getProperty( "autoPlaylist", autoPlaylist );
+
+                // check collection for setting
+                std::string settingPrefix = "collections." + currentPage_->getCollectionName() + ".";
+                if (config_.propertyExists(settingPrefix + "autoPlaylist")) {
+                    config_.getProperty(settingPrefix + "autoPlaylist", autoPlaylist);
+                }
+                else {
+                    config_.getProperty("autoPlaylist", autoPlaylist);
+                }
+
+                if (currentPage_->getCollectionName() == "Favorites") {
+                    autoPlaylist = "favorites";
+                }
+
                 bool returnToRememberedPlaylist = rememberMenu && lastMenuPlaylists_.find(collectionName) != lastMenuPlaylists_.end();
                 if (returnToRememberedPlaylist)
                 {
@@ -1260,7 +1280,20 @@ bool RetroFE::run( )
                 config_.getProperty( "rememberMenu", rememberMenu );
 
                 std::string autoPlaylist = "all";
-                config_.getProperty( "autoPlaylist", autoPlaylist );
+
+                // check collection for setting
+                std::string settingPrefix = "collections." + currentPage_->getCollectionName() + ".";
+                if (config_.propertyExists(settingPrefix + "autoPlaylist")) {
+                    config_.getProperty(settingPrefix + "autoPlaylist", autoPlaylist);
+                }
+                else {
+                    config_.getProperty("autoPlaylist", autoPlaylist);
+                }
+
+                if (currentPage_->getCollectionName() == "Favorites") {
+                    autoPlaylist = "favorites";
+                }
+
                 bool returnToRememberedPlaylist = rememberMenu && lastMenuPlaylists_.find(collectionName) != lastMenuPlaylists_.end();
                 if (returnToRememberedPlaylist)
                 {
@@ -1469,7 +1502,20 @@ bool RetroFE::run( )
                 config_.getProperty( "rememberMenu", rememberMenu );
 
                 std::string autoPlaylist = "all";
-                config_.getProperty( "autoPlaylist", autoPlaylist );
+                
+                // check collection for setting
+                std::string settingPrefix = "collections." + currentPage_->getCollectionName() + ".";
+                if (config_.propertyExists(settingPrefix + "autoPlaylist")) {
+                    config_.getProperty(settingPrefix + "autoPlaylist", autoPlaylist);
+                }
+                else {
+                    config_.getProperty("autoPlaylist", autoPlaylist);
+                }
+
+                if (currentPage_->getCollectionName() == "Favorites") {
+                    autoPlaylist = "favorites";
+                }
+
                 bool returnToRememberedPlaylist = rememberMenu && lastMenuPlaylists_.find(collectionName) != lastMenuPlaylists_.end();
                 if (returnToRememberedPlaylist)
                 {

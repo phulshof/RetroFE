@@ -452,14 +452,16 @@ void CollectionInfoBuilder::addPlaylists(CollectionInfo *info)
     bool globalFavLast = false;
     (void)conf_.getProperty("globalFavLast", globalFavLast);
     if (globalFavLast) {
+        std::map<std::string, Item*> tmpPlaylistItems;
         // don't use collection's playlist
-        if (!info->playlists["favorites"]) {
-            info->playlists["favorites"] = new std::vector<Item*>();
-        } else {
+        if (info->playlists["favorites"]) {
             info->playlists["favorites"]->clear();
+            std::string path = Utils::combinePath(Configuration::absolutePath, "collections", "Favorites", "playlists");
+            loadPlaylistItems(info, &tmpPlaylistItems, path);
         }
-        std::string path = Utils::combinePath(Configuration::absolutePath, "collections", "Favorites", "playlists");
-        loadPlaylistItems(info, &playlistItems, path);
+        else {
+            info->playlists["favorites"] = new std::vector<Item*>();
+        }
     }
 
     // no playlists found, done

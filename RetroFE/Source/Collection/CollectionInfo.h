@@ -28,7 +28,7 @@ public:
     CollectionInfo(Configuration& c, std::string name, std::string listPath, std::string extensions, std::string metadataType, std::string metadataPath);
     virtual ~CollectionInfo();
     std::string settingsPath() const;
-    bool Save();
+    bool saveFavorites(Item* removed = NULL);
     void sortItems();
     void sortPlaylists();
     void addSubcollection(CollectionInfo *info);

@@ -107,7 +107,6 @@ void Page::deInitialize()
     // Deinitialize and clear collections_
     for (auto& collectionEntry : collections_)
     {
-        collectionEntry.collection->Save();
         delete collectionEntry.collection;
     }
     collections_.clear();
@@ -1047,7 +1046,7 @@ void Page::prevPlaylist()
 void Page::selectPlaylist(std::string playlist)
 {
     MenuInfo_S &info = collections_.back();
-    info.collection->Save();
+    //info.collection->saveFavorites();
     size_t numlists = info.collection->playlists.size();
     // save last playlist selected item
     rememberSelectedItem();
@@ -1239,7 +1238,6 @@ void Page::cleanup()
 
             if(info.collection)
             {
-                info.collection->Save();
                 delete info.collection;
             }
             deleteCollections_.erase(del);
@@ -1285,6 +1283,15 @@ void Page::removePlaylist()
     MenuInfo_S &info = collections_.back();
     CollectionInfo *collection = info.collection;
 
+    bool globalFavLast = false;
+    (void)config_.getProperty("globalFavLast", globalFavLast);
+    if (globalFavLast && collection->name != "Favorites") {
+        collection->saveRequest = true;
+        collection->saveFavorites(selectedItem_);
+
+        return;
+    }
+
     std::vector<Item *> *items = collection->playlists["favorites"];
     std::vector<Item *>::iterator it = std::find(items->begin(), items->end(), selectedItem_);
 
@@ -1312,7 +1319,7 @@ void Page::removePlaylist()
             amenu->setScrollOffsetIndex(index);
         }
     }
-    collection->Save();
+    collection->saveFavorites();
 }
 
 
@@ -1332,7 +1339,7 @@ void Page::addPlaylist()
         collection->sortPlaylists();
         collection->saveRequest = true;
     }
-    collection->Save();
+    collection->saveFavorites();
 }
 
 

@@ -78,7 +78,7 @@ CollectionInfo::~CollectionInfo()
     }
 }
 
-bool CollectionInfo::Save() 
+bool CollectionInfo::saveFavorites(Item* removed)
 {
     bool retval = true;
     if(saveRequest && name != "")
@@ -91,7 +91,7 @@ bool CollectionInfo::Save()
         }
         std::string dir  = Utils::combinePath(Configuration::absolutePath, "collections", playlistCollectionName, "playlists");
         std::string file = Utils::combinePath(Configuration::absolutePath, "collections", playlistCollectionName, "playlists", "favorites.txt");
-        Logger::write(Logger::ZONE_INFO, "Collection", "Saving " + file);
+        Logger::write(Logger::ZONE_INFO, "Collection", "Saving favorites " + file);
 
         std::ofstream filestream;
         try
@@ -126,9 +126,75 @@ bool CollectionInfo::Save()
                 Logger::write(Logger::ZONE_WARNING, "Collection", dir + " exists, but is not a directory.");
                 return false;
             }
+            std::vector<Item*>* saveitems = playlists["favorites"];
+            if (globalFavLast && name != "Favorites") {
+                std::map <std::string, std::map <std::string, std::string>> existing;
 
-            filestream.open(file.c_str());
-            std::vector<Item *> *saveitems = playlists["favorites"];
+                // remove from favorites file
+                if (removed != NULL) {
+                    std::vector <std::string> remaining;
+                    std::ifstream includeStream(file.c_str());
+                    std::string line;
+                    std::string collectionName;
+                    std::string itemName;
+                    while (std::getline(includeStream, line)) {
+                        line = Utils::filterComments(line);
+                        if (!line.empty() && line != "_" + removed->collectionInfo->name + ":" + removed->name) {
+                            remaining.push_back(line);
+                        }
+                    }
+                    filestream.open(file.c_str());
+                    std::vector<std::string>::iterator it = remaining.begin();
+                    while (it != remaining.end())
+                    {
+                        filestream << (*it) << std::endl;
+                        it++;
+                    }
+                    filestream.close();
+
+                    return true;
+                }
+
+                // add to favorites file
+                // make lookup of existing by collection to only add unique entries
+                // and check if a game has been removed for that collection
+                std::ifstream includeStream(file.c_str());
+                std::string line;
+                std::string collectionName;
+                std::string itemName;
+                while (std::getline(includeStream, line)) {
+                    line = Utils::filterComments(line);
+                    if (!line.empty()){
+                        if (line.at(0) == '_') { // name consists of _<collectionName>:<itemName>
+                            line.erase(0, 1); // Remove _
+                            size_t position = line.find(":");
+                            if (position != std::string::npos) {
+                                collectionName = line.substr(0, position);
+                                itemName = line.erase(0, position + 1);
+                            }
+                        }
+                        existing[collectionName][itemName] = itemName;
+                    }
+                }
+                std::vector<Item*>::iterator it = saveitems->begin();
+                while (it != saveitems->end())
+                {
+                    if (existing.find((*it)->collectionInfo->name) != existing.end() &&
+                        existing[(*it)->collectionInfo->name].find((*it)->name) != existing[(*it)->collectionInfo->name].end()) {
+                        // exists so don't add to file
+                        it = saveitems->erase(it);
+                    }
+                    else {
+                        it++;
+                    }                    
+                }
+            
+                filestream.open(file.c_str(), std::ios_base::app);
+            }
+            else {
+                filestream.open(file.c_str());
+            }
+            
             for(std::vector<Item *>::iterator it = saveitems->begin(); it != saveitems->end(); it++)
             {
                 if ((*it)->collectionInfo->name == (*it)->name)
@@ -145,7 +211,7 @@ bool CollectionInfo::Save()
         }
         catch(std::exception &)
         {
-            Logger::write(Logger::ZONE_ERROR, "Collection", "Save failed: " + file);
+            Logger::write(Logger::ZONE_ERROR, "Collection", "Save favorites failed: " + file);
             retval = false;
         }
     }
