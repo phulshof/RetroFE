@@ -14,3 +14,5 @@ BP Files/RetroFE.cpp
 /.vs
 /RetroFE/Builds
 /RetroFE/Build2
+.DS_Store
+.vscode/settings.json

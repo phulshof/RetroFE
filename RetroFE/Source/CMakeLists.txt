@@ -60,12 +60,18 @@ else()
 	find_package(Threads REQUIRED)
 
 if(APPLE)
+	include(FindPkgConfig)
+	find_package(Glib2 REQUIRED)
 	find_package(SDL2 REQUIRED)
+	find_package(SDL2_IMAGE)
+	find_package(SDL2_MIXER)
+	find_package(SDL2_TTF)
+	find_package(GSTREAMER REQUIRED)
 endif()
 endif()
 
 set(RETROFE_INCLUDE_DIRS
-	"/usr/local/opt/gst-plugins-base/include/gstreamer-1.0"
+	# "/usr/local/opt/gst-plugins-base/include/gstreamer-1.0"
 	"${GLIB2_INCLUDE_DIRS}"
 	"${GSTREAMER_INCLUDE_DIRS}"
 	"${SDL2_INCLUDE_DIRS}"
@@ -75,6 +81,9 @@ set(RETROFE_INCLUDE_DIRS
 	"${ZLIB_INCLUDE_DIRS}"
 	"${SQLITE3_ROOT}"
 	"${RAPIDXML_ROOT}"
+	"/opt/homebrew/Cellar/sdl2_image/2.6.3_2/include/SDL2"
+	"/opt/homebrew/Cellar/glib/2.78.1/include/glib-2.0"
+	"/opt/homebrew/Cellar/glib/2.78.1/lib/glib-2.0/include/"
 )
 
 if(MSVC)
