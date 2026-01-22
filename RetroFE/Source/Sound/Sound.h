@@ -23,6 +23,7 @@ public:
     Sound(std::string file, std::string altfile);
     virtual ~Sound();
     void play();
+    void stop();
     bool allocate();
     bool free();
     bool isPlaying();

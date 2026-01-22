@@ -18,7 +18,7 @@
 #include "VideoComponent.h"
 #include "VideoBuilder.h"
 #include "../../Video/IVideo.h"
-#include "../../Video/GStreamerVideo.h"
+#include "../../Video/VLCVideo.h"
 #include "../../Utility/Log.h"
 #include "../../SDL.h"
 
@@ -99,9 +99,9 @@ void Video::allocateGraphicsMemory( )
 
         if (file != "")
         {
-            IVideo      *video = new GStreamerVideo( baseViewInfo.Monitor );
+            IVideo      *video = new VLCVideo( baseViewInfo.Monitor );
             video->initialize();
-            ((GStreamerVideo *)(video))->setNumLoops( numLoops_ );
+            ((VLCVideo *)(video))->setNumLoops( numLoops_ );
             video_ = new VideoComponent( video, page, file );
         }
     }

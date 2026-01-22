@@ -17,7 +17,7 @@
 #include "VideoFactory.h"
 #include "IVideo.h"
 #include "../Utility/Log.h"
-#include "GStreamerVideo.h"
+#include "VLCVideo.h"
 
 bool VideoFactory::enabled_ = true;
 int VideoFactory::numLoops_ = 0;
@@ -29,7 +29,7 @@ IVideo *VideoFactory::createVideo( int monitor, bool isTypeVideo, int numLoops )
     IVideo *instance = NULL;
     if ( enabled_ && (!isTypeVideo || !instance_) )
     {
-        instance = new GStreamerVideo( monitor );
+        instance = new VLCVideo( monitor );
         instance->initialize();
         if ( isTypeVideo )
             instance_ = instance;
@@ -38,9 +38,9 @@ IVideo *VideoFactory::createVideo( int monitor, bool isTypeVideo, int numLoops )
         instance = instance_;
 
     if (numLoops > 0 )
-        ((GStreamerVideo *)(instance))->setNumLoops(numLoops);
+        ((VLCVideo *)(instance))->setNumLoops(numLoops);
     else
-        ((GStreamerVideo *)(instance))->setNumLoops(numLoops_);
+        ((VLCVideo *)(instance))->setNumLoops(numLoops_);
 
     return instance;
 }

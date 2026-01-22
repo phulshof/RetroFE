@@ -72,6 +72,16 @@ CollectionInfo::~CollectionInfo()
         items.erase(it);
         it = items.begin();
     }
+
+    // Clean up foreign collections created during import
+    for(std::vector<CollectionInfo*>::iterator fit = foreignCollections.begin(); fit != foreignCollections.end(); ++fit) {
+        delete *fit;
+    }
+    foreignCollections.clear();
+}
+
+void CollectionInfo::addForeignCollection(CollectionInfo* info) {
+    foreignCollections.push_back(info);
 }
 
 bool CollectionInfo::Save() 

@@ -50,6 +50,15 @@ void Sound::play()
     }
 }
 
+void Sound::stop()
+{
+    if(channel_ != -1 && Mix_Playing(channel_))
+    {
+        Mix_HaltChannel(channel_);
+        channel_ = -1;
+    }
+}
+
 bool Sound::free()
 {
     if(chunk_)

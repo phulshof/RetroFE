@@ -360,6 +360,11 @@ void Page::stop()
         }
     }
 
+    // Stop any currently playing sounds before playing unload sound
+    if(loadSoundChunk_) loadSoundChunk_->stop();
+    if(highlightSoundChunk_) highlightSoundChunk_->stop();
+    if(selectSoundChunk_) selectSoundChunk_->stop();
+
     if(unloadSoundChunk_)
     {
         unloadSoundChunk_->play();

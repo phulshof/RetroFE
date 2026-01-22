@@ -40,8 +40,8 @@ bool SDL::initialize( Configuration &config )
 
     int         audioRate     = MIX_DEFAULT_FREQUENCY;
     Uint16      audioFormat   = MIX_DEFAULT_FORMAT; /* 16-bit stereo */
-    int         audioChannels = 1;
-    int         audioBuffers  = 4096;
+    int         audioChannels = 2;  /* Stereo, not mono! */
+    int         audioBuffers  = 2048; /* Smaller buffer for less latency */
     bool        hideMouse;
 
     Logger::write( Logger::ZONE_INFO, "SDL", "Initializing" );

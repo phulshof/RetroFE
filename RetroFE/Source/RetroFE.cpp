@@ -31,7 +31,6 @@
 #include "Graphics/Page.h"
 #include "Graphics/Component/ScrollingList.h"
 #include "Graphics/Component/Video.h"
-#include <gst/gst.h>
 #include "Video/VideoFactory.h"
 #include <algorithm>
 #include <dirent.h>
@@ -296,7 +295,7 @@ bool RetroFE::deInitialize( )
     {
         Logger::write( Logger::ZONE_INFO, "RetroFE", "Exiting" );
         SDL::deInitialize( );
-        gst_deinit( );
+        // libVLC cleanup is handled automatically by destructors
     }
 
     return retVal;

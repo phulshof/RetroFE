@@ -222,6 +222,44 @@ bool MetadataDatabase::importDirectory()
     return true;
 }
 
+void MetadataDatabase::injectItemMetadata(Item* item)
+{
+    sqlite3 *handle = db_.handle;
+    int rc;
+    sqlite3_stmt *stmt;
+
+    if (!item || !item->collectionInfo) return;
+
+    sqlite3_prepare_v2(handle,
+                       "SELECT title, year, manufacturer, developer, genre, players, ctrltype, buttons, joyways, cloneOf, rating, score "
+                       "FROM Meta WHERE collectionName=? AND name=?;",
+                       -1, &stmt, 0);
+
+    sqlite3_bind_text(stmt, 1, item->collectionInfo->metadataType.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, item->name.c_str(), -1, SQLITE_TRANSIENT);
+
+    rc = sqlite3_step(stmt);
+
+    if (rc == SQLITE_ROW)
+    {
+        // Column 0 is title because we selected specific columns, not *
+        item->fullTitle = (char *)sqlite3_column_text(stmt, 0);
+        item->title = item->fullTitle; // Usually title is fullTitle
+        item->year = (char *)sqlite3_column_text(stmt, 1);
+        item->manufacturer = (char *)sqlite3_column_text(stmt, 2);
+        item->developer = (char *)sqlite3_column_text(stmt, 3);
+        item->genre = (char *)sqlite3_column_text(stmt, 4);
+        item->numberPlayers = (char *)sqlite3_column_text(stmt, 5);
+        item->ctrlType = (char *)sqlite3_column_text(stmt, 6);
+        item->numberButtons = (char *)sqlite3_column_text(stmt, 7);
+        item->joyWays = (char *)sqlite3_column_text(stmt, 8);
+        item->cloneof = (char *)sqlite3_column_text(stmt, 9);
+        item->rating = (char *)sqlite3_column_text(stmt, 10);
+        item->score = (char *)sqlite3_column_text(stmt, 11);
+    }
+    sqlite3_finalize(stmt);
+}
+
 void MetadataDatabase::injectMetadata(CollectionInfo *collection)
 {
     sqlite3 *handle = db_.handle;

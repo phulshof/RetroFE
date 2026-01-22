@@ -104,25 +104,44 @@ elif args.build == 'layout':
     copytree(layout_os_path, layout_dest_path)
 
 #####################################################################
-# Copy retrofe executable
+# Copy retrofe executable and libVLC dependencies
 #####################################################################
 if args.os == 'windows':
   if args.build == 'full' or args.build == 'core' or args.build == 'engine':
     # copy retrofe.exe to core folder
     if(hasattr(args, 'compiler') and args.compiler == 'mingw'):
       src_exe = os.path.join(base_path, 'RetroFE', 'Build', 'retrofe.exe')
+      build_dir = os.path.join(base_path, 'RetroFE', 'Build')
     else:
       src_exe = os.path.join(base_path, 'RetroFE', 'Build', 'Release', 'retrofe.exe')
-      
+      build_dir = os.path.join(base_path, 'RetroFE', 'Build', 'Release')
+
     core_path = os.path.join(output_path, 'core')
-    
+
     # create the core folder
     if not os.path.exists(core_path):
       os.makedirs(core_path)
-      
+
     # copy retrofe.exe
     shutil.copy(src_exe, core_path)
-#    third_party_path = os.path.join(base_path, 'RetroFE', 'ThirdParty')
+
+    # copy libVLC runtime DLLs
+    libvlc_dlls = ['libvlc.dll', 'libvlccore.dll']
+    for dll in libvlc_dlls:
+      dll_path = os.path.join(build_dir, dll)
+      if os.path.exists(dll_path):
+        print("COPY: " + os.path.join(core_path, dll))
+        shutil.copy(dll_path, core_path)
+      else:
+        print("WARNING: " + dll + " not found at " + dll_path)
+
+    # copy libVLC plugins directory
+    plugins_src = os.path.join(build_dir, 'plugins')
+    plugins_dst = os.path.join(core_path, 'plugins')
+    if os.path.exists(plugins_src):
+      copytree(plugins_src, plugins_dst)
+    else:
+      print("WARNING: libVLC plugins directory not found at " + plugins_src)
         
 elif args.os == 'linux':
   if args.build == 'full' or args.build == 'core' or args.build == 'engine':

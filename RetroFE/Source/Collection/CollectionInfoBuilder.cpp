@@ -204,23 +204,107 @@ bool CollectionInfoBuilder::ImportBasicList(CollectionInfo *info, std::string fi
     }
 
     std::string line; 
+    bool firstLine = true;
 
     while(std::getline(includeStream, line))
     {
+        // Strip UTF-8 BOM if present on the first line
+        if (firstLine) {
+            if (line.size() >= 3 && static_cast<unsigned char>(line[0]) == 0xEF && static_cast<unsigned char>(line[1]) == 0xBB && static_cast<unsigned char>(line[2]) == 0xBF) {
+                line = line.substr(3);
+            }
+            firstLine = false;
+        }
+
         line = Utils::filterComments(line);
         
-        if (!line.empty() && list.find(line) == list.end())
+        if (!line.empty())
         {
-            Item *i = new Item();
+            // Check for System:Game syntax
+            std::string collectionName = info->name;
+            std::string gameName = line;
+            CollectionInfo* itemCollectionInfo = info;
 
-            line.erase( std::remove(line.begin(), line.end(), '\r'), line.end() );
+            size_t separatorPos = line.find(':');
+            if (separatorPos != std::string::npos) {
+                // Potential split found.
+                // We assume SystemName:GameName. 
+                // Playlists use _System:Game, supporting both for consistency/safety.
+                
+                std::string part1 = Utils::trimEnds(line.substr(0, separatorPos));
+                std::string part2 = Utils::trimEnds(line.substr(separatorPos + 1));
 
-            i->fullTitle = line;
-            i->name = line;
-            i->title = line;
-            i->collectionInfo = info;
+                // Basic validation: neither part should be empty
+                if (!part1.empty() && !part2.empty()) {
+                    // Check if part1 starts with underscore (legacy playlist format support)
+                    if (part1[0] == '_') {
+                        collectionName = part1.substr(1);
+                    } else {
+                        collectionName = part1;
+                    }
+                    gameName = part2;
 
-            list[line] = i;
+                    // If the system name is different from current, we need a new CollectionInfo
+                    if (collectionName != info->name) {
+                        // We need to build a partial CollectionInfo for this foreign system
+                        // so the item knows where to find its media/launcher.
+                        // Ideally we cache this to avoid recreating it for every item.
+                        
+                        // NOTE: In a full architecture we'd ask a Manager for this.
+                        // Here, we'll construct a lightweight one.
+                        
+                        // We recycle the builder's logic to get paths
+                        std::string listItemsPath;
+                        std::string extensions;
+                        std::string metadataType = collectionName;
+                        std::string metadataPath;
+                        std::string launcherName;
+                        
+                        conf_.getCollectionAbsolutePath(collectionName, listItemsPath);
+                        conf_.getProperty("collections." + collectionName + ".list.extensions", extensions);
+                        conf_.getProperty("collections." + collectionName + ".metadata.type", metadataType);
+                        conf_.getProperty("collections." + collectionName + ".metadata.path", metadataPath);
+
+                                                // Import the foreign collection's settings.conf to ensure media paths are loaded
+                                                std::string foreignSettings = Utils::combinePath(Configuration::absolutePath, "collections", collectionName, "settings.conf");
+                                                conf_.import("collections." + collectionName, foreignSettings);
+                        
+                                                itemCollectionInfo = new CollectionInfo(collectionName, listItemsPath, extensions, metadataType, metadataPath);
+                        conf_.getProperty("collections." + collectionName + ".launcher", itemCollectionInfo->launcher);
+                        
+                        // Populate media paths (logic copied from buildCollection)
+                        // CollectionInfo has a way to own subcollections? 
+                        // It has addSubcollection which merges items, but we just want to own the pointer.
+                        // Let's rely on the Item owning it? No, Item doesn't delete collectionInfo.
+                        // Let's add it to a "foreignCollections" vector in CollectionInfo if we modify header,
+                        // OR (simpler for now): We don't have an easy ownership model here without modifying CollectionInfo.h.
+                        // 
+                        // CRITICAL: For now, we will create a NEW CollectionInfo for EVERY foreign item.
+                        // This is a memory leak if not cleaned up.
+                        // Let's modifying CollectionInfo.h to track these.
+                        info->addForeignCollection(itemCollectionInfo);
+                    }
+                }
+            }
+
+            if (list.find(line) == list.end())
+            {
+                Item *i = new Item();
+
+                gameName.erase( std::remove(gameName.begin(), gameName.end(), '\r'), gameName.end() );
+
+                i->fullTitle = gameName;
+                i->name = gameName;
+                i->title = gameName;
+                i->collectionInfo = itemCollectionInfo;
+
+                // Inject metadata for this specific item if it's from a foreign collection
+                if (itemCollectionInfo != info) {
+                    metaDB_.injectItemMetadata(i);
+                }
+
+                list[line] = i;
+            }
         }
     }
 
@@ -237,18 +321,68 @@ bool CollectionInfoBuilder::ImportBasicList(CollectionInfo *info, std::string fi
     }
 
     std::string line; 
+    bool firstLine = true;
 
     while(std::getline(includeStream, line))
     {
+        // Strip UTF-8 BOM if present on the first line
+        if (firstLine) {
+            if (line.size() >= 3 && static_cast<unsigned char>(line[0]) == 0xEF && static_cast<unsigned char>(line[1]) == 0xBB && static_cast<unsigned char>(line[2]) == 0xBF) {
+                line = line.substr(3);
+            }
+            firstLine = false;
+        }
+
         line = Utils::filterComments(line);
         
         if (!line.empty())
         {
+             // Check for System:Game syntax
+            std::string collectionName = info->name;
+            std::string gameName = line;
+            CollectionInfo* itemCollectionInfo = info;
+
+            size_t separatorPos = line.find(':');
+            if (separatorPos != std::string::npos) {
+                std::string part1 = Utils::trimEnds(line.substr(0, separatorPos));
+                std::string part2 = Utils::trimEnds(line.substr(separatorPos + 1));
+
+                if (!part1.empty() && !part2.empty()) {
+                    if (part1[0] == '_') {
+                        collectionName = part1.substr(1);
+                    } else {
+                        collectionName = part1;
+                    }
+                    gameName = part2;
+
+                    if (collectionName != info->name) {
+                        std::string listItemsPath;
+                        std::string extensions;
+                        std::string metadataType = collectionName;
+                        std::string metadataPath;
+                        
+                        conf_.getCollectionAbsolutePath(collectionName, listItemsPath);
+                        conf_.getProperty("collections." + collectionName + ".list.extensions", extensions);
+                        conf_.getProperty("collections." + collectionName + ".metadata.type", metadataType);
+                        conf_.getProperty("collections." + collectionName + ".metadata.path", metadataPath);
+
+                        // Import the foreign collection's settings.conf to ensure media paths are loaded
+                        std::string foreignSettings = Utils::combinePath(Configuration::absolutePath, "collections", collectionName, "settings.conf");
+                        conf_.import("collections." + collectionName, foreignSettings);
+
+                        itemCollectionInfo = new CollectionInfo(collectionName, listItemsPath, extensions, metadataType, metadataPath);
+                        conf_.getProperty("collections." + collectionName + ".launcher", itemCollectionInfo->launcher);
+                        
+                        // Track ownership to prevent leaks
+                        info->addForeignCollection(itemCollectionInfo);
+                    }
+                }
+            }
 
             bool found = false;
             for (std::vector<Item *>::iterator it = list.begin(); it != list.end(); ++it)
             {
-                if (line == (*it)->name)
+                if (gameName == (*it)->name) // Changed to check gameName
                 {
                     found = true;
                 }
@@ -258,12 +392,16 @@ bool CollectionInfoBuilder::ImportBasicList(CollectionInfo *info, std::string fi
             {
                 Item *i = new Item();
 
-                line.erase( std::remove(line.begin(), line.end(), '\r'), line.end() );
+                gameName.erase( std::remove(gameName.begin(), gameName.end(), '\r'), gameName.end() );
 
-                i->fullTitle = line;
-                i->name = line;
-                i->title = line;
-                i->collectionInfo = info;
+                i->fullTitle = gameName;
+                i->name = gameName;
+                i->title = gameName;
+                i->collectionInfo = itemCollectionInfo;
+
+                if (itemCollectionInfo != info) {
+                    metaDB_.injectItemMetadata(i);
+                }
 
                 list.push_back(i);
             }

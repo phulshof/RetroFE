@@ -18,7 +18,7 @@
 #include "../ViewInfo.h"
 #include "../../Database/Configuration.h"
 #include "../../Utility/Log.h"
-#include "../../Video/GStreamerVideo.h"
+#include "../../Video/VLCVideo.h"
 #include "../../Video/VideoFactory.h"
 #include "../../SDL.h"
 
@@ -48,8 +48,32 @@ void VideoComponent::update(float dt)
 {
     if (videoInst_)
     {
-        isPlaying_ = ((GStreamerVideo *)(videoInst_))->isPlaying();
+        bool wasPlaying = isPlaying_;
+        isPlaying_ = ((VLCVideo *)(videoInst_))->isPlaying();
+
+        // Only handle volume-based start/stop for non-intro videos
+        // Check if this is likely a background video/audio by looking at the file
+        bool isBackgroundMedia = (videoFile_.find("sounds/") != std::string::npos) ||
+                                  (videoFile_.find("video/") != std::string::npos &&
+                                   videoFile_.find("intro") == std::string::npos);
+
+        if(isBackgroundMedia)
+        {
+            // Start playing if volume becomes > 0.01 and not already playing
+            // Using 0.01 threshold to allow very quiet audio
+            if(!wasPlaying && !isPlaying_ && baseViewInfo.Volume > 0.01f)
+            {
+                isPlaying_ = videoInst_->play(videoFile_);
+            }
+            // Stop playing if volume becomes very low (essentially 0)
+            else if(isPlaying_ && baseViewInfo.Volume <= 0.01f)
+            {
+                videoInst_->stop();
+                isPlaying_ = false;
+            }
+        }
     }
+
     if(isPlaying_)
     {
         videoInst_->setVolume(baseViewInfo.Volume);
@@ -71,9 +95,27 @@ void VideoComponent::allocateGraphicsMemory()
 {
     Component::allocateGraphicsMemory();
 
+    // Check if this is likely a background video/audio
+    bool isBackgroundMedia = (videoFile_.find("sounds/") != std::string::npos) ||
+                              (videoFile_.find("video/") != std::string::npos &&
+                               videoFile_.find("intro") == std::string::npos);
+
+    // Only apply volume check for background media, not intro videos
     if(!isPlaying_)
     {
-        isPlaying_ = videoInst_->play(videoFile_);
+        if(isBackgroundMedia)
+        {
+            // Only start playing if volume is greater than 0.01
+            if(baseViewInfo.Volume > 0.01f)
+            {
+                isPlaying_ = videoInst_->play(videoFile_);
+            }
+        }
+        else
+        {
+            // Always play intro videos and other non-background videos
+            isPlaying_ = videoInst_->play(videoFile_);
+        }
     }
 }
 
